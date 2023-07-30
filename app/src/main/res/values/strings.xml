@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Tip Calculator Wear</string>
-    <string name="base_amount">Bill\nAmount</string>
-    <string name="tip_percentage">Tip\nPercent</string>
+    <string name="base_amount">Bill Amount</string>
+    <string name="tip_percentage">Tip Percentage</string>
     <string name="display_bill">Bill</string>
     <string name="display_tip">Tip</string>
     <string name="display_total">Total</string>
