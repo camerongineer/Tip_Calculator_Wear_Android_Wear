@@ -43,8 +43,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -208,7 +206,7 @@ fun TipCalcApp(
                                 digitChar = '7',
                                 onClick = {
                                     haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    tipCalcViewModel.onDigitTyped('6')
+                                    tipCalcViewModel.onDigitTyped('7')
                                 },
                                 modifier = Modifier.weight(.33f)
                             )
@@ -251,13 +249,19 @@ fun TipCalcApp(
                             )
                             BillKeyboardDigit(
                                 digitChar = '0',
-                                onClick = { tipCalcViewModel.onDigitTyped('0') },
+                                onClick = {
+                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    tipCalcViewModel.onDigitTyped('0')
+                                },
                                 modifier = Modifier.weight(.33f)
                             )
                             BillKeyboardButton(
                                 icon = Icons.Default.Done,
                                 contentDescription = "Keyboard Bottom Of Screen",
-                                onClick = scrollToBottom,
+                                onClick = {
+                                    scrollToBottom()
+                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                },
                                 modifier = Modifier.weight(.33f)
                             )
                         }
@@ -576,13 +580,4 @@ fun SmallText(
         textAlign = TextAlign.Left,
         modifier = modifier.padding(end=1.dp)
     )
-}
-
-
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
-@Composable
-fun DefaultPreview() {
-    TipCalcApp()
 }
