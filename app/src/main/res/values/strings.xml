@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Tip Calculator Wear</string>
-    <string name="base_amount">Bill Amount</string>
+    <string name="sub_total">SUBTOTAL</string>
     <string name="tip_percentage">Tip Percentage</string>
-    <string name="display_bill">Bill</string>
-    <string name="display_tip">Tip</string>
-    <string name="display_total">Total</string>
+    <string name="display_bill">SUBTOTAL</string>
+    <string name="display_tip">TIP</string>
+    <string name="display_total">GRANDTOTAL</string>
     <string name="title_activity_presentation._main">presentation.MainActivity</string>
     <string name="title_activity_main">MainActivity</string>
 </resources>
