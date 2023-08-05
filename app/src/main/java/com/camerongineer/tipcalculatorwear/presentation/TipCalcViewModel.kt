@@ -5,13 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 
 class TipCalcViewModel: ViewModel() {
+
+    companion object {
+        const val MAX_TIP_PENCENT = 100
+    }
+
     private val _billAmount = mutableStateOf(0f)
     private val _billAmountString = mutableStateOf("")
     private val _tipPercentValue = mutableStateOf(15.0)
+
     private val _calculatedTipAmount = derivedStateOf {
         _billAmount.value * (_tipPercentValue.value.toFloat() / 100)
     }
@@ -20,8 +27,12 @@ class TipCalcViewModel: ViewModel() {
         _billAmount.value + _calculatedTipAmount.value
     }
 
-    fun onTipPercentChange(newAmount: Int) {
-        _tipPercentValue.value = newAmount.toDouble()
+    fun tipSliderUpClicked() {
+        _tipPercentValue.value += 1
+    }
+
+    fun tipSliderDownClicked() {
+        _tipPercentValue.value -= 1
     }
 
     fun onDigitTyped(char: Char) {
@@ -30,6 +41,7 @@ class TipCalcViewModel: ViewModel() {
                 _billAmountString.value += char
             }
         }
+        _tipPercentValue.value = min(MAX_TIP_PENCENT.toDouble(), _tipPercentValue.value)
     }
 
     fun onDeleteTyped() {
@@ -37,21 +49,24 @@ class TipCalcViewModel: ViewModel() {
             _billAmountString.value = _billAmountString.value
                 .substring(0 until _billAmountString.value.length - 1)
         }
+        _tipPercentValue.value = min(MAX_TIP_PENCENT.toDouble(), _tipPercentValue.value)
     }
 
     fun onRoundUpClicked() {
         viewModelScope.launch {
-            val nextTotal = if (_grandTotal.value.roundToInt() == _grandTotal.value.toInt()) {
-                (_grandTotal.value.toInt() + 0.50).toFloat()
+            val multipliedGrandTotal = (_grandTotal.value * 100).roundToInt()
+            val multipliedRemainder = multipliedGrandTotal % 50
+            val nextTotal = (if (multipliedRemainder == 0) {
+                multipliedGrandTotal + 50
             } else {
-                _grandTotal.value.roundToInt().toFloat()
-            }
+                (multipliedGrandTotal - multipliedRemainder + 50)
+            }).toFloat() / 100.0
 
             val billAmountNormalized = _billAmount.value / 10000.0
-            val increment = 1 / (billAmountNormalized * 20000)
+            val increment = 1 / (billAmountNormalized * 50000)
 
-            if (_billAmount.value > 0.0) {
-                while (_grandTotal.value < nextTotal) {
+            if (_billAmount.value > 0.00) {
+                while (_grandTotal.value <= nextTotal) {
                     _tipPercentValue.value += increment
                 }
             }
@@ -60,14 +75,16 @@ class TipCalcViewModel: ViewModel() {
 
     fun onRoundDownClicked() {
         viewModelScope.launch {
-            val nextTotal = if (_grandTotal.value.roundToInt() != _grandTotal.value.toInt()) {
-                (_grandTotal.value.toInt() + 0.50).toFloat()
+            val multipliedGrandTotal = (_grandTotal.value * 100).toInt()
+            val multipliedRemainder = multipliedGrandTotal % 50
+            val nextTotal = (if (multipliedRemainder == 0) {
+                multipliedGrandTotal - 50
             } else {
-                _grandTotal.value.roundToInt().toFloat()
-            }
+                (multipliedGrandTotal - multipliedRemainder)
+            }).toFloat() / 100.0
 
             val billAmountNormalized = _billAmount.value / 10000.0
-            val increment = 1 / (billAmountNormalized * 20000)
+            val increment = 1 / (billAmountNormalized * 50000)
 
             if (_billAmount.value > 0.0) {
                 while (_grandTotal.value > nextTotal && _tipPercentValue.value > 0.0) {
