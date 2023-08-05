@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -237,7 +238,6 @@ fun KeyboardItem(
                 .height(min(buttonHeight, 24.dp))
                 .fillMaxWidth(.8f)
         )
-
     }
 }
 
@@ -379,15 +379,11 @@ fun TipSelectionItem(
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val tipSliderHeight = screenHeight * .12f
+    val tipSliderHeight = screenHeight * .16f
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .padding(
-                start = 8.dp,
-                end = 8.dp,
-            )
             .fillMaxSize()
             .height(screenHeight)
     ) {
@@ -399,7 +395,11 @@ fun TipSelectionItem(
         TipSlider(
             tipSliderValue = tipCalcViewModel.getTipPercentage().roundToInt(),
             tipSliderHeight = tipSliderHeight,
-            onTipSliderChange = { tipCalcViewModel.onTipPercentChange(it) },
+            tipSliderUpClicked = tipCalcViewModel::tipSliderUpClicked,
+            tipSliderDownClicked = tipCalcViewModel::tipSliderDownClicked,
+            maxTipPercentage = TipCalcViewModel.MAX_TIP_PENCENT,
+            roundUpClicked = tipCalcViewModel::onRoundUpClicked,
+            roundDownClicked = tipCalcViewModel::onRoundDownClicked,
             modifier = modifier
                 .padding(top = 2.dp, bottom = 2.dp)
                 .fillMaxWidth(.9f)
@@ -412,8 +412,6 @@ fun TipSelectionItem(
             tipAmountClicked = { scrollToBottom() },
             grandTotalString = tipCalcViewModel.getFormattedGrandTotal(),
             grandTotalClicked = { scrollToBottom() },
-            roundUpClicked = { tipCalcViewModel.onRoundUpClicked() },
-            roundDownClicked = { tipCalcViewModel.onRoundDownClicked() },
             modifier = modifier.wrapContentSize()
         )
         Spacer(
@@ -424,11 +422,16 @@ fun TipSelectionItem(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TipSlider(
     tipSliderValue: Int,
     tipSliderHeight: Dp,
-    onTipSliderChange: (Int) -> Unit,
+    tipSliderUpClicked: () -> Unit,
+    tipSliderDownClicked: () -> Unit,
+    maxTipPercentage: Int,
+    roundUpClicked: () -> Unit,
+    roundDownClicked: () -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
@@ -463,25 +466,51 @@ fun TipSlider(
         }
         InlineSlider(
             value = tipSliderValue,
-            onValueChange = {
-                onTipSliderChange(it)
-                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            },
-            valueProgression = IntProgression.fromClosedRange(0, 100, 1),
+            onValueChange = {},
+            valueProgression = IntProgression.fromClosedRange(0, maxTipPercentage, 1),
             decreaseIcon = {
                 Image(
                     imageVector = Icons.Default.ArrowLeft,
                     contentDescription = "Tip Percentage Down",
+                    Modifier.combinedClickable(
+                        onLongClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            roundDownClicked()
+                        },
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            tipSliderDownClicked()
+                        }
+                    )
                 )
             },
             increaseIcon = {
                 Image(
                     imageVector = Icons.Default.ArrowRight,
                     contentDescription = "Tip Percentage Up",
+                    Modifier.combinedClickable(
+                        onLongClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            roundUpClicked()
+                        },
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            tipSliderUpClicked()
+                        }
+                    )
                 )
             },
             colors = InlineSliderDefaults.colors(selectedBarColor = MaterialTheme.colors.primary),
-            modifier = modifier.height(tipSliderHeight))
+            modifier = modifier
+                .height(tipSliderHeight)
+        )
+        SmallText(
+            text = stringResource(
+                id = R.string.round_up_down
+            ),
+            fontSize = 7.sp,
+            color = MaterialTheme.colors.secondaryVariant)
+
     }
 }
 
@@ -493,9 +522,7 @@ fun GrandTotalDisplay(
     modifier: Modifier = Modifier,
     billAmountClicked: () -> Unit = {},
     tipAmountClicked: () -> Unit = {},
-    grandTotalClicked: () -> Unit = {},
-    roundUpClicked: () -> Unit = {},
-    roundDownClicked: () -> Unit = {}
+    grandTotalClicked: () -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -528,33 +555,6 @@ fun GrandTotalDisplay(
                     .fillMaxWidth(),
                 onClick = grandTotalClicked
             )
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 2.dp)
-            ) {
-                Image(
-                    imageVector = Icons.Default.ArrowLeft,
-                    contentDescription = "Round Down",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
-                    modifier = Modifier
-                        .width(16.dp)
-                        .height(16.dp)
-                        .clickable { roundDownClicked() }
-                )
-                SmallText(text = "ROUND", color = MaterialTheme.colors.secondaryVariant)
-                Image(
-                    imageVector = Icons.Default.ArrowRight,
-                    contentDescription = "Round Up",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
-                    modifier = Modifier
-                        .width(16.dp)
-                        .height(16.dp)
-                        .clickable { roundUpClicked() }
-                )
-            }
         }
     }
 }
@@ -582,13 +582,16 @@ fun AmountDisplay(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
-                    .clickable { onClick() }
+                    .wrapContentWidth()
             ) {
                 Text(
                     text = "$label: ",
                     fontSize = 10.sp,
                     textAlign = TextAlign.Right,
-                    modifier = Modifier.width(70.dp))
+                    modifier = Modifier
+                        .width(70.dp)
+                        .clickable { onClick() }
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -602,6 +605,7 @@ fun AmountDisplay(
                         text = "$amount ",
                         modifier = Modifier
                             .wrapContentSize()
+                            .clickable { onClick() }
                     )
                 }
             }
