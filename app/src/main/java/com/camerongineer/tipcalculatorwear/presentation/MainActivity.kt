@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -47,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -70,6 +72,7 @@ import androidx.wear.compose.material.rememberScalingLazyListState
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
 
@@ -224,7 +227,7 @@ fun KeyboardItem(
             )
         }
         Spacer(modifier = Modifier.height(2.dp))
-        BaseTotalDisplay(
+        SubTotalDisplay(
             billAmountString = tipCalcViewModel.getFormattedBillAmount(),
             onClick = if (isScrolledToTop.value) scrollToBottom else scrollToTop,
             modifier = Modifier
@@ -235,7 +238,6 @@ fun KeyboardItem(
                 .height(min(buttonHeight, 24.dp))
                 .fillMaxWidth(.8f)
         )
-
     }
 }
 
@@ -330,7 +332,7 @@ fun BillKeyboardButton(
 }
 
 @Composable
-fun BaseTotalDisplay(
+fun SubTotalDisplay(
     billAmountString: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -341,21 +343,25 @@ fun BaseTotalDisplay(
         modifier = modifier
     ) {
         Box {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 InputLabel(
                     labelText = stringResource(
-                        id = R.string.sub_total) + ": "
+                        id = R.string.sub_total) + ": ",
+                    onClick = onClick
                 )
                 SmallText(
                     text = "$",
                     color = MaterialTheme.colors.primary,
-                    fontSize = 9.sp
+                    fontSize = 9.sp,
                 )
                 Text(
                     text = "$billAmountString ",
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colors.primaryVariant,
-                    modifier = Modifier.wrapContentHeight()
+                    modifier = Modifier
+                        .wrapContentHeight()
                 )
             }
         }
@@ -373,24 +379,29 @@ fun TipSelectionItem(
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-
+    val tipSliderHeight = screenHeight * .16f
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .padding(
-                start = 8.dp,
-                end = 8.dp,
-                top = 4.dp
-            )
             .fillMaxSize()
             .height(screenHeight)
     ) {
+        Spacer(
+            modifier = Modifier
+                .height(screenHeight * .16f)
+                .clickable { scrollToTop() }
+        )
         TipSlider(
-            tipSliderValue = tipCalcViewModel.getTipPercentage(),
-            onTipSliderChange = { tipCalcViewModel.onTipPercentChange(it) },
+            tipSliderValue = tipCalcViewModel.getTipPercentage().roundToInt(),
+            tipSliderHeight = tipSliderHeight,
+            tipSliderUpClicked = tipCalcViewModel::tipSliderUpClicked,
+            tipSliderDownClicked = tipCalcViewModel::tipSliderDownClicked,
+            maxTipPercentage = TipCalcViewModel.MAX_TIP_PENCENT,
+            roundUpClicked = tipCalcViewModel::onRoundUpClicked,
+            roundDownClicked = tipCalcViewModel::onRoundDownClicked,
             modifier = modifier
-                .height(30.dp)
+                .padding(top = 2.dp, bottom = 2.dp)
                 .fillMaxWidth(.9f)
         ) { scrollToTop() }
 
@@ -403,13 +414,24 @@ fun TipSelectionItem(
             grandTotalClicked = { scrollToBottom() },
             modifier = modifier.wrapContentSize()
         )
+        Spacer(
+            modifier = Modifier
+                .height(screenHeight * .16f)
+                .clickable { scrollToBottom() }
+        )
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TipSlider(
     tipSliderValue: Int,
-    onTipSliderChange: (Int) -> Unit,
+    tipSliderHeight: Dp,
+    tipSliderUpClicked: () -> Unit,
+    tipSliderDownClicked: () -> Unit,
+    maxTipPercentage: Int,
+    roundUpClicked: () -> Unit,
+    roundDownClicked: () -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
@@ -444,25 +466,51 @@ fun TipSlider(
         }
         InlineSlider(
             value = tipSliderValue,
-            onValueChange = {
-                onTipSliderChange(it)
-                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            },
-            valueProgression = IntProgression.fromClosedRange(0, 50, 1),
+            onValueChange = {},
+            valueProgression = IntProgression.fromClosedRange(0, maxTipPercentage, 1),
             decreaseIcon = {
                 Image(
                     imageVector = Icons.Default.ArrowLeft,
                     contentDescription = "Tip Percentage Down",
+                    Modifier.combinedClickable(
+                        onLongClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            roundDownClicked()
+                        },
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            tipSliderDownClicked()
+                        }
+                    )
                 )
             },
             increaseIcon = {
                 Image(
                     imageVector = Icons.Default.ArrowRight,
                     contentDescription = "Tip Percentage Up",
+                    Modifier.combinedClickable(
+                        onLongClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            roundUpClicked()
+                        },
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            tipSliderUpClicked()
+                        }
+                    )
                 )
             },
             colors = InlineSliderDefaults.colors(selectedBarColor = MaterialTheme.colors.primary),
-            modifier = modifier)
+            modifier = modifier
+                .height(tipSliderHeight)
+        )
+        SmallText(
+            text = stringResource(
+                id = R.string.round_up_down
+            ),
+            fontSize = 7.sp,
+            color = MaterialTheme.colors.secondaryVariant)
+
     }
 }
 
@@ -489,19 +537,22 @@ fun GrandTotalDisplay(
             AmountDisplay(
                 amount = billAmountString,
                 label = stringResource(id = R.string.display_bill),
-                modifier = modifier.padding(bottom = 2.dp),
+                modifier = modifier
+                    .fillMaxWidth(),
                 onClick = billAmountClicked
             )
             AmountDisplay(
                 amount = tipAmountString,
                 label = stringResource(id = R.string.display_tip),
-                modifier = modifier.padding(top = 2.dp, bottom = 2.dp),
+                modifier = modifier
+                    .fillMaxWidth(),
                 onClick = tipAmountClicked
             )
             AmountDisplay(
                 amount = grandTotalString,
                 label = stringResource(id = R.string.display_total),
-                modifier = modifier.padding(top = 2.dp, bottom = 2.dp),
+                modifier = modifier
+                    .fillMaxWidth(),
                 onClick = grandTotalClicked
             )
         }
@@ -528,15 +579,19 @@ fun AmountDisplay(
                 .padding(start = 5.dp, end = 5.dp),
         ) {
             Row(
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
-                    .clickable { onClick() }
+                    .wrapContentWidth()
             ) {
                 Text(
                     text = "$label: ",
                     fontSize = 10.sp,
                     textAlign = TextAlign.Right,
-                    modifier = Modifier.width(70.dp))
+                    modifier = Modifier
+                        .width(70.dp)
+                        .clickable { onClick() }
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -550,6 +605,7 @@ fun AmountDisplay(
                         text = "$amount ",
                         modifier = Modifier
                             .wrapContentSize()
+                            .clickable { onClick() }
                     )
                 }
             }
@@ -602,7 +658,7 @@ fun DefaultPreview() {
             tipCalcViewModel = TipCalcViewModel(),
             scrollToTop = {},
             scrollToBottom = {},
-            modifier = Modifier.background(color = Color.Black)
+            modifier = Modifier.background(color = MaterialTheme.colors.background)
         )
     }
 }
@@ -612,6 +668,7 @@ fun DefaultPreview() {
 //@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
 //@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 //@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+//@Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 //@Composable
 //fun DefaultPreview() {
 //    TipCalcApp()
