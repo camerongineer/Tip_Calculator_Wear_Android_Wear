@@ -20,5 +20,7 @@ internal val wearColorPalette: Colors = Colors(
     error = Red400,
     onPrimary = Color.Black,
     onSecondary = LightBlue,
-    onError = Color.Black
+    onError = Color.Black,
+    background = Color.Black,
+    onBackground = Color.White
 )
