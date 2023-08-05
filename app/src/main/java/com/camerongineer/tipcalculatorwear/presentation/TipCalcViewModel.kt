@@ -3,12 +3,15 @@ package com.camerongineer.tipcalculatorwear.presentation
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 class TipCalcViewModel: ViewModel() {
     private val _billAmount = mutableStateOf(0f)
     private val _billAmountString = mutableStateOf("")
-    private val _tipPercentValue = mutableStateOf(15)
+    private val _tipPercentValue = mutableStateOf(15.0)
     private val _calculatedTipAmount = derivedStateOf {
         _billAmount.value * (_tipPercentValue.value.toFloat() / 100)
     }
@@ -18,7 +21,7 @@ class TipCalcViewModel: ViewModel() {
     }
 
     fun onTipPercentChange(newAmount: Int) {
-        _tipPercentValue.value = newAmount
+        _tipPercentValue.value = newAmount.toDouble()
     }
 
     fun onDigitTyped(char: Char) {
@@ -33,6 +36,49 @@ class TipCalcViewModel: ViewModel() {
         if (_billAmountString.value.isNotEmpty()) {
             _billAmountString.value = _billAmountString.value
                 .substring(0 until _billAmountString.value.length - 1)
+        }
+    }
+
+    fun onRoundUpClicked() {
+        viewModelScope.launch {
+            val nextTotal = if (_grandTotal.value.roundToInt() == _grandTotal.value.toInt()) {
+                (_grandTotal.value.toInt() + 0.50).toFloat()
+            } else {
+                _grandTotal.value.roundToInt().toFloat()
+            }
+
+            val billAmountNormalized = _billAmount.value / 10000.0
+            val increment = 1 / (billAmountNormalized * 20000)
+
+            if (_billAmount.value > 0.0) {
+                while (_grandTotal.value < nextTotal) {
+                    _tipPercentValue.value += increment
+                }
+            }
+        }
+    }
+
+    fun onRoundDownClicked() {
+        viewModelScope.launch {
+            val nextTotal = if (_grandTotal.value.roundToInt() != _grandTotal.value.toInt()) {
+                (_grandTotal.value.toInt() + 0.50).toFloat()
+            } else {
+                _grandTotal.value.roundToInt().toFloat()
+            }
+
+            val billAmountNormalized = _billAmount.value / 10000.0
+            val increment = 1 / (billAmountNormalized * 20000)
+
+            if (_billAmount.value > 0.0) {
+                while (_grandTotal.value > nextTotal && _tipPercentValue.value > 0.0) {
+                    _tipPercentValue.value -= increment
+                }
+                _tipPercentValue.value = if (_tipPercentValue.value < 0) {
+                    0.0
+                } else {
+                    _tipPercentValue.value
+                }
+            }
         }
     }
 
@@ -56,5 +102,4 @@ class TipCalcViewModel: ViewModel() {
     fun getFormattedCalculatedTipAmount() = "%.2f".format(_calculatedTipAmount.value)
 
     fun getFormattedGrandTotal() = "%.2f".format(_grandTotal.value)
-
 }
