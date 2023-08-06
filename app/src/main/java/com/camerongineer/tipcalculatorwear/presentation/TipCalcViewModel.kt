@@ -5,7 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.min
+import kotlin.math.round
 import kotlin.math.roundToInt
 
 
@@ -28,11 +32,17 @@ class TipCalcViewModel: ViewModel() {
     }
 
     fun tipSliderUpClicked() {
-        _tipPercentValue.value += 1
+        if (floor(_tipPercentValue.value) + 1 <= MAX_TIP_PENCENT) {
+            _tipPercentValue.value = floor(_tipPercentValue.value) + 1
+        }
     }
 
     fun tipSliderDownClicked() {
-        _tipPercentValue.value -= 1
+        if (_tipPercentValue.value > 100) {
+            _tipPercentValue.value = 100.0
+        } else if (ceil(_tipPercentValue.value) - 1 >= 0) {
+            _tipPercentValue.value = ceil(_tipPercentValue.value) - 1
+        }
     }
 
     fun onDigitTyped(char: Char) {
@@ -115,6 +125,19 @@ class TipCalcViewModel: ViewModel() {
     }
 
     fun getTipPercentage() = _tipPercentValue.value
+
+    fun getFormattedTipPercentage() = "${_tipPercentValue.value.roundToInt()}"
+
+    fun getEqualitySymbol() : String {
+        val roundedPercentage = round(_tipPercentValue.value)
+        return if (abs(_tipPercentValue.value - roundedPercentage) < .1) {
+            ""
+        } else if (_tipPercentValue.value > roundedPercentage) {
+            ">"
+        } else {
+            "<"
+        }
+    }
 
     fun getFormattedCalculatedTipAmount() = "%.2f".format(_calculatedTipAmount.value)
 

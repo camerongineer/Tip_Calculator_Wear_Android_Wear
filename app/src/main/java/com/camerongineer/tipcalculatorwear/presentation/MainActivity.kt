@@ -394,6 +394,8 @@ fun TipSelectionItem(
         )
         TipSlider(
             tipSliderValue = tipCalcViewModel.getTipPercentage().roundToInt(),
+            tipPercentageString = tipCalcViewModel.getFormattedTipPercentage(),
+            equalitySymbolString = tipCalcViewModel.getEqualitySymbol(),
             tipSliderHeight = tipSliderHeight,
             tipSliderUpClicked = tipCalcViewModel::tipSliderUpClicked,
             tipSliderDownClicked = tipCalcViewModel::tipSliderDownClicked,
@@ -426,6 +428,8 @@ fun TipSelectionItem(
 @Composable
 fun TipSlider(
     tipSliderValue: Int,
+    tipPercentageString: String,
+    equalitySymbolString: String,
     tipSliderHeight: Dp,
     tipSliderUpClicked: () -> Unit,
     tipSliderDownClicked: () -> Unit,
@@ -452,8 +456,13 @@ fun TipSlider(
                     id = R.string.tip_percentage) + ":",
                 modifier = Modifier.padding(bottom = 4.dp),
                 onClick = onClick)
+            SmallText(
+                text = " $equalitySymbolString",
+                color = MaterialTheme.colors.error,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(bottom = 4.dp))
             Text(
-                " $tipSliderValue",
+                text = tipPercentageString,
                 color = MaterialTheme.colors.error,
                 fontSize = 16.sp,
                 modifier = Modifier.wrapContentHeight()
@@ -462,7 +471,7 @@ fun TipSlider(
                 text = "%",
                 color = MaterialTheme.colors.error,
                 fontSize = 12.sp,
-                modifier = Modifier.padding(2.dp))
+                modifier = Modifier.padding(bottom=2.dp))
         }
         InlineSlider(
             value = tipSliderValue,
