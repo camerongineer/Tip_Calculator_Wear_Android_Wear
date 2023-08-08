@@ -3,7 +3,7 @@
     <string name="sub_total">SUBTOTAL</string>
     <string name="tip_percentage">Tip Percentage</string>
     <string name="round_up_down">HOLD TO ROUND GRANDTOTAL UP/DOWN</string>
-    <string name="display_bill">SUBTOTAL</string>
+    <string name="display_sub_total">SUBTOTAL</string>
     <string name="display_tip">TIP</string>
     <string name="display_total">GRANDTOTAL</string>
     <string name="title_activity_presentation._main">presentation.MainActivity</string>
