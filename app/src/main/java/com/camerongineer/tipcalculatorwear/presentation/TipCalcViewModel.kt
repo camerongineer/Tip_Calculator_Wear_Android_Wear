@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.math.min
 import kotlin.math.round
 import kotlin.math.roundToInt
 
@@ -16,130 +15,140 @@ import kotlin.math.roundToInt
 class TipCalcViewModel: ViewModel() {
 
     companion object {
-        const val MAX_TIP_PENCENT = 100
+        const val MAX_TIP_PERCENT = 100
+        const val DEFAULT_TIP_PERCENTAGE = 15.0
+        const val ROUNDING_NUM = 50
     }
 
-    private val _billAmount = mutableStateOf(0f)
-    private val _billAmountString = mutableStateOf("")
-    private val _tipPercentValue = mutableStateOf(15.0)
-
-    private val _calculatedTipAmount = derivedStateOf {
-        _billAmount.value * (_tipPercentValue.value.toFloat() / 100)
-    }
+    private val _subTotal = mutableStateOf(0)
+    private val _subTotalString = mutableStateOf("")
+    private val _tipAmount = mutableStateOf(0)
+    private val _tipPercentage = mutableStateOf(DEFAULT_TIP_PERCENTAGE)
 
     private val _grandTotal = derivedStateOf {
-        _billAmount.value + _calculatedTipAmount.value
-    }
-
-    fun tipSliderUpClicked() {
-        if (floor(_tipPercentValue.value) + 1 <= MAX_TIP_PENCENT) {
-            _tipPercentValue.value = floor(_tipPercentValue.value) + 1
-        }
-    }
-
-    fun tipSliderDownClicked() {
-        if (_tipPercentValue.value > 100) {
-            _tipPercentValue.value = 100.0
-        } else if (ceil(_tipPercentValue.value) - 1 >= 0) {
-            _tipPercentValue.value = ceil(_tipPercentValue.value) - 1
-        }
+        _subTotal.value + _tipAmount.value
     }
 
     fun onDigitTyped(char: Char) {
-        if (_billAmountString.value.length < 6) {
-            if (_billAmountString.value.isNotEmpty() || char != '0') {
-                _billAmountString.value += char
+        if (_subTotalString.value.length < 6) {
+            if (_subTotalString.value.isNotEmpty() || char != '0') {
+                _subTotalString.value += char
+                setSubTotal()
             }
         }
-        _tipPercentValue.value = min(MAX_TIP_PENCENT.toDouble(), _tipPercentValue.value)
     }
 
     fun onDeleteTyped() {
-        if (_billAmountString.value.isNotEmpty()) {
-            _billAmountString.value = _billAmountString.value
-                .substring(0 until _billAmountString.value.length - 1)
+        if (_subTotalString.value.isNotEmpty()) {
+            _subTotalString.value = _subTotalString.value
+                .substring(0 until _subTotalString.value.length - 1)
+            setSubTotal()
         }
-        _tipPercentValue.value = min(MAX_TIP_PENCENT.toDouble(), _tipPercentValue.value)
+    }
+
+    private fun setSubTotal() {
+        val subTotalDouble = _subTotalString.value.toDoubleOrNull()
+        if (subTotalDouble != null) {
+            _subTotal.value = subTotalDouble.roundToInt()
+        } else {
+            _subTotal.value = 0
+        }
+        setTipAmount()
+    }
+
+    fun tipPercentageIncrement() {
+        if(_tipPercentage.value < MAX_TIP_PERCENT) {
+            _tipPercentage.value = floor(_tipPercentage.value) + 1
+            setTipAmount()
+        }
+    }
+
+    fun tipPercentageDecrement() {
+        if(_tipPercentage.value > 0) {
+            _tipPercentage.value = minOf(ceil(_tipPercentage.value) - 1, MAX_TIP_PERCENT.toDouble())
+            setTipAmount()
+        }
+    }
+
+    private fun setTipAmount() {
+        _tipAmount.value = (_subTotal.value * (_tipPercentage.value / 100.0)).roundToInt()
     }
 
     fun onRoundUpClicked() {
         viewModelScope.launch {
-            val multipliedGrandTotal = (_grandTotal.value * 100).roundToInt()
-            val multipliedRemainder = multipliedGrandTotal % 50
-            val nextTotal = (if (multipliedRemainder == 0) {
-                multipliedGrandTotal + 50
+            val nextTotal = (if (_grandTotal.value % ROUNDING_NUM == 0) {
+                _grandTotal.value + ROUNDING_NUM
             } else {
-                (multipliedGrandTotal - multipliedRemainder + 50)
-            }).toFloat() / 100.0
+                _grandTotal.value - (_grandTotal.value % ROUNDING_NUM) + ROUNDING_NUM
+            })
 
-            val billAmountNormalized = _billAmount.value / 10000.0
-            val increment = 1 / (billAmountNormalized * 50000)
-
-            if (_billAmount.value > 0.00) {
-                while (_grandTotal.value <= nextTotal) {
-                    _tipPercentValue.value += increment
+            if (_subTotal.value > 0) {
+                while ((_subTotal.value + _tipAmount.value) < nextTotal) {
+                    _tipAmount.value += 1
                 }
+                setTipPercentage()
             }
         }
     }
 
     fun onRoundDownClicked() {
         viewModelScope.launch {
-            val multipliedGrandTotal = (_grandTotal.value * 100).toInt()
-            val multipliedRemainder = multipliedGrandTotal % 50
-            val nextTotal = (if (multipliedRemainder == 0) {
-                multipliedGrandTotal - 50
+            val nextTotal = (if (_grandTotal.value % ROUNDING_NUM == 0) {
+                _grandTotal.value - ROUNDING_NUM
             } else {
-                (multipliedGrandTotal - multipliedRemainder)
-            }).toFloat() / 100.0
+                _grandTotal.value - (_grandTotal.value % ROUNDING_NUM)
+            })
 
-            val billAmountNormalized = _billAmount.value / 10000.0
-            val increment = 1 / (billAmountNormalized * 50000)
-
-            if (_billAmount.value > 0.0) {
-                while (_grandTotal.value > nextTotal && _tipPercentValue.value > 0.0) {
-                    _tipPercentValue.value -= increment
+            if (_subTotal.value > 0) {
+                while ((_subTotal.value + _tipAmount.value) > nextTotal && _tipAmount.value > 0) {
+                    _tipAmount.value -= 1
                 }
-                _tipPercentValue.value = if (_tipPercentValue.value < 0) {
-                    0.0
-                } else {
-                    _tipPercentValue.value
-                }
+                setTipPercentage()
             }
         }
     }
 
-    fun setBillAmountBlank() {
-        _billAmountString.value = ""
+    private fun setTipPercentage() {
+        _tipPercentage.value = (_tipAmount.value.toDouble() / _subTotal.value.toDouble()) * 100
     }
 
-    fun getFormattedBillAmount(): String {
-        val billFloat = _billAmountString.value.toFloatOrNull()
-        return if (billFloat != null && billFloat > .01) {
-            _billAmount.value = billFloat / 100
-            "%.2f".format(billFloat / 100)
+    fun setSubTotalBlank() {
+        _subTotalString.value = ""
+    }
+
+    fun getFormattedSubTotal(): String {
+        val subTotalDouble = _subTotalString.value.toDoubleOrNull()
+        return if (subTotalDouble != null && subTotalDouble > 0) {
+            "%.2f".format(subTotalDouble / 100)
         } else {
-            _billAmount.value = 0f
             "0.00"
         }
     }
 
-    fun getTipPercentage() = _tipPercentValue.value
+    fun getSubtotal() = _subTotal.value
 
-    fun getFormattedTipPercentage() = "${_tipPercentValue.value.roundToInt()}"
+    fun getTipAmount() = _tipAmount.value
+
+    fun getTipPercentage() = _tipPercentage.value
+
+    fun getFormattedTipPercentage() = "${_tipPercentage.value.roundToInt()}"
 
     fun getEqualitySymbol() : String {
-        val roundedPercentage = round(_tipPercentValue.value)
-        return if (abs(_tipPercentValue.value - roundedPercentage) < .1) {
+        val roundedTipPercentage = round(_tipPercentage.value)
+        return if (abs(_tipPercentage.value - roundedTipPercentage) < .1) {
             ""
-        } else if (_tipPercentValue.value > roundedPercentage) {
+        } else if (_tipPercentage.value > roundedTipPercentage) {
             ">"
         } else {
             "<"
         }
     }
 
-    fun getFormattedCalculatedTipAmount() = "%.2f".format(_calculatedTipAmount.value)
+    fun getFormattedTipAmount(): String {
+        return getFormattedAmountString(_tipAmount.value)
+    }
 
-    fun getFormattedGrandTotal() = "%.2f".format(_grandTotal.value)
+    fun getFormattedGrandTotal() = getFormattedAmountString(_grandTotal.value)
+
+    private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)
 }
