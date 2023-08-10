@@ -232,7 +232,7 @@ fun SplitButtons(
         )
         Text(
             text = numSplit.toString(),
-            fontSize = 30.sp,
+            fontSize = 28.sp,
             color = MaterialTheme.colors.primary
         )
         BillKeyboardButton(
@@ -329,9 +329,9 @@ fun SplitPreview() {
     TipCalculatorWearTheme {
         SplitCalcScreen(
             navController = rememberSwipeDismissableNavController(),
-            subTotal = 2001,
-            tipAmount = 301,
-            numSplit = mutableIntStateOf(2),
+            subTotal = 2000,
+            tipAmount = 300,
+            numSplit = mutableIntStateOf(20),
             modifier = Modifier.background(color = Color.Black)
         )
     }
