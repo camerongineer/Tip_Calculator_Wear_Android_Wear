@@ -4,13 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.wear.compose.navigation.SwipeDismissableNavHost
+import androidx.wear.compose.navigation.composable
+import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,9 +30,12 @@ class MainActivity : ComponentActivity() {
 fun TipCalcApp(
     tipCalcViewModel: TipCalcViewModel = TipCalcViewModel()
 ) {
-    val navController = rememberNavController()
-    val numSplit = remember { mutableStateOf(SplitViewModel.DEFAULT_SPLIT_NUM) }
-    NavHost(navController, startDestination = "home") {
+    val navController = rememberSwipeDismissableNavController()
+    val numSplit = remember { mutableIntStateOf(SplitViewModel.DEFAULT_SPLIT_NUM) }
+    SwipeDismissableNavHost(
+        navController = navController,
+        startDestination = "home")
+    {
         composable("home") {
             TipCalcScreen(
                 navController = navController,

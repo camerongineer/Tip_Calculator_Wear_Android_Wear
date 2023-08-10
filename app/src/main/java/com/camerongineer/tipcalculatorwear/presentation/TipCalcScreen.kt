@@ -15,13 +15,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
@@ -29,6 +27,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.KeyboardBackspace
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,8 +46,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.wear.compose.material.AutoCenteringParams
+import androidx.navigation.NavHostController
+import androidx.wear.compose.foundation.lazy.AutoCenteringParams
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonColors
 import androidx.wear.compose.material.ButtonDefaults
@@ -56,14 +58,11 @@ import androidx.wear.compose.material.InlineSlider
 import androidx.wear.compose.material.InlineSliderDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
-import androidx.wear.compose.material.ScalingLazyColumn
-import androidx.wear.compose.material.ScalingLazyListAnchorType
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
-import androidx.wear.compose.material.rememberScalingLazyListState
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import kotlinx.coroutines.launch
@@ -71,7 +70,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun TipCalcScreen(
-    navController: NavController,
+    navController: NavHostController,
     tipCalcViewModel: TipCalcViewModel
 ) {
     val listState = rememberScalingLazyListState()
@@ -138,6 +137,7 @@ fun KeyboardItem(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val buttonHeight = screenHeight * (if (configuration.isScreenRound) .15f else .17f)
+    val scrollToTipSection = remember { { scrollToSection(1) } }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -154,19 +154,19 @@ fun KeyboardItem(
         Spacer(modifier = Modifier.height(if (configuration.isScreenRound) 8.dp else 0.dp))
         BillDigitsRow(
             digits = listOf('1', '2', '3'),
-            onDigitClick = { tipCalcViewModel.onDigitTyped(it) },
+            onDigitClick = tipCalcViewModel::onDigitTyped,
             modifier = Modifier.height(buttonHeight)
         )
 
         BillDigitsRow(
             digits = listOf('4', '5', '6'),
-            onDigitClick = { tipCalcViewModel.onDigitTyped(it) },
+            onDigitClick = tipCalcViewModel::onDigitTyped,
             modifier = Modifier.height(buttonHeight)
         )
 
         BillDigitsRow(
             digits = listOf('7', '8', '9'),
-            onDigitClick = { tipCalcViewModel.onDigitTyped(it) },
+            onDigitClick = tipCalcViewModel::onDigitTyped,
             modifier = Modifier.height(buttonHeight)
         )
 
@@ -178,7 +178,7 @@ fun KeyboardItem(
             BillKeyboardButton(
                 icon = Icons.Default.KeyboardBackspace,
                 contentDescription = "Keyboard Backspace",
-                onClick = { tipCalcViewModel.onDeleteTyped() },
+                onClick = tipCalcViewModel::onDeleteTyped,
                 onLongClick = { tipCalcViewModel.setSubTotalBlank() },
                 modifier = Modifier
                     .weight(.33f)
@@ -194,7 +194,7 @@ fun KeyboardItem(
             BillKeyboardButton(
                 icon = Icons.Default.Done,
                 contentDescription = "Keyboard Bottom Of Screen",
-                onClick = { scrollToSection(1) },
+                onClick = scrollToTipSection,
                 modifier = Modifier
                     .weight(.33f)
                     .height(buttonHeight)
@@ -203,7 +203,7 @@ fun KeyboardItem(
         Spacer(modifier = Modifier.height(2.dp))
         SubTotalDisplay(
             billAmountString = tipCalcViewModel.getFormattedSubTotal(),
-            onClick = { scrollToSection(1) },
+            onClick = scrollToTipSection,
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colors.surface,
@@ -250,7 +250,7 @@ fun BillKeyboardDigit(
         modifier = modifier,
         text = digitChar.toString(),
         buttonColors = ButtonDefaults.primaryButtonColors(),
-    ) { onClick() }
+        onClick = onClick)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -321,8 +321,7 @@ fun SubTotalDisplay(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 InputLabel(
-                    labelText = stringResource(
-                        id = R.string.sub_total) + ": ",
+                    labelText = stringResource(id = R.string.display_sub_total),
                     onClick = onClick
                 )
                 SmallText(
@@ -355,6 +354,8 @@ fun TipSelectionItem(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val tipSliderHeight = screenHeight * .16f
+    val scrollToKeyboard = remember { { scrollToSection(0) } }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -365,7 +366,7 @@ fun TipSelectionItem(
         Spacer(
             modifier = Modifier
                 .weight(.08f)
-                .clickable { scrollToSection(0) }
+                .clickable(onClick = scrollToKeyboard)
         )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -394,7 +395,8 @@ fun TipSelectionItem(
                 tipAmountClicked = { scrollToSection(1) },
                 grandTotalString = tipCalcViewModel.getFormattedGrandTotal(),
                 grandTotalClicked = { },
-                modifier = modifier.wrapContentSize()
+                modifier = modifier
+                    .padding(top = screenHeight / 15)
             )
         }
         Row(
@@ -406,7 +408,7 @@ fun TipSelectionItem(
                 color = Color.Yellow,
                 modifier = Modifier
                     .padding(top = 2.dp, bottom = 4.dp)
-                    .clickable { onSplitClicked() }
+                    .clickable(onClick = onSplitClicked)
             )
         }
     }
@@ -433,6 +435,7 @@ fun TipSlider(
         modifier = Modifier
     ) {
         val haptics = LocalHapticFeedback.current
+
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center,
@@ -441,7 +444,7 @@ fun TipSlider(
         ) {
             InputLabel(
                 labelText = stringResource(
-                    id = R.string.tip_percentage) + ":",
+                    id = R.string.tip_percentage),
                 modifier = Modifier.padding(bottom = 4.dp),
                 onClick = onClick)
             SmallText(
@@ -521,47 +524,65 @@ fun GrandTotalDisplay(
     tipAmountClicked: () -> Unit = {},
     grandTotalClicked: () -> Unit = {}
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth(.9f)
-            .padding(top = 4.dp)
     ) {
         Column(
-            horizontalAlignment = Alignment.Start
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+        ) {
+            InputLabel(
+                labelText = stringResource(id = R.string.display_sub_total),
+                color = MaterialTheme.colors.onBackground,
+                onClick = billAmountClicked,
+                modifier = Modifier.height(16.dp))
+            InputLabel(
+                labelText = stringResource(id = R.string.display_tip),
+                color = MaterialTheme.colors.onBackground,
+                onClick = tipAmountClicked,
+                modifier = Modifier.height(16.dp))
+            InputLabel(
+                labelText = stringResource(id = R.string.display_total),
+                color = MaterialTheme.colors.onBackground,
+                onClick = grandTotalClicked,
+                modifier = Modifier.height(16.dp))
+        }
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
         ) {
             AmountDisplay(
-                amount = billAmountString,
-                label = stringResource(id = R.string.display_sub_total),
-                modifier = modifier
-                    .fillMaxWidth(),
+                amountString = billAmountString,
+                modifier = Modifier.height(16.dp),
                 onClick = billAmountClicked
             )
             AmountDisplay(
-                amount = tipAmountString,
-                label = stringResource(id = R.string.display_tip),
-                modifier = modifier
-                    .fillMaxWidth(),
+                amountString = tipAmountString,
+                modifier = Modifier.height(16.dp),
                 onClick = tipAmountClicked
             )
             AmountDisplay(
-                amount = grandTotalString,
-                label = stringResource(id = R.string.display_total),
-                modifier = modifier
-                    .fillMaxWidth(),
+                amountString = grandTotalString,
+                modifier = Modifier.height(16.dp),
                 onClick = grandTotalClicked
             )
         }
+
     }
 }
 
 
 @Composable
-fun AmountDisplay(
-    amount: String,
+fun LabeledAmountDisplay(
     label: String,
+    amountString: String,
     modifier: Modifier = Modifier,
+    smallText: Boolean = false,
     onClick: () -> Unit = { }
 ) {
     Column(
@@ -569,45 +590,53 @@ fun AmountDisplay(
         horizontalAlignment = Alignment.Start,
         modifier = modifier
     ) {
-        BasicTextField(
-            value = amount,
-            onValueChange = {},
-            readOnly = true,
-            modifier = Modifier
-                .padding(start = 5.dp, end = 5.dp),
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .wrapContentWidth()
+                .clickable(onClick = onClick)
         ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier
-                    .wrapContentWidth()
-            ) {
-                Text(
-                    text = "$label: ",
-                    fontSize = 10.sp,
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier
-                        .width(70.dp)
-                        .clickable { onClick() }
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SmallText(
-                        text = "$",
-                        color = MaterialTheme.colors.primary,
-                    )
-                    Text(
-                        color = MaterialTheme.colors.primaryVariant,
-                        textAlign = TextAlign.Center,
-                        text = "$amount ",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clickable { onClick() }
-                    )
-                }
-            }
+            Text(
+                text = "$label: ",
+                fontSize = if (smallText) 9.sp else 10.sp,
+                textAlign = TextAlign.Right,
+                modifier = Modifier
+            )
+            AmountDisplay(
+                amountString = amountString,
+                smallText = smallText
+            )
         }
+    }
+}
+
+@Composable
+fun AmountDisplay(
+    amountString: String,
+    modifier: Modifier = Modifier,
+    smallText: Boolean = false,
+    onClick: () -> Unit = {}
+) {
+    Row(
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .wrapContentSize()
+    ) {
+        SmallText(
+            text = "$",
+            color = MaterialTheme.colors.primary,
+            fontSize = if (smallText) 7.sp else 9.sp
+        )
+        Text(
+            color = MaterialTheme.colors.primaryVariant,
+            text = amountString,
+            fontSize = if (smallText) 9.sp else 12.sp,
+            modifier = modifier
+                .wrapContentSize()
+                .clickable(onClick = onClick)
+        )
     }
 }
 
@@ -615,17 +644,18 @@ fun AmountDisplay(
 fun InputLabel(
     labelText: String,
     modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.primary,
     fontSize: TextUnit = 10.sp,
     onClick: () -> Unit = {},
 ) {
     Text(
-        color = MaterialTheme.colors.primary,
+        color = color,
         fontSize = fontSize,
-        textAlign = TextAlign.Center,
-        text = labelText,
+        textAlign = TextAlign.Right,
+        text = "$labelText: ",
         modifier = modifier
             .wrapContentSize()
-            .clickable { onClick() }
+            .clickable(onClick = onClick)
     )
 }
 
