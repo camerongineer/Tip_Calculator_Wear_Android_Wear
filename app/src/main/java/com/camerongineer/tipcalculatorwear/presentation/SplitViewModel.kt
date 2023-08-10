@@ -2,19 +2,18 @@ package com.camerongineer.tipcalculatorwear.presentation
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 
 class SplitViewModel(
     subTotal: Int,
     tipAmount: Int,
-    private val numSplit: MutableState<Int> = mutableStateOf(DEFAULT_SPLIT_NUM)
+    private val numSplit: MutableState<Int> = mutableIntStateOf(DEFAULT_SPLIT_NUM)
 ): ViewModel() {
 
     companion object {
         const val DEFAULT_SPLIT_NUM = 2
         const val MAX_NUM_SPLIT = 20
-
     }
 
     private val _splitSubTotal = derivedStateOf {
@@ -48,13 +47,19 @@ class SplitViewModel(
 
     fun getNumSplit() = numSplit.value
 
+    fun getSplitSubTotalRemainder(): Int = _splitSubTotalRemainder.value
+
+    fun getSplitTipAmountRemainder(): Int = _splitTipRemainder.value
+
     fun getFormattedSplitSubTotal() = getFormattedAmountString(_splitSubTotal.value)
 
-    fun getFormattedSplitSubTotalRemainder()= getFormattedAmountString(_splitSubTotalRemainder.value)
+    fun getFormattedSplitSubTotalRemainder() = getFormattedAmountString(_splitSubTotalRemainder.value)
 
     fun getFormattedSplitTipAmount() = getFormattedAmountString(_splitTipAmount.value)
 
-    fun getFormattedSplitGrandTotal() = getFormattedAmountString(_splitGrandTotal.value)
+    fun getFormattedSplitTipAmountRemainder() = getFormattedAmountString(_splitTipRemainder.value)
 
-    private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)
+    fun getFormattedSplitGrandTotal() = getFormattedAmountString(_splitGrandTotal.value)
 }
+
+private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)

@@ -1,6 +1,8 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,13 +22,13 @@ class TipCalcViewModel: ViewModel() {
         const val ROUNDING_NUM = 50
     }
 
-    private val _subTotal = mutableStateOf(0)
+    private val _subTotal = mutableIntStateOf(0)
     private val _subTotalString = mutableStateOf("")
-    private val _tipAmount = mutableStateOf(0)
-    private val _tipPercentage = mutableStateOf(DEFAULT_TIP_PERCENTAGE)
+    private val _tipAmount = mutableIntStateOf(0)
+    private val _tipPercentage = mutableDoubleStateOf(DEFAULT_TIP_PERCENTAGE)
 
     private val _grandTotal = derivedStateOf {
-        _subTotal.value + _tipAmount.value
+        _subTotal.intValue + _tipAmount.intValue
     }
 
     fun onDigitTyped(char: Char) {
@@ -49,29 +51,29 @@ class TipCalcViewModel: ViewModel() {
     private fun setSubTotal() {
         val subTotalDouble = _subTotalString.value.toDoubleOrNull()
         if (subTotalDouble != null) {
-            _subTotal.value = subTotalDouble.roundToInt()
+            _subTotal.intValue = subTotalDouble.roundToInt()
         } else {
-            _subTotal.value = 0
+            _subTotal.intValue = 0
         }
         setTipAmount()
     }
 
     fun tipPercentageIncrement() {
-        if(_tipPercentage.value < MAX_TIP_PERCENT) {
-            _tipPercentage.value = floor(_tipPercentage.value) + 1
+        if(_tipPercentage.doubleValue < MAX_TIP_PERCENT) {
+            _tipPercentage.doubleValue = floor(_tipPercentage.doubleValue) + 1
             setTipAmount()
         }
     }
 
     fun tipPercentageDecrement() {
-        if(_tipPercentage.value > 0) {
-            _tipPercentage.value = minOf(ceil(_tipPercentage.value) - 1, MAX_TIP_PERCENT.toDouble())
+        if(_tipPercentage.doubleValue > 0) {
+            _tipPercentage.doubleValue = minOf(ceil(_tipPercentage.doubleValue) - 1, MAX_TIP_PERCENT.toDouble())
             setTipAmount()
         }
     }
 
     private fun setTipAmount() {
-        _tipAmount.value = (_subTotal.value * (_tipPercentage.value / 100.0)).roundToInt()
+        _tipAmount.intValue = (_subTotal.intValue * (_tipPercentage.doubleValue / 100.0)).roundToInt()
     }
 
     fun onRoundUpClicked() {
@@ -82,9 +84,9 @@ class TipCalcViewModel: ViewModel() {
                 _grandTotal.value - (_grandTotal.value % ROUNDING_NUM) + ROUNDING_NUM
             })
 
-            if (_subTotal.value > 0) {
-                while ((_subTotal.value + _tipAmount.value) < nextTotal) {
-                    _tipAmount.value += 1
+            if (_subTotal.intValue > 0) {
+                while ((_subTotal.intValue + _tipAmount.intValue) < nextTotal) {
+                    _tipAmount.intValue += 1
                 }
                 setTipPercentage()
             }
@@ -99,9 +101,9 @@ class TipCalcViewModel: ViewModel() {
                 _grandTotal.value - (_grandTotal.value % ROUNDING_NUM)
             })
 
-            if (_subTotal.value > 0) {
-                while ((_subTotal.value + _tipAmount.value) > nextTotal && _tipAmount.value > 0) {
-                    _tipAmount.value -= 1
+            if (_subTotal.intValue > 0) {
+                while ((_subTotal.intValue + _tipAmount.intValue) > nextTotal && _tipAmount.intValue > 0) {
+                    _tipAmount.intValue -= 1
                 }
                 setTipPercentage()
             }
@@ -109,11 +111,13 @@ class TipCalcViewModel: ViewModel() {
     }
 
     private fun setTipPercentage() {
-        _tipPercentage.value = (_tipAmount.value.toDouble() / _subTotal.value.toDouble()) * 100
+        _tipPercentage.doubleValue = (_tipAmount.intValue.toDouble() / _subTotal.intValue.toDouble()) * 100
     }
 
     fun setSubTotalBlank() {
         _subTotalString.value = ""
+        _subTotal.intValue = 0
+        _tipAmount.intValue = 0
     }
 
     fun getFormattedSubTotal(): String {
@@ -125,19 +129,19 @@ class TipCalcViewModel: ViewModel() {
         }
     }
 
-    fun getSubtotal() = _subTotal.value
+    fun getSubtotal() = _subTotal.intValue
 
-    fun getTipAmount() = _tipAmount.value
+    fun getTipAmount() = _tipAmount.intValue
 
-    fun getTipPercentage() = _tipPercentage.value
+    fun getTipPercentage() = _tipPercentage.doubleValue
 
-    fun getFormattedTipPercentage() = "${_tipPercentage.value.roundToInt()}"
+    fun getFormattedTipPercentage() = "${_tipPercentage.doubleValue.roundToInt()}"
 
     fun getEqualitySymbol() : String {
-        val roundedTipPercentage = round(_tipPercentage.value)
-        return if (abs(_tipPercentage.value - roundedTipPercentage) < .1) {
+        val roundedTipPercentage = round(_tipPercentage.doubleValue)
+        return if (abs(_tipPercentage.doubleValue - roundedTipPercentage) < .1) {
             ""
-        } else if (_tipPercentage.value > roundedTipPercentage) {
+        } else if (_tipPercentage.doubleValue > roundedTipPercentage) {
             ">"
         } else {
             "<"
@@ -145,7 +149,7 @@ class TipCalcViewModel: ViewModel() {
     }
 
     fun getFormattedTipAmount(): String {
-        return getFormattedAmountString(_tipAmount.value)
+        return getFormattedAmountString(_tipAmount.intValue)
     }
 
     fun getFormattedGrandTotal() = getFormattedAmountString(_grandTotal.value)
