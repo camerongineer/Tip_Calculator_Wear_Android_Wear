@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
@@ -55,7 +53,9 @@ fun SplitCalcScreen(
     )
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
     val topBottomMarginHeight = screenHeight * .10f
+    val splitButtonsWidth = screenWidth * .22f
     Scaffold(
         timeText = {
             TimeText(
@@ -74,12 +74,13 @@ fun SplitCalcScreen(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceAround,
+                verticalArrangement = Arrangement.Center,
                 modifier = modifier
                     .height(screenHeight)
-                    .wrapContentSize()
+                    .width(screenWidth - splitButtonsWidth)
                     .padding(
                         top = topBottomMarginHeight,
+                        start = 10.dp,
                         bottom = 4.dp
                     )
             ) {
@@ -110,6 +111,7 @@ fun SplitCalcScreen(
                 onSplitDownClicked = splitViewModel::onSplitDownClicked,
                 modifier = Modifier
                     .fillMaxHeight()
+                    .width(splitButtonsWidth)
             )
         }
     }
@@ -127,30 +129,64 @@ fun SplitDisplay(
 ) {
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.End,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Row(
-            modifier = modifier.padding(start = 4.dp, end = 2.dp)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.padding(start = 4.dp, end = 4.dp)
         ) {
-            SmallText(
-                text = "${stringResource(id = R.string.split_grand_total)}: ",
+            Text(
+                text = stringResource(id = R.string.split_grand_total),
+                fontSize = 14.sp,
                 color = Color.White)
-            AmountDisplay(amountString = splitGrandTotalString)
+            AmountDisplay(
+                amountString = splitGrandTotalString,
+                fontSize = 24.sp,
+                onClick = { onSplitGrandTotalClicked() }
+            )
         }
-        LabeledAmountDisplay(
-            amountString = splitSubTotalString,
-            label = stringResource(id = R.string.display_sub_total),
-            smallText = true,
-            onClick = { onSplitSubtotalClicked() }
-        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 4.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.SpaceBetween,
+            ){
+                InputLabel(
+                    labelText = stringResource(id = R.string.display_sub_total),
+                    color = MaterialTheme.colors.onBackground,
+                    fontSize = 10.sp,
+                    onClick = { onSplitSubtotalClicked() },
+                    modifier = Modifier.height(14.dp))
+                InputLabel(
+                    labelText = stringResource(id = R.string.display_tip),
+                    color = MaterialTheme.colors.onBackground,
+                    fontSize = 10.sp,
+                    onClick = { onSplitTipAmountClicked() },
+                    modifier = Modifier.height(14.dp))
+            }
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                AmountDisplay(
+                    amountString = splitSubTotalString,
+                    fontSize = 12.sp,
+                    onClick = { onSplitSubtotalClicked() },
+                    modifier = Modifier.height(14.dp)
+                )
+                AmountDisplay(
+                    amountString = splitTipString,
+                    fontSize = 12.sp,
+                    onClick = { onSplitTipAmountClicked() },
+                    modifier = Modifier.height(14.dp)
+                )
+            }
+        }
 
-        LabeledAmountDisplay(
-            amountString = splitTipString,
-            label = stringResource(id = R.string.display_tip),
-            smallText = true,
-            onClick = { onSplitTipAmountClicked() }
-        )
     }
 }
 
@@ -167,9 +203,7 @@ fun SplitButtons(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .padding(
-                start = 8.dp,
-                end = 12.dp)
+            .padding(end = 8.dp)
     ) {
         BillKeyboardButton(
             icon = Icons.Default.ArrowDropUp,
@@ -180,12 +214,12 @@ fun SplitButtons(
             },
             modifier = Modifier
                 .width(30.dp)
-                .height(36.dp)
+                .height(32.dp)
         )
         Text(
             text = numSplit.toString(),
             fontSize = 30.sp,
-            color = MaterialTheme.colors.primaryVariant
+            color = MaterialTheme.colors.primary
         )
         BillKeyboardButton(
             icon = Icons.Default.ArrowDropDown,
@@ -196,7 +230,7 @@ fun SplitButtons(
             },
             modifier = Modifier
                 .width(30.dp)
-                .height(36.dp)
+                .height(32.dp)
         )
     }
 }
@@ -213,29 +247,58 @@ fun UnevenSplitWarning(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
-                .padding(top = 2.dp)
+                .padding(start = 4.dp, end = 2.dp, top = 4.dp)
         ) {
             SmallText(
                 text = stringResource(id = R.string.split_warning),
-                color = Color.Red,
-                fontSize = 8.sp,
-                modifier = Modifier
-                    .fillMaxWidth(.7f)
-                    .padding(start = 4.dp)
+                color = MaterialTheme.colors.secondaryVariant,
+                fontSize = 9.sp,
             )
-            if (subTotalRemainder > 0) {
-                LabeledAmountDisplay(
-                    amountString = subTotalRemainderString,
-                    label = stringResource(id = R.string.display_sub_total),
-                    smallText = true
-                )
-            }
-            if (tipAmountRemainder > 0) {
-                LabeledAmountDisplay(
-                    amountString = tipAmountRemainderString,
-                    label = stringResource(id = R.string.display_tip),
-                    smallText = true
-                )
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ){
+                    if (subTotalRemainder > 0) {
+                        InputLabel(
+                            labelText = stringResource(id = R.string.display_sub_total),
+                            color = MaterialTheme.colors.onBackground,
+                            fontSize = 12.sp,
+                            modifier = Modifier.height(16.dp)
+                        )
+                    }
+                    if (tipAmountRemainder > 0) {
+                        InputLabel(
+                            labelText = stringResource(id = R.string.display_tip),
+                            color = MaterialTheme.colors.onBackground,
+                            fontSize = 12.sp,
+                            modifier = Modifier.height(16.dp)
+                        )
+                    }
+                }
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    if (subTotalRemainder > 0) {
+                        AmountDisplay(
+                            amountString = subTotalRemainderString,
+                            fontSize = 14.sp,
+                            modifier = Modifier.height(16.dp)
+                        )
+                    }
+                    if (tipAmountRemainder > 0) {
+                        AmountDisplay(
+                            amountString = tipAmountRemainderString,
+                            fontSize = 14.sp,
+                            modifier = Modifier.height(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -252,8 +315,8 @@ fun SplitPreview() {
     TipCalculatorWearTheme {
         SplitCalcScreen(
             navController = rememberSwipeDismissableNavController(),
-            subTotal = 2000,
-            tipAmount = 300,
+            subTotal = 2001,
+            tipAmount = 301,
             numSplit = mutableIntStateOf(2),
             modifier = Modifier.background(color = Color.Black)
         )

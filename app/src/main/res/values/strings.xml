@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">Tip Calculator Wear</string>
     <string name="tip_percentage">Tip Percentage</string>
-    <string name="round_up_down">HOLD TO ROUND GRANDTOTAL UP/DOWN</string>
+    <string name="round_up_down">HOLD ARROW TO ROUND GRANDTOTAL</string>
     <string name="display_sub_total">SUBTOTAL</string>
     <string name="display_tip">TIP</string>
     <string name="display_total">GRANDTOTAL</string>
+    <string name="split">Split</string>
     <string name="split_grand_total">Each payee owes</string>
-    <string name="breakdown">BREAKDOWN</string>
-    <string name="split_warning">Uneven split, one payee must add the additional amount(s) specified below to satisfy the total bill.</string>
+    <string name="split_warning">Uneven Split, additional amount(s) are required to satisfy grand total.</string>
     <string name="title_activity_presentation._main">presentation.MainActivity</string>
     <string name="title_activity_main">MainActivity</string>
 </resources>
