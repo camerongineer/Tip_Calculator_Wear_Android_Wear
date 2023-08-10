@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -322,19 +321,14 @@ fun SubTotalDisplay(
             ) {
                 InputLabel(
                     labelText = stringResource(id = R.string.display_sub_total),
+                    fontSize = 10.sp,
                     onClick = onClick
                 )
-                SmallText(
-                    text = "$",
-                    color = MaterialTheme.colors.primary,
-                    fontSize = 9.sp,
-                )
-                Text(
-                    text = "$billAmountString ",
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.primaryVariant,
-                    modifier = Modifier
-                        .wrapContentHeight()
+                AmountDisplay(
+                    amountString = billAmountString,
+                    fontSize = 12.sp,
+                    modifier = Modifier.height(16.dp),
+                    onClick = onClick
                 )
             }
         }
@@ -396,21 +390,24 @@ fun TipSelectionItem(
                 grandTotalString = tipCalcViewModel.getFormattedGrandTotal(),
                 grandTotalClicked = { },
                 modifier = modifier
-                    .padding(top = screenHeight / 15)
+                    .padding(top = screenHeight / 20)
             )
         }
         Row(
             modifier = Modifier
                 .weight(.12f)
         ) {
-            SmallText(
-                text = "Split",
-                color = Color.Yellow,
-                modifier = Modifier
-                    .padding(top = 2.dp, bottom = 4.dp)
-                    .clickable(onClick = onSplitClicked)
-            )
+            Button(
+                onClick = onSplitClicked,
+                colors = ButtonDefaults.secondaryButtonColors()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.split),
+                    color = MaterialTheme.colors.primary
+                )
+            }
         }
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -437,32 +434,32 @@ fun TipSlider(
         val haptics = LocalHapticFeedback.current
 
         Row(
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = modifier
                 .wrapContentSize()
         ) {
             InputLabel(
-                labelText = stringResource(
-                    id = R.string.tip_percentage),
-                modifier = Modifier.padding(bottom = 4.dp),
+                labelText = stringResource(id = R.string.tip_percentage),
+                fontSize = 14.sp,
+                modifier = Modifier,
                 onClick = onClick)
             SmallText(
-                text = " $equalitySymbol",
+                text = equalitySymbol,
                 color = MaterialTheme.colors.error,
-                fontSize = 10.sp,
-                modifier = Modifier.padding(bottom = 4.dp))
+                fontSize = 12.sp,
+                modifier = Modifier)
             Text(
                 text = tipPercentageString,
                 color = MaterialTheme.colors.error,
-                fontSize = 16.sp,
-                modifier = Modifier.wrapContentHeight()
+                fontSize = 18.sp,
+                modifier = Modifier.padding(end = 1.dp)
             )
             SmallText(
                 text = "%",
                 color = MaterialTheme.colors.error,
                 fontSize = 12.sp,
-                modifier = Modifier.padding(bottom=2.dp))
+                modifier = Modifier)
         }
         InlineSlider(
             value = tipPercentage,
@@ -508,7 +505,7 @@ fun TipSlider(
             text = stringResource(
                 id = R.string.round_up_down
             ),
-            fontSize = 7.sp,
+            fontSize = 8.sp,
             color = MaterialTheme.colors.secondaryVariant)
 
     }
@@ -576,46 +573,11 @@ fun GrandTotalDisplay(
     }
 }
 
-
-@Composable
-fun LabeledAmountDisplay(
-    label: String,
-    amountString: String,
-    modifier: Modifier = Modifier,
-    smallText: Boolean = false,
-    onClick: () -> Unit = { }
-) {
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start,
-        modifier = modifier
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-                .wrapContentWidth()
-                .clickable(onClick = onClick)
-        ) {
-            Text(
-                text = "$label: ",
-                fontSize = if (smallText) 9.sp else 10.sp,
-                textAlign = TextAlign.Right,
-                modifier = Modifier
-            )
-            AmountDisplay(
-                amountString = amountString,
-                smallText = smallText
-            )
-        }
-    }
-}
-
 @Composable
 fun AmountDisplay(
     amountString: String,
     modifier: Modifier = Modifier,
-    smallText: Boolean = false,
+    fontSize: TextUnit = 14.sp,
     onClick: () -> Unit = {}
 ) {
     Row(
@@ -627,12 +589,12 @@ fun AmountDisplay(
         SmallText(
             text = "$",
             color = MaterialTheme.colors.primary,
-            fontSize = if (smallText) 7.sp else 9.sp
+            fontSize = fontSize * .60f
         )
         Text(
             color = MaterialTheme.colors.primaryVariant,
             text = amountString,
-            fontSize = if (smallText) 9.sp else 12.sp,
+            fontSize = fontSize,
             modifier = modifier
                 .wrapContentSize()
                 .clickable(onClick = onClick)
@@ -645,7 +607,7 @@ fun InputLabel(
     labelText: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
-    fontSize: TextUnit = 10.sp,
+    fontSize: TextUnit = 11.sp,
     onClick: () -> Unit = {},
 ) {
     Text(
