@@ -52,10 +52,16 @@ fun SplitCalcScreen(
         numSplit = numSplit
     )
     val configuration = LocalConfiguration.current
+    val haptics = LocalHapticFeedback.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
     val topBottomMarginHeight = screenHeight * .10f
     val splitButtonsWidth = screenWidth * .22f
+
+    val returnToKeyboard = {
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        navController.navigateUp()
+    }
     Scaffold(
         timeText = {
             TimeText(
@@ -93,11 +99,12 @@ fun SplitCalcScreen(
                         splitSubTotalString = splitViewModel.getFormattedSplitSubTotal(),
                         splitTipString = splitViewModel.getFormattedSplitTipAmount(),
                         splitGrandTotalString = splitViewModel.getFormattedSplitGrandTotal(),
-                        onSplitSubtotalClicked = navController::navigateUp,
-                        onSplitTipAmountClicked = navController::navigateUp,
-                        onSplitGrandTotalClicked = navController::navigateUp
+                        onSplitSubtotalClicked = returnToKeyboard,
+                        onSplitTipAmountClicked = returnToKeyboard,
+                        onSplitGrandTotalClicked = returnToKeyboard
                     )
                 }
+
                 UnevenSplitWarning(
                     subTotalRemainder = splitViewModel.getSplitSubTotalRemainder(),
                     subTotalRemainderString = splitViewModel.getFormattedSplitSubTotalRemainder(),
@@ -105,10 +112,17 @@ fun SplitCalcScreen(
                     tipAmountRemainderString = splitViewModel.getFormattedSplitTipAmountRemainder()
                 )
             }
+
             SplitButtons(
                 numSplit = splitViewModel.getNumSplit(),
-                onSplitUpClicked = splitViewModel::onSplitUpClicked,
-                onSplitDownClicked = splitViewModel::onSplitDownClicked,
+                onSplitUpClicked = {
+                    splitViewModel.onSplitUpClicked()
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                },
+                onSplitDownClicked = {
+                    splitViewModel.onSplitDownClicked()
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                },
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(splitButtonsWidth)

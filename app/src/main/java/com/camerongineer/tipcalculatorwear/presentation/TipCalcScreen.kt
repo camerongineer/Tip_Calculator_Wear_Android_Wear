@@ -321,13 +321,12 @@ fun SubTotalDisplay(
             ) {
                 InputLabel(
                     labelText = stringResource(id = R.string.display_sub_total),
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     onClick = onClick
                 )
                 AmountDisplay(
                     amountString = billAmountString,
-                    fontSize = 12.sp,
-                    modifier = Modifier.height(16.dp),
+                    fontSize = 14.sp,
                     onClick = onClick
                 )
             }
@@ -649,6 +648,21 @@ fun TipSelectionPreview() {
             tipCalcViewModel = TipCalcViewModel(),
             scrollToSection = {},
             onSplitClicked = {},
+            modifier = Modifier.background(color = MaterialTheme.colors.background)
+        )
+    }
+}
+
+@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+@Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
+@Composable
+fun KeyboardPreview() {
+    TipCalculatorWearTheme {
+        KeyboardItem(
+            tipCalcViewModel = TipCalcViewModel(),
+            scrollToSection = {},
             modifier = Modifier.background(color = MaterialTheme.colors.background)
         )
     }
