@@ -1,7 +1,9 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,13 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -35,22 +36,16 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.R
+import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 
 
 @Composable
 fun SplitCalcScreen(
     navController: NavHostController,
-    subTotal: Int,
-    tipAmount: Int,
-    numSplit: MutableIntState,
+    splitViewModel: SplitViewModel,
     modifier: Modifier = Modifier
 ) {
-    val splitViewModel = SplitViewModel(
-        subTotal = subTotal,
-        tipAmount = tipAmount,
-        numSplit = numSplit
-    )
     val configuration = LocalConfiguration.current
     val haptics = LocalHapticFeedback.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -115,14 +110,9 @@ fun SplitCalcScreen(
 
             SplitButtons(
                 numSplit = splitViewModel.getNumSplit(),
-                onSplitUpClicked = {
-                    splitViewModel.onSplitUpClicked()
-                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                },
-                onSplitDownClicked = {
-                    splitViewModel.onSplitDownClicked()
-                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                },
+                onSplitUpClicked = splitViewModel::onSplitUpClicked,
+                onSplitDownClicked = splitViewModel::onSplitDownClicked,
+                onNumSplitLongClicked = splitViewModel::resetNumSplit,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(splitButtonsWidth)
@@ -205,11 +195,13 @@ fun SplitDisplay(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SplitButtons(
     numSplit: Int,
     onSplitUpClicked: () -> Unit,
     onSplitDownClicked: () -> Unit,
+    onNumSplitLongClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val haptics = LocalHapticFeedback.current
@@ -233,7 +225,16 @@ fun SplitButtons(
         Text(
             text = numSplit.toString(),
             fontSize = 28.sp,
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier.combinedClickable(
+                onLongClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onNumSplitLongClicked()
+                },
+                onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
+            )
         )
         BillKeyboardButton(
             icon = Icons.Default.ArrowDropDown,
@@ -329,9 +330,11 @@ fun SplitPreview() {
     TipCalculatorWearTheme {
         SplitCalcScreen(
             navController = rememberSwipeDismissableNavController(),
-            subTotal = 2000,
-            tipAmount = 300,
-            numSplit = mutableIntStateOf(20),
+            splitViewModel = SplitViewModel(
+                datastore = DataStoreManager(LocalContext.current),
+                subTotal = 3000,
+                tipAmount = 1000,
+            ),
             modifier = Modifier.background(color = Color.Black)
         )
     }
