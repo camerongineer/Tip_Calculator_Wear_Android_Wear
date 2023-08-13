@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -14,7 +16,7 @@ import kotlin.math.round
 import kotlin.math.roundToInt
 
 
-class TipCalcViewModel: ViewModel() {
+class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
 
     companion object {
         const val MAX_TIP_PERCENT = 100
@@ -26,6 +28,13 @@ class TipCalcViewModel: ViewModel() {
     private val _subTotalString = mutableStateOf("")
     private val _tipAmount = mutableIntStateOf(0)
     private val _tipPercentage = mutableDoubleStateOf(DEFAULT_TIP_PERCENTAGE)
+
+    init {
+        viewModelScope.launch {
+            _tipPercentage.doubleValue = dataStore.tipPercentageFlow.first()
+        }
+    }
+
 
     private val _grandTotal = derivedStateOf {
         _subTotal.intValue + _tipAmount.intValue
@@ -72,8 +81,16 @@ class TipCalcViewModel: ViewModel() {
         }
     }
 
+    fun resetTipPercentage() {
+        viewModelScope.launch {
+            _tipPercentage.doubleValue = dataStore.defaultTipPercentageFlow.first()
+            setTipAmount()
+        }
+    }
+
     private fun setTipAmount() {
         _tipAmount.intValue = (_subTotal.intValue * (_tipPercentage.doubleValue / 100.0)).roundToInt()
+        saveTipPercentage()
     }
 
     fun onRoundUpClicked() {
@@ -155,4 +172,9 @@ class TipCalcViewModel: ViewModel() {
     fun getFormattedGrandTotal() = getFormattedAmountString(_grandTotal.value)
 
     private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)
+    private fun saveTipPercentage() {
+        viewModelScope.launch {
+            dataStore.saveTipPercentage(_tipPercentage.doubleValue)
+        }
+    }
 }

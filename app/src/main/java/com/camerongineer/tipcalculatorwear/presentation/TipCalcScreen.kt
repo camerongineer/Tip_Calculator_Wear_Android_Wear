@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -63,6 +64,7 @@ import androidx.wear.compose.material.TimeTextDefaults
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
+import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -372,6 +374,7 @@ fun TipSelectionItem(
                 equalitySymbol = tipCalcViewModel.getEqualitySymbol(),
                 onTipSliderUpClicked = tipCalcViewModel::tipPercentageIncrement,
                 onTipSliderDownClicked = tipCalcViewModel::tipPercentageDecrement,
+                onTipPercentageLongClicked = tipCalcViewModel::resetTipPercentage,
                 tipSliderHeight = tipSliderHeight,
                 maxTipPercentage = TipCalcViewModel.MAX_TIP_PERCENT,
                 roundUpClicked = tipCalcViewModel::onRoundUpClicked,
@@ -418,6 +421,7 @@ fun TipSlider(
     equalitySymbol: String,
     onTipSliderUpClicked: () -> Unit,
     onTipSliderDownClicked: () -> Unit,
+    onTipPercentageLongClicked: () -> Unit,
     tipSliderHeight: Dp,
     maxTipPercentage: Int,
     roundUpClicked: () -> Unit,
@@ -452,7 +456,17 @@ fun TipSlider(
                 text = tipPercentageString,
                 color = MaterialTheme.colors.error,
                 fontSize = 18.sp,
-                modifier = Modifier.padding(end = 1.dp)
+                modifier = Modifier
+                    .padding(end = 1.dp)
+                    .combinedClickable(
+                        onLongClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onTipPercentageLongClicked()
+                        },
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        }
+                    )
             )
             SmallText(
                 text = "%",
@@ -645,7 +659,7 @@ fun SmallText(
 fun TipSelectionPreview() {
     TipCalculatorWearTheme {
         TipSelectionItem(
-            tipCalcViewModel = TipCalcViewModel(),
+            tipCalcViewModel = TipCalcViewModel(DataStoreManager(LocalContext.current)),
             scrollToSection = {},
             onSplitClicked = {},
             modifier = Modifier.background(color = MaterialTheme.colors.background)
@@ -661,7 +675,7 @@ fun TipSelectionPreview() {
 fun KeyboardPreview() {
     TipCalculatorWearTheme {
         KeyboardItem(
-            tipCalcViewModel = TipCalcViewModel(),
+            tipCalcViewModel = TipCalcViewModel(DataStoreManager(LocalContext.current)),
             scrollToSection = {},
             modifier = Modifier.background(color = MaterialTheme.colors.background)
         )
