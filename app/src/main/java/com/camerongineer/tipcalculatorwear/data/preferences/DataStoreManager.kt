@@ -1,6 +1,7 @@
 package com.camerongineer.tipcalculatorwear.data.preferences
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -9,8 +10,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.camerongineer.tipcalculatorwear.presentation.SplitViewModel
-import com.camerongineer.tipcalculatorwear.presentation.TipCalcViewModel
+import com.camerongineer.tipcalculatorwear.presentation.SettingsViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -24,6 +24,7 @@ class DataStoreManager(context: Context) {
 
     companion object {
         val rememberSettingsKey = booleanPreferencesKey("REMEMBER_SETTINGS_KEY")
+        val launchCountKey = intPreferencesKey("LAUNCH_COUNT_KEY")
         val tipPercentageKey = doublePreferencesKey("TIP_PERCENT_KEY")
         val defaultTipPercentageKey = doublePreferencesKey("DEFAULT_TIP_PERCENT_KEY")
         val numSplitKey = intPreferencesKey("NUM_SPLIT_KEY")
@@ -37,15 +38,29 @@ class DataStoreManager(context: Context) {
         defaultValue = true
     )
 
-    suspend fun saveRememberSettings(isRememberSettings: Boolean) {
-        dataSave(isRememberSettings, rememberSettingsKey)
+    suspend fun saveRememberSettings(rememberSettings: Boolean) {
+        dataSave(rememberSettings, rememberSettingsKey)
     }
 
+
+    val launchCountFlow: Flow<Int> = dataFlow(
+        key = launchCountKey,
+        defaultValue = 0
+    )
+
+
+    suspend fun incrementLaunchCount() {
+        dataStore.edit {
+            val currentLaunchCount = it[launchCountKey] ?: 0
+            it[launchCountKey] = currentLaunchCount + 1
+            Log.d("LAUNCH_COUNT", "The current launch count is ${it[launchCountKey]}")
+        }
+    }
 
 
     val tipPercentageFlow: Flow<Double> = dataFlow(
         key = tipPercentageKey,
-        defaultValue = TipCalcViewModel.DEFAULT_TIP_PERCENTAGE
+        defaultValue = SettingsViewModel.DEFAULT_TIP_PERCENTAGE
     )
 
     suspend fun saveTipPercentage(tipPercentage: Double) {
@@ -56,7 +71,7 @@ class DataStoreManager(context: Context) {
 
     val defaultTipPercentageFlow: Flow<Double> = dataFlow(
         key = defaultTipPercentageKey,
-        defaultValue = TipCalcViewModel.DEFAULT_TIP_PERCENTAGE
+        defaultValue = SettingsViewModel.DEFAULT_TIP_PERCENTAGE
     )
 
     suspend fun saveDefaultTipPercentage(defaultTipPercentage: Double) {
@@ -67,7 +82,7 @@ class DataStoreManager(context: Context) {
 
     val numSplitFlow: Flow<Int> = dataFlow(
         key = numSplitKey,
-        defaultValue = SplitViewModel.DEFAULT_SPLIT_NUM
+        defaultValue = SettingsViewModel.DEFAULT_NUM_SPLIT
     )
 
     suspend fun saveNumSplit(numSplit: Int) {
@@ -78,7 +93,7 @@ class DataStoreManager(context: Context) {
 
     val defaultNumSplitFlow: Flow<Int> = dataFlow(
         key = defaultNumSplitKey,
-        defaultValue = SplitViewModel.DEFAULT_SPLIT_NUM
+        defaultValue = SettingsViewModel.DEFAULT_NUM_SPLIT
     )
 
     suspend fun saveDefaultNumSplit(defaultNumSplit: Int) {

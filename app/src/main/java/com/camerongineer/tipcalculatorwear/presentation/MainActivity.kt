@@ -16,9 +16,9 @@ import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearT
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         val dataStore = DataStoreManager(this)
         val tipCalcViewModel = TipCalcViewModel(dataStore)
-        super.onCreate(savedInstanceState)
         setContent {
             TipCalculatorWearTheme {
                 TipCalcApp(tipCalcViewModel)
@@ -37,6 +37,7 @@ fun TipCalcApp(
         subTotal = tipCalcViewModel.getSubtotal(),
         tipAmount = tipCalcViewModel.getTipAmount(),
     )
+    val settingsViewModel = SettingsViewModel(dataStore = tipCalcViewModel.dataStore)
 
     SwipeDismissableNavHost(
         navController = navController,
@@ -52,6 +53,12 @@ fun TipCalcApp(
             SplitCalcScreen(
                 navController = navController,
                 splitViewModel = splitViewModel
+            )
+        }
+        composable("settings") {
+            SettingsScreen(
+                navController = navController,
+                settingsViewModel = settingsViewModel
             )
         }
     }
