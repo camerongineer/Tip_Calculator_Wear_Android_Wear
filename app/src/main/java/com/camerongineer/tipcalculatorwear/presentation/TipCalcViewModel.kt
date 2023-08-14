@@ -20,17 +20,26 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
 
     companion object {
         const val MAX_TIP_PERCENT = 100
-        const val DEFAULT_TIP_PERCENTAGE = 15.0
         const val ROUNDING_NUM = 50
     }
 
     private val _subTotal = mutableIntStateOf(0)
+    fun getSubtotal() = _subTotal.intValue
+
     private val _subTotalString = mutableStateOf("")
+
     private val _tipAmount = mutableIntStateOf(0)
-    private val _tipPercentage = mutableDoubleStateOf(DEFAULT_TIP_PERCENTAGE)
+    fun getTipAmount() = _tipAmount.intValue
+
+    private val _tipPercentage = mutableDoubleStateOf(SettingsViewModel.DEFAULT_TIP_PERCENTAGE)
+    fun getTipPercentage() = _tipPercentage.doubleValue
+
+    private var _isFirstLaunch = true
+    fun isFirstLaunch() = _isFirstLaunch
 
     init {
         viewModelScope.launch {
+            dataStore.incrementLaunchCount()
             _tipPercentage.doubleValue = dataStore.tipPercentageFlow.first()
         }
     }
@@ -137,6 +146,10 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
         _tipAmount.intValue = 0
     }
 
+    fun markAsNotFirstLaunch() {
+        _isFirstLaunch = false
+    }
+
     fun getFormattedSubTotal(): String {
         val subTotalDouble = _subTotalString.value.toDoubleOrNull()
         return if (subTotalDouble != null && subTotalDouble > 0) {
@@ -146,11 +159,7 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
         }
     }
 
-    fun getSubtotal() = _subTotal.intValue
 
-    fun getTipAmount() = _tipAmount.intValue
-
-    fun getTipPercentage() = _tipPercentage.doubleValue
 
     fun getFormattedTipPercentage() = "${_tipPercentage.doubleValue.roundToInt()}"
 

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.KeyboardBackspace
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -69,6 +71,7 @@ import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearT
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TipCalcScreen(
     navController: NavHostController,
@@ -85,8 +88,14 @@ fun TipCalcScreen(
         }
     }
 
+
     DisposableEffect(Unit) {
-        coroutineScope.launch { listState.scrollToItem(0) }
+        if (tipCalcViewModel.isFirstLaunch()) {
+            tipCalcViewModel.markAsNotFirstLaunch()
+            coroutineScope.launch {
+                listState.scrollToItem(0)
+            }
+        }
         onDispose { }
     }
 
@@ -103,10 +112,12 @@ fun TipCalcScreen(
             .wrapContentHeight()
             .background(color = MaterialTheme.colors.background)
     ) {
-        ScalingLazyColumn(state = listState,
+        ScalingLazyColumn(
+            state = listState,
             autoCentering = AutoCenteringParams(itemIndex = 0),
             modifier = Modifier.fillMaxWidth(),
             anchorType = ScalingLazyListAnchorType.ItemCenter,
+            userScrollEnabled = false,
             contentPadding = PaddingValues(horizontal = 0.dp)
         ) {
 
@@ -121,7 +132,11 @@ fun TipCalcScreen(
                 TipSelectionItem(
                     tipCalcViewModel = tipCalcViewModel,
                     scrollToSection = scrollToSection,
-                    onSplitClicked = { navController.navigate("split") }
+                    onSplitClicked = { navController.navigate("split") },
+                    onSettingsClicked = {
+                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        navController.navigate("settings")
+                    }
                 )
             }
 
@@ -139,7 +154,6 @@ fun KeyboardItem(
     val screenHeight = configuration.screenHeightDp.dp
     val buttonHeight = screenHeight * (if (configuration.isScreenRound) .15f else .17f)
     val scrollToTipSection = remember { { scrollToSection(1) } }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -343,6 +357,7 @@ fun TipSelectionItem(
     tipCalcViewModel: TipCalcViewModel,
     scrollToSection: (Int) -> Unit,
     onSplitClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -360,7 +375,7 @@ fun TipSelectionItem(
     ) {
         Spacer(
             modifier = Modifier
-                .weight(.08f)
+                .weight(.10f)
                 .clickable(onClick = scrollToKeyboard)
         )
         Column(
@@ -390,7 +405,6 @@ fun TipSelectionItem(
                 tipAmountString = tipCalcViewModel.getFormattedTipAmount(),
                 tipAmountClicked = { scrollToSection(1) },
                 grandTotalString = tipCalcViewModel.getFormattedGrandTotal(),
-                grandTotalClicked = { },
                 modifier = modifier
                     .padding(top = screenHeight / 20)
             )
@@ -399,6 +413,21 @@ fun TipSelectionItem(
             modifier = Modifier
                 .weight(.12f)
         ) {
+
+            Button(
+                onClick = onSettingsClicked,
+                colors = ButtonDefaults.secondaryButtonColors(),
+                modifier = Modifier
+                    .width(26.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings Button",
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSecondary),
+                    modifier = Modifier.height(16.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(6.dp))
             Button(
                 onClick = onSplitClicked,
                 colors = ButtonDefaults.secondaryButtonColors()
@@ -409,7 +438,7 @@ fun TipSelectionItem(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(9.dp))
     }
 }
 
@@ -532,34 +561,41 @@ fun GrandTotalDisplay(
     modifier: Modifier = Modifier,
     billAmountClicked: () -> Unit = {},
     tipAmountClicked: () -> Unit = {},
-    grandTotalClicked: () -> Unit = {}
+    grandTotalClicked: () -> Unit = {},
+
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth(.9f)
-    ) {
+        modifier = Modifier
+            .fillMaxSize(.85f)
+            .padding(bottom = 2.dp)
+        )
+    {
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
+                .padding(start = 4.dp, end = 4.dp)
         ) {
             InputLabel(
                 labelText = stringResource(id = R.string.display_sub_total),
                 color = MaterialTheme.colors.onBackground,
                 onClick = billAmountClicked,
-                modifier = Modifier.height(16.dp))
+                modifier = Modifier.height(16.dp)
+            )
             InputLabel(
                 labelText = stringResource(id = R.string.display_tip),
                 color = MaterialTheme.colors.onBackground,
                 onClick = tipAmountClicked,
-                modifier = Modifier.height(16.dp))
+                modifier = Modifier.height(16.dp)
+            )
             InputLabel(
                 labelText = stringResource(id = R.string.display_total),
                 color = MaterialTheme.colors.onBackground,
                 onClick = grandTotalClicked,
-                modifier = Modifier.height(16.dp))
+                modifier = Modifier.height(16.dp)
+            )
         }
         Column(
             horizontalAlignment = Alignment.Start,
@@ -582,7 +618,6 @@ fun GrandTotalDisplay(
                 onClick = grandTotalClicked
             )
         }
-
     }
 }
 
@@ -662,6 +697,7 @@ fun TipSelectionPreview() {
             tipCalcViewModel = TipCalcViewModel(DataStoreManager(LocalContext.current)),
             scrollToSection = {},
             onSplitClicked = {},
+            onSettingsClicked = {},
             modifier = Modifier.background(color = MaterialTheme.colors.background)
         )
     }

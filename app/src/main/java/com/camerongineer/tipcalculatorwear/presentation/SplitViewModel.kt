@@ -15,11 +15,10 @@ class SplitViewModel(
 ): ViewModel() {
 
     companion object {
-        const val DEFAULT_SPLIT_NUM = 2
         const val MAX_NUM_SPLIT = 20
     }
 
-    private val _numSplit = mutableIntStateOf(DEFAULT_SPLIT_NUM)
+    private val _numSplit = mutableIntStateOf(SettingsViewModel.DEFAULT_NUM_SPLIT)
 
     init {
         viewModelScope.launch {
