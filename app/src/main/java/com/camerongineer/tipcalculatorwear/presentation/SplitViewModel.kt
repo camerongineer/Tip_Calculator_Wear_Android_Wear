@@ -1,14 +1,17 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class SplitViewModel(
+    private val datastore: DataStoreManager,
     subTotal: Int,
     tipAmount: Int,
-    private val numSplit: MutableState<Int> = mutableIntStateOf(DEFAULT_SPLIT_NUM)
 ): ViewModel() {
 
     companion object {
@@ -16,20 +19,28 @@ class SplitViewModel(
         const val MAX_NUM_SPLIT = 20
     }
 
+    private val _numSplit = mutableIntStateOf(DEFAULT_SPLIT_NUM)
+
+    init {
+        viewModelScope.launch {
+            _numSplit.intValue = datastore.numSplitFlow.first()
+        }
+    }
+
     private val _splitSubTotal = derivedStateOf {
-        subTotal / numSplit.value
+        subTotal / _numSplit.intValue
     }
 
     private val _splitSubTotalRemainder = derivedStateOf {
-        subTotal % numSplit.value
+        subTotal % _numSplit.intValue
     }
 
     private val _splitTipAmount = derivedStateOf {
-        tipAmount / numSplit.value
+        tipAmount / _numSplit.intValue
     }
 
     private val _splitTipRemainder = derivedStateOf {
-        tipAmount % numSplit.value
+        tipAmount % _numSplit.intValue
     }
 
     private val _splitGrandTotal = derivedStateOf {
@@ -38,14 +49,27 @@ class SplitViewModel(
 
 
     fun onSplitUpClicked() {
-        if (numSplit.value < MAX_NUM_SPLIT) numSplit.value++
+        if (_numSplit.intValue < MAX_NUM_SPLIT) {
+            _numSplit.intValue++
+            saveNumSplit()
+        }
     }
 
     fun onSplitDownClicked() {
-        if (numSplit.value > 2) numSplit.value--
+        if (_numSplit.intValue > 2) {
+            _numSplit.intValue--
+            saveNumSplit()
+        }
     }
 
-    fun getNumSplit() = numSplit.value
+    fun resetNumSplit() {
+        viewModelScope.launch {
+            _numSplit.intValue = datastore.defaultNumSplitFlow.first()
+            saveNumSplit()
+        }
+    }
+
+    fun getNumSplit() = _numSplit.intValue
 
     fun getSplitSubTotalRemainder(): Int = _splitSubTotalRemainder.value
 
@@ -60,6 +84,12 @@ class SplitViewModel(
     fun getFormattedSplitTipAmountRemainder() = getFormattedAmountString(_splitTipRemainder.value)
 
     fun getFormattedSplitGrandTotal() = getFormattedAmountString(_splitGrandTotal.value)
+
+    private fun saveNumSplit() {
+        viewModelScope.launch {
+            datastore.saveNumSplit(numSplit = _numSplit.intValue)
+        }
+    }
 }
 
 private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)
