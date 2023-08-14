@@ -3,6 +3,7 @@ package com.camerongineer.tipcalculatorwear.data.preferences
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -22,11 +23,22 @@ class DataStoreManager(context: Context) {
     private val dataStore = context.dataStore
 
     companion object {
+        val rememberSettingsKey = booleanPreferencesKey("REMEMBER_SETTINGS_KEY")
         val tipPercentageKey = doublePreferencesKey("TIP_PERCENT_KEY")
         val defaultTipPercentageKey = doublePreferencesKey("DEFAULT_TIP_PERCENT_KEY")
         val numSplitKey = intPreferencesKey("NUM_SPLIT_KEY")
         val defaultNumSplitKey = intPreferencesKey("DEFAULT_NUM_SPLIT_KEY")
+        val preciseSplitKey = booleanPreferencesKey("PRECISE_SPLIT_KEY")
+    }
 
+
+    val rememberSettingsFlow: Flow<Boolean> = dataFlow(
+        key = rememberSettingsKey,
+        defaultValue = true
+    )
+
+    suspend fun saveRememberSettings(isRememberSettings: Boolean) {
+        dataSave(isRememberSettings, rememberSettingsKey)
     }
 
 
@@ -74,6 +86,15 @@ class DataStoreManager(context: Context) {
     }
 
 
+
+    val preciseSplitFlow: Flow<Boolean> = dataFlow(
+        key = preciseSplitKey,
+        defaultValue = true
+    )
+
+    suspend fun savePreciseSplit(isPreciseSplit: Boolean) {
+        dataSave(isPreciseSplit, preciseSplitKey)
+    }
 
     private fun <T> dataFlow(
         key: Preferences.Key<T>,
