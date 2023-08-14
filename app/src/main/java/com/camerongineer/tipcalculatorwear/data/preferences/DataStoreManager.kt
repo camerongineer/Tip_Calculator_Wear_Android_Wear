@@ -15,9 +15,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
+private val Context.dataStore : DataStore<Preferences> by preferencesDataStore("SETTINGS_KEY")
+
 class DataStoreManager(context: Context) {
 
-    private val Context.dataStore : DataStore<Preferences> by preferencesDataStore("SETTINGS_KEY")
     private val dataStore = context.dataStore
 
     companion object {
