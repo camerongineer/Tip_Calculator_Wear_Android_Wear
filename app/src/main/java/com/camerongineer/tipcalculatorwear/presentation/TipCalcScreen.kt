@@ -71,7 +71,6 @@ import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearT
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TipCalcScreen(
     navController: NavHostController,
@@ -102,9 +101,8 @@ fun TipCalcScreen(
     Scaffold(
         timeText = { if (!listState.isScrollInProgress) {
             TimeText(
-            timeTextStyle = TimeTextDefaults.timeTextStyle(
-                color = MaterialTheme.colors.onSecondary)
-            )
+                timeTextStyle = TimeTextDefaults
+                    .timeTextStyle(color = MaterialTheme.colors.onSecondary))
         } },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         modifier = Modifier
@@ -217,6 +215,7 @@ fun KeyboardItem(
         }
         Spacer(modifier = Modifier.height(2.dp))
         SubTotalDisplay(
+            currencySymbol = tipCalcViewModel.getCurrencySymbol(),
             billAmountString = tipCalcViewModel.getFormattedSubTotal(),
             onClick = scrollToTipSection,
             modifier = Modifier
@@ -248,8 +247,7 @@ fun BillDigitsRow(
             BillKeyboardDigit(
                 digitChar = digit,
                 onClick = { onDigitClick(digit) },
-                modifier = modifier
-                    .weight(1f)
+                modifier = modifier.weight(1f)
             )
         }
     }
@@ -291,12 +289,12 @@ fun BillKeyboardButton(
     ) {
         val buttonModifier = Modifier.combinedClickable(
             onLongClick = {
-                onLongClick()
                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                onLongClick()
             },
             onClick = {
-                onClick()
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
             }
         )
         icon?.let {
@@ -322,6 +320,7 @@ fun BillKeyboardButton(
 
 @Composable
 fun SubTotalDisplay(
+    currencySymbol: String,
     billAmountString: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -341,6 +340,7 @@ fun SubTotalDisplay(
                     onClick = onClick
                 )
                 AmountDisplay(
+                    currencySymbol = currencySymbol,
                     amountString = billAmountString,
                     fontSize = 14.sp,
                     onClick = onClick
@@ -400,6 +400,7 @@ fun TipSelectionItem(
             ) { scrollToSection(1) }
 
             GrandTotalDisplay(
+                currencySymbol = tipCalcViewModel.getCurrencySymbol(),
                 billAmountString = tipCalcViewModel.getFormattedSubTotal(),
                 billAmountClicked = { scrollToSection(0) },
                 tipAmountString = tipCalcViewModel.getFormattedTipAmount(),
@@ -555,6 +556,7 @@ fun TipSlider(
 
 @Composable
 fun GrandTotalDisplay(
+    currencySymbol: String,
     billAmountString: String,
     tipAmountString: String,
     grandTotalString: String,
@@ -603,16 +605,19 @@ fun GrandTotalDisplay(
             modifier = Modifier
         ) {
             AmountDisplay(
+                currencySymbol = currencySymbol,
                 amountString = billAmountString,
                 modifier = Modifier.height(16.dp),
                 onClick = billAmountClicked
             )
             AmountDisplay(
+                currencySymbol = currencySymbol,
                 amountString = tipAmountString,
                 modifier = Modifier.height(16.dp),
                 onClick = tipAmountClicked
             )
             AmountDisplay(
+                currencySymbol = currencySymbol,
                 amountString = grandTotalString,
                 modifier = Modifier.height(16.dp),
                 onClick = grandTotalClicked
@@ -623,6 +628,7 @@ fun GrandTotalDisplay(
 
 @Composable
 fun AmountDisplay(
+    currencySymbol: String,
     amountString: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 14.sp,
@@ -635,7 +641,7 @@ fun AmountDisplay(
             .wrapContentSize()
     ) {
         SmallText(
-            text = "$",
+            text = currencySymbol,
             color = MaterialTheme.colors.primary,
             fontSize = fontSize * .60f
         )

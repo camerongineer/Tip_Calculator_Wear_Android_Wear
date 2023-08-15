@@ -31,16 +31,27 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     private val _tipAmount = mutableIntStateOf(0)
     fun getTipAmount() = _tipAmount.intValue
 
-    private val _tipPercentage = mutableDoubleStateOf(SettingsViewModel.DEFAULT_TIP_PERCENTAGE)
+    private val _tipPercentage =
+        mutableDoubleStateOf(
+            DataStoreManager.DEFAULT_TIP_PERCENTAGE.toDouble()
+        )
     fun getTipPercentage() = _tipPercentage.doubleValue
 
     private var _isFirstLaunch = true
     fun isFirstLaunch() = _isFirstLaunch
 
+    private val _currencySymbol = mutableStateOf("$")
+    fun getCurrencySymbol() = _currencySymbol.value
+
     init {
         viewModelScope.launch {
             dataStore.incrementLaunchCount()
-            _tipPercentage.doubleValue = dataStore.tipPercentageFlow.first()
+            _tipPercentage.doubleValue = if (dataStore.rememberTipPercentageFlow.first()) {
+                dataStore.tipPercentageFlow.first().toDouble()
+            } else {
+                dataStore.defaultTipPercentageFlow.first().toDouble()
+            }
+            _currencySymbol.value = dataStore.currencySymbolFlow.first()
         }
     }
 
@@ -92,7 +103,7 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
 
     fun resetTipPercentage() {
         viewModelScope.launch {
-            _tipPercentage.doubleValue = dataStore.defaultTipPercentageFlow.first()
+            _tipPercentage.doubleValue = dataStore.defaultTipPercentageFlow.first().toDouble()
             setTipAmount()
         }
     }
@@ -183,7 +194,7 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)
     private fun saveTipPercentage() {
         viewModelScope.launch {
-            dataStore.saveTipPercentage(_tipPercentage.doubleValue)
+            dataStore.saveTipPercentage(_tipPercentage.doubleValue.roundToInt())
         }
     }
 }
