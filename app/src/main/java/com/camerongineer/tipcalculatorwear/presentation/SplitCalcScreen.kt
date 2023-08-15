@@ -91,6 +91,7 @@ fun SplitCalcScreen(
                     modifier = modifier
                 ) {
                     SplitDisplay(
+                        currencySymbol = splitViewModel.getCurrencySymbol(),
                         splitSubTotalString = splitViewModel.getFormattedSplitSubTotal(),
                         splitTipString = splitViewModel.getFormattedSplitTipAmount(),
                         splitGrandTotalString = splitViewModel.getFormattedSplitGrandTotal(),
@@ -101,6 +102,7 @@ fun SplitCalcScreen(
                 }
 
                 UnevenSplitWarning(
+                    currencySymbol = splitViewModel.getCurrencySymbol(),
                     subTotalRemainder = splitViewModel.getSplitSubTotalRemainder(),
                     subTotalRemainderString = splitViewModel.getFormattedSplitSubTotalRemainder(),
                     tipAmountRemainder = splitViewModel.getSplitTipAmountRemainder(),
@@ -123,6 +125,7 @@ fun SplitCalcScreen(
 
 @Composable
 fun SplitDisplay(
+    currencySymbol: String,
     splitSubTotalString: String,
     splitTipString: String,
     splitGrandTotalString: String,
@@ -145,6 +148,7 @@ fun SplitDisplay(
                 fontSize = 14.sp,
                 color = Color.White)
             AmountDisplay(
+                currencySymbol = currencySymbol,
                 amountString = splitGrandTotalString,
                 fontSize = 24.sp,
                 onClick = { onSplitGrandTotalClicked() }
@@ -177,12 +181,14 @@ fun SplitDisplay(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 AmountDisplay(
+                    currencySymbol = currencySymbol,
                     amountString = splitSubTotalString,
                     fontSize = 12.sp,
                     onClick = { onSplitSubtotalClicked() },
                     modifier = Modifier.height(14.dp)
                 )
                 AmountDisplay(
+                    currencySymbol = currencySymbol,
                     amountString = splitTipString,
                     fontSize = 12.sp,
                     onClick = { onSplitTipAmountClicked() },
@@ -252,6 +258,7 @@ fun SplitButtons(
 
 @Composable
 fun UnevenSplitWarning(
+    currencySymbol: String,
     subTotalRemainder: Int,
     subTotalRemainderString: String,
     tipAmountRemainder: Int,
@@ -301,6 +308,7 @@ fun UnevenSplitWarning(
                 ) {
                     if (subTotalRemainder > 0) {
                         AmountDisplay(
+                            currencySymbol = currencySymbol,
                             amountString = subTotalRemainderString,
                             fontSize = 14.sp,
                             modifier = Modifier.height(16.dp)
@@ -308,6 +316,7 @@ fun UnevenSplitWarning(
                     }
                     if (tipAmountRemainder > 0) {
                         AmountDisplay(
+                            currencySymbol = currencySymbol,
                             amountString = tipAmountRemainderString,
                             fontSize = 14.sp,
                             modifier = Modifier.height(16.dp)
@@ -331,7 +340,7 @@ fun SplitPreview() {
         SplitCalcScreen(
             navController = rememberSwipeDismissableNavController(),
             splitViewModel = SplitViewModel(
-                datastore = DataStoreManager(LocalContext.current),
+                dataStore = DataStoreManager(LocalContext.current),
                 subTotal = 3000,
                 tipAmount = 1000,
             ),

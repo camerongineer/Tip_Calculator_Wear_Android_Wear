@@ -5,16 +5,18 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.camerongineer.tipcalculatorwear.presentation.SettingsViewModel
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import java.util.Currency
+import java.util.Locale
 
 private val Context.dataStore : DataStore<Preferences> by preferencesDataStore("SETTINGS_KEY")
 
@@ -23,31 +25,39 @@ class DataStoreManager(context: Context) {
     private val dataStore = context.dataStore
 
     companion object {
-        val rememberSettingsKey = booleanPreferencesKey("REMEMBER_SETTINGS_KEY")
+        const val DEFAULT_TIP_PERCENTAGE = 15
+        const val DEFAULT_NUM_SPLIT = 2
+        const val MAX_NUM_SPLIT = 30
+
         val launchCountKey = intPreferencesKey("LAUNCH_COUNT_KEY")
-        val tipPercentageKey = doublePreferencesKey("TIP_PERCENT_KEY")
-        val defaultTipPercentageKey = doublePreferencesKey("DEFAULT_TIP_PERCENT_KEY")
+        val tipPercentageKey = intPreferencesKey("TIP_PERCENT_KEY")
+        val defaultTipPercentageKey = intPreferencesKey("DEFAULT_TIP_PERCENT_KEY")
+        val rememberTipPercentageKey = booleanPreferencesKey("REMEMBER_TIP_PERCENTAGE_KEY")
         val numSplitKey = intPreferencesKey("NUM_SPLIT_KEY")
         val defaultNumSplitKey = intPreferencesKey("DEFAULT_NUM_SPLIT_KEY")
+        val rememberNumSplitKey = booleanPreferencesKey("REMEMBER_NUM_SPLIT_KEY")
         val preciseSplitKey = booleanPreferencesKey("PRECISE_SPLIT_KEY")
+        val currencySymbolKey = stringPreferencesKey("CURRENCY_SYMBOL_KEY")
     }
 
+    private val tipCurrency = try {
+        val currency: Currency = Currency.getInstance(Locale.getDefault())
+        val currencyCode: String = currency.currencyCode
+        Log.d("Currency", currencyCode)
+        TipCurrency.valueOf(currencyCode)
+    } catch (e: Exception) {
+        TipCurrency.USD
+    }
 
-    val rememberSettingsFlow: Flow<Boolean> = dataFlow(
-        key = rememberSettingsKey,
-        defaultValue = true
+    val currencySymbolFlow: Flow<String> = dataFlow(
+        key = currencySymbolKey,
+        defaultValue = tipCurrency.symbol
     )
-
-    suspend fun saveRememberSettings(rememberSettings: Boolean) {
-        dataSave(rememberSettings, rememberSettingsKey)
-    }
-
 
     val launchCountFlow: Flow<Int> = dataFlow(
         key = launchCountKey,
         defaultValue = 0
     )
-
 
     suspend fun incrementLaunchCount() {
         dataStore.edit {
@@ -58,31 +68,39 @@ class DataStoreManager(context: Context) {
     }
 
 
-    val tipPercentageFlow: Flow<Double> = dataFlow(
+    val tipPercentageFlow: Flow<Int> = dataFlow(
         key = tipPercentageKey,
-        defaultValue = SettingsViewModel.DEFAULT_TIP_PERCENTAGE
+        defaultValue = DEFAULT_TIP_PERCENTAGE
     )
 
-    suspend fun saveTipPercentage(tipPercentage: Double) {
+    suspend fun saveTipPercentage(tipPercentage: Int) {
         dataSave(tipPercentage, tipPercentageKey)
     }
 
 
-
-    val defaultTipPercentageFlow: Flow<Double> = dataFlow(
+    val defaultTipPercentageFlow: Flow<Int> = dataFlow(
         key = defaultTipPercentageKey,
-        defaultValue = SettingsViewModel.DEFAULT_TIP_PERCENTAGE
+        defaultValue =  DEFAULT_TIP_PERCENTAGE
     )
 
-    suspend fun saveDefaultTipPercentage(defaultTipPercentage: Double) {
+    suspend fun saveDefaultTipPercentage(defaultTipPercentage: Int) {
         dataSave(defaultTipPercentage, defaultTipPercentageKey)
     }
 
 
+    val rememberTipPercentageFlow: Flow<Boolean> = dataFlow(
+        key = rememberTipPercentageKey,
+        defaultValue = true
+    )
+
+    suspend fun saveRememberTipPercentage(rememberTipPercentage: Boolean) {
+        dataSave(rememberTipPercentage, rememberTipPercentageKey)
+    }
+
 
     val numSplitFlow: Flow<Int> = dataFlow(
         key = numSplitKey,
-        defaultValue = SettingsViewModel.DEFAULT_NUM_SPLIT
+        defaultValue = DEFAULT_NUM_SPLIT
     )
 
     suspend fun saveNumSplit(numSplit: Int) {
@@ -93,13 +111,22 @@ class DataStoreManager(context: Context) {
 
     val defaultNumSplitFlow: Flow<Int> = dataFlow(
         key = defaultNumSplitKey,
-        defaultValue = SettingsViewModel.DEFAULT_NUM_SPLIT
+        defaultValue = DEFAULT_NUM_SPLIT
     )
 
     suspend fun saveDefaultNumSplit(defaultNumSplit: Int) {
         dataSave(defaultNumSplit, defaultNumSplitKey)
     }
 
+
+    val rememberNumSplitFlow: Flow<Boolean> = dataFlow(
+        key = rememberNumSplitKey,
+        defaultValue = true
+    )
+
+    suspend fun saveRememberNumSplit(rememberNumSplit: Boolean) {
+        dataSave(rememberNumSplit, rememberNumSplitKey)
+    }
 
 
     val preciseSplitFlow: Flow<Boolean> = dataFlow(

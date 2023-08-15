@@ -2,6 +2,7 @@ package com.camerongineer.tipcalculatorwear.presentation
 
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
@@ -9,20 +10,24 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SplitViewModel(
-    private val datastore: DataStoreManager,
+    private val dataStore: DataStoreManager,
     subTotal: Int,
     tipAmount: Int,
 ): ViewModel() {
 
-    companion object {
-        const val MAX_NUM_SPLIT = 20
-    }
+    private val _numSplit = mutableIntStateOf(DataStoreManager.DEFAULT_NUM_SPLIT)
 
-    private val _numSplit = mutableIntStateOf(SettingsViewModel.DEFAULT_NUM_SPLIT)
+    private val _currencySymbol = mutableStateOf("$")
+    fun getCurrencySymbol() = _currencySymbol.value
 
     init {
         viewModelScope.launch {
-            _numSplit.intValue = datastore.numSplitFlow.first()
+            _numSplit.intValue = if (dataStore.rememberNumSplitFlow.first()) {
+                dataStore.numSplitFlow.first()
+            } else {
+                dataStore.defaultNumSplitFlow.first()
+            }
+            _currencySymbol.value = dataStore.currencySymbolFlow.first()
         }
     }
 
@@ -48,7 +53,7 @@ class SplitViewModel(
 
 
     fun onSplitUpClicked() {
-        if (_numSplit.intValue < MAX_NUM_SPLIT) {
+        if (_numSplit.intValue < DataStoreManager.MAX_NUM_SPLIT) {
             _numSplit.intValue++
             saveNumSplit()
         }
@@ -63,7 +68,7 @@ class SplitViewModel(
 
     fun resetNumSplit() {
         viewModelScope.launch {
-            _numSplit.intValue = datastore.defaultNumSplitFlow.first()
+            _numSplit.intValue = dataStore.defaultNumSplitFlow.first()
             saveNumSplit()
         }
     }
@@ -86,7 +91,7 @@ class SplitViewModel(
 
     private fun saveNumSplit() {
         viewModelScope.launch {
-            datastore.saveNumSplit(numSplit = _numSplit.intValue)
+            dataStore.saveNumSplit(numSplit = _numSplit.intValue)
         }
     }
 }

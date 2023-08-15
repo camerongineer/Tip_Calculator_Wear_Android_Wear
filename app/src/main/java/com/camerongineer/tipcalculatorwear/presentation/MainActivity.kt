@@ -33,11 +33,15 @@ fun TipCalcApp(
 ) {
     val navController = rememberSwipeDismissableNavController()
     val splitViewModel = SplitViewModel(
-        datastore = tipCalcViewModel.dataStore,
+        dataStore = tipCalcViewModel.dataStore,
         subTotal = tipCalcViewModel.getSubtotal(),
         tipAmount = tipCalcViewModel.getTipAmount(),
     )
     val settingsViewModel = SettingsViewModel(dataStore = tipCalcViewModel.dataStore)
+    val defaultTipPercentageViewModel = PickerViewModel(
+        initialValue = settingsViewModel.getDefaultTipPercentage(),
+        minimumValue = 0,
+        maximumValue = TipCalcViewModel.MAX_TIP_PERCENT)
 
     SwipeDismissableNavHost(
         navController = navController,
@@ -59,6 +63,13 @@ fun TipCalcApp(
             SettingsScreen(
                 navController = navController,
                 settingsViewModel = settingsViewModel
+            )
+        }
+        composable("default_tip_picker") {
+            PickerScreen(
+                navController = navController,
+                pickerViewModel = defaultTipPercentageViewModel,
+                callbackCommand = settingsViewModel::setDefaultTipPercentage
             )
         }
     }
