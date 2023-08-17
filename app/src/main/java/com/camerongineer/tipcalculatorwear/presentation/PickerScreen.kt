@@ -2,16 +2,17 @@ package com.camerongineer.tipcalculatorwear.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -32,18 +33,19 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.rememberPickerState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
-import kotlin.reflect.KFunction1
 
 @Composable
 fun PickerScreen(
     navController: NavHostController,
     pickerViewModel: PickerViewModel,
-    callbackCommand: KFunction1<Int, Unit>?
+    callbackCommand: (Int) -> Unit
 ) {
+    val startIndex = pickerViewModel.optionsList.indexOf(pickerViewModel.state.intValue.toString())
     val state = rememberPickerState(
-        initialNumberOfOptions = pickerViewModel.maximumValue - pickerViewModel.minimumValue,
-        initiallySelectedOption = pickerViewModel.initialValue,
+        initialNumberOfOptions = pickerViewModel.optionsList.size,
+        initiallySelectedOption = startIndex,
         repeatItems = false
     )
     Scaffold(
@@ -54,30 +56,37 @@ fun PickerScreen(
         },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
+            .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxSize(),
+        Box(
+            contentAlignment = Alignment.TopCenter,
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(.9f)
         ) {
             Picker(
                 state = state,
                 contentDescription = "Select Value",
-                modifier = Modifier.weight(.7f),
                 flingBehavior = PickerDefaults.flingBehavior(state = state),
-                readOnly = true
             ) {
                 Text(
-                    text = it.toString(),
-                    fontSize = 28.sp
+                    text = pickerViewModel.optionsList[it],
+                    fontSize = 28.sp,
+                    color = MaterialTheme.colors.primaryVariant
                 )
             }
+        }
+
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier.fillMaxSize()
+        ) {
             Button(
-                onClick = {
-                    callbackCommand?.invoke(state.selectedOption)
+                onClick = withHaptics {
+                    val savedOption = pickerViewModel.optionsList[state.selectedOption].toInt()
+                    callbackCommand(savedOption)
+                    pickerViewModel.state.intValue = savedOption
                     navController.navigateUp()
                 },
                 modifier = Modifier
@@ -87,10 +96,11 @@ fun PickerScreen(
                 Image(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Value Selected",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.background),
                 )
             }
         }
+
     }
 }
 
@@ -103,8 +113,7 @@ fun PickerPreview() {
     TipCalculatorWearTheme {
         PickerScreen(
             rememberSwipeDismissableNavController(),
-            PickerViewModel(15, 0, 100),
-            null,
-        )
+            PickerViewModel(remember {mutableIntStateOf(2)}, OptionsLists.NUM_SPLIT_OPTIONS),
+        ) { }
     }
 }

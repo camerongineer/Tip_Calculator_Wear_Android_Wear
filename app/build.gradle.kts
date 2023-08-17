@@ -82,9 +82,20 @@ dependencies {
     implementation("com.google.android.horologist:horologist-tiles:0.5.3")
     implementation("androidx.wear.watchface:watchface-complications-data-source-ktx:1.1.1")
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation("androidx.vectordrawable:vectordrawable:1.1.0")
+    testImplementation("junit:junit:4.13.2")
+
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     "baselineProfile"(project(":baselineprofile"))
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // Testing dependencies
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Compose testing dependencies
+    androidTestImplementation("androidx.compose.ui:ui-test")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
