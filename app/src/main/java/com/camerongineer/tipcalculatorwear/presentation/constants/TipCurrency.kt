@@ -4,6 +4,7 @@ enum class TipCurrency(val symbol: String) {
     CAD("$"),
     CNY("¥"),
     EUR("€"),
+    GBP("£"),
     HKD("$"),
     USD("$")
 }

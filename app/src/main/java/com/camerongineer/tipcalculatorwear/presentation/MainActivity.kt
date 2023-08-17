@@ -11,6 +11,7 @@ import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,9 +40,11 @@ fun TipCalcApp(
     )
     val settingsViewModel = SettingsViewModel(dataStore = tipCalcViewModel.dataStore)
     val defaultTipPercentageViewModel = PickerViewModel(
-        initialValue = settingsViewModel.getDefaultTipPercentage(),
-        minimumValue = 0,
-        maximumValue = TipCalcViewModel.MAX_TIP_PERCENT)
+        state = settingsViewModel.defaultTipPercentage,
+        optionsList = OptionsLists.TIP_PERCENT_OPTIONS)
+    val defaultNumSplitViewModel = PickerViewModel(
+        state = settingsViewModel.defaultNumSplit,
+        optionsList = OptionsLists.NUM_SPLIT_OPTIONS)
 
     SwipeDismissableNavHost(
         navController = navController,
@@ -70,6 +73,13 @@ fun TipCalcApp(
                 navController = navController,
                 pickerViewModel = defaultTipPercentageViewModel,
                 callbackCommand = settingsViewModel::setDefaultTipPercentage
+            )
+        }
+        composable("default_split_picker") {
+            PickerScreen(
+                navController = navController,
+                pickerViewModel = defaultNumSplitViewModel,
+                callbackCommand = settingsViewModel::setDefaultNumSplit
             )
         }
     }

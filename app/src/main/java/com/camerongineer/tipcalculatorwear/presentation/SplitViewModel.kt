@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -17,7 +18,7 @@ class SplitViewModel(
 
     private val _numSplit = mutableIntStateOf(DataStoreManager.DEFAULT_NUM_SPLIT)
 
-    private val _currencySymbol = mutableStateOf("$")
+    private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
     fun getCurrencySymbol() = _currencySymbol.value
 
     init {
@@ -79,15 +80,20 @@ class SplitViewModel(
 
     fun getSplitTipAmountRemainder(): Int = _splitTipRemainder.value
 
-    fun getFormattedSplitSubTotal() = getFormattedAmountString(_splitSubTotal.value)
+    fun getFormattedSplitSubTotal() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitSubTotal.value)
 
-    fun getFormattedSplitSubTotalRemainder() = getFormattedAmountString(_splitSubTotalRemainder.value)
+    fun getFormattedSplitSubTotalRemainder() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitSubTotalRemainder.value)
 
-    fun getFormattedSplitTipAmount() = getFormattedAmountString(_splitTipAmount.value)
+    fun getFormattedSplitTipAmount() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitTipAmount.value)
 
-    fun getFormattedSplitTipAmountRemainder() = getFormattedAmountString(_splitTipRemainder.value)
+    fun getFormattedSplitTipAmountRemainder() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitTipRemainder.value)
 
-    fun getFormattedSplitGrandTotal() = getFormattedAmountString(_splitGrandTotal.value)
+    fun getFormattedSplitGrandTotal() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitGrandTotal.value)
 
     private fun saveNumSplit() {
         viewModelScope.launch {
@@ -95,5 +101,3 @@ class SplitViewModel(
         }
     }
 }
-
-private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)

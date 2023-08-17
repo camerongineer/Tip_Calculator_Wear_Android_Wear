@@ -13,6 +13,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import java.util.Currency
@@ -20,14 +21,16 @@ import java.util.Locale
 
 private val Context.dataStore : DataStore<Preferences> by preferencesDataStore("SETTINGS_KEY")
 
-class DataStoreManager(context: Context) {
+class DataStoreManager(context: Context?) {
 
-    private val dataStore = context.dataStore
+    private val dataStore = context?.dataStore
 
     companion object {
         const val DEFAULT_TIP_PERCENTAGE = 15
+        const val MAX_TIP_PERCENT = 100
         const val DEFAULT_NUM_SPLIT = 2
         const val MAX_NUM_SPLIT = 30
+        const val DEFAULT_ROUNDING_NUM = 50
 
         val launchCountKey = intPreferencesKey("LAUNCH_COUNT_KEY")
         val tipPercentageKey = intPreferencesKey("TIP_PERCENT_KEY")
@@ -60,7 +63,7 @@ class DataStoreManager(context: Context) {
     )
 
     suspend fun incrementLaunchCount() {
-        dataStore.edit {
+        dataStore?.edit {
             val currentLaunchCount = it[launchCountKey] ?: 0
             it[launchCountKey] = currentLaunchCount + 1
             Log.d("LAUNCH_COUNT", "The current launch count is ${it[launchCountKey]}")
@@ -121,7 +124,7 @@ class DataStoreManager(context: Context) {
 
     val rememberNumSplitFlow: Flow<Boolean> = dataFlow(
         key = rememberNumSplitKey,
-        defaultValue = true
+        defaultValue = false
     )
 
     suspend fun saveRememberNumSplit(rememberNumSplit: Boolean) {
@@ -142,22 +145,22 @@ class DataStoreManager(context: Context) {
         key: Preferences.Key<T>,
         defaultValue: T
     ): Flow<T> {
-        return dataStore.data
-            .catch { exception ->
+        return dataStore?.data
+            ?.catch { exception ->
                 if (exception is IOException) {
                     emit(emptyPreferences())
                 } else {
                     throw exception
                 }
             }
-            .map { it[key] ?: defaultValue }
+            ?.map { it[key] ?: defaultValue } ?: flowOf()
     }
 
     private suspend fun <T> dataSave(
         value: T,
         key: Preferences.Key<T>
     ) {
-        dataStore.edit { it[key] = value }
+        dataStore?.edit { it[key] = value }
     }
 }
 

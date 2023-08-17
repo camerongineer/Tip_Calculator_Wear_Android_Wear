@@ -7,6 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
+import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
+import com.camerongineer.tipcalculatorwear.utils.roundDown
+import com.camerongineer.tipcalculatorwear.utils.roundUp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -17,11 +21,6 @@ import kotlin.math.roundToInt
 
 
 class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
-
-    companion object {
-        const val MAX_TIP_PERCENT = 100
-        const val ROUNDING_NUM = 50
-    }
 
     private val _subTotal = mutableIntStateOf(0)
     fun getSubtotal() = _subTotal.intValue
@@ -40,8 +39,10 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     private var _isFirstLaunch = true
     fun isFirstLaunch() = _isFirstLaunch
 
-    private val _currencySymbol = mutableStateOf("$")
+    private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
     fun getCurrencySymbol() = _currencySymbol.value
+
+    private val _roundingNum = DataStoreManager.DEFAULT_ROUNDING_NUM
 
     init {
         viewModelScope.launch {
@@ -88,7 +89,7 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     }
 
     fun tipPercentageIncrement() {
-        if(_tipPercentage.doubleValue < MAX_TIP_PERCENT) {
+        if(_tipPercentage.doubleValue < DataStoreManager.MAX_TIP_PERCENT) {
             _tipPercentage.doubleValue = floor(_tipPercentage.doubleValue) + 1
             setTipAmount()
         }
@@ -96,7 +97,9 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
 
     fun tipPercentageDecrement() {
         if(_tipPercentage.doubleValue > 0) {
-            _tipPercentage.doubleValue = minOf(ceil(_tipPercentage.doubleValue) - 1, MAX_TIP_PERCENT.toDouble())
+            _tipPercentage.doubleValue =
+                minOf(ceil(_tipPercentage.doubleValue) - 1,
+                    DataStoreManager.MAX_TIP_PERCENT.toDouble())
             setTipAmount()
         }
     }
@@ -109,22 +112,16 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     }
 
     private fun setTipAmount() {
-        _tipAmount.intValue = (_subTotal.intValue * (_tipPercentage.doubleValue / 100.0)).roundToInt()
+        _tipAmount.intValue =
+            (_subTotal.intValue * (_tipPercentage.doubleValue / 100.0)).roundToInt()
         saveTipPercentage()
     }
 
     fun onRoundUpClicked() {
         viewModelScope.launch {
-            val nextTotal = (if (_grandTotal.value % ROUNDING_NUM == 0) {
-                _grandTotal.value + ROUNDING_NUM
-            } else {
-                _grandTotal.value - (_grandTotal.value % ROUNDING_NUM) + ROUNDING_NUM
-            })
-
             if (_subTotal.intValue > 0) {
-                while ((_subTotal.intValue + _tipAmount.intValue) < nextTotal) {
-                    _tipAmount.intValue += 1
-                }
+                val nextTotal = roundUp(_grandTotal.value, _roundingNum)
+                _tipAmount.intValue = nextTotal - _subTotal.intValue
                 setTipPercentage()
             }
         }
@@ -132,23 +129,17 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
 
     fun onRoundDownClicked() {
         viewModelScope.launch {
-            val nextTotal = (if (_grandTotal.value % ROUNDING_NUM == 0) {
-                _grandTotal.value - ROUNDING_NUM
-            } else {
-                _grandTotal.value - (_grandTotal.value % ROUNDING_NUM)
-            })
-
             if (_subTotal.intValue > 0) {
-                while ((_subTotal.intValue + _tipAmount.intValue) > nextTotal && _tipAmount.intValue > 0) {
-                    _tipAmount.intValue -= 1
-                }
+                val nextTotal = roundDown(_grandTotal.value, _roundingNum)
+                _tipAmount.intValue = nextTotal - _subTotal.intValue
                 setTipPercentage()
             }
         }
     }
 
     private fun setTipPercentage() {
-        _tipPercentage.doubleValue = (_tipAmount.intValue.toDouble() / _subTotal.intValue.toDouble()) * 100
+        _tipPercentage.doubleValue =
+            (_tipAmount.intValue.toDouble() / _subTotal.intValue.toDouble()) * 100
     }
 
     fun setSubTotalBlank() {
@@ -164,13 +155,11 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     fun getFormattedSubTotal(): String {
         val subTotalDouble = _subTotalString.value.toDoubleOrNull()
         return if (subTotalDouble != null && subTotalDouble > 0) {
-            "%.2f".format(subTotalDouble / 100)
+            getFormattedAmountString(subTotalDouble.roundToInt())
         } else {
             "0.00"
         }
     }
-
-
 
     fun getFormattedTipPercentage() = "${_tipPercentage.doubleValue.roundToInt()}"
 
@@ -189,9 +178,9 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
         return getFormattedAmountString(_tipAmount.intValue)
     }
 
-    fun getFormattedGrandTotal() = getFormattedAmountString(_grandTotal.value)
+    fun getFormattedGrandTotal() =
+        getFormattedAmountString(_grandTotal.value)
 
-    private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)
     private fun saveTipPercentage() {
         viewModelScope.launch {
             dataStore.saveTipPercentage(_tipPercentage.doubleValue.roundToInt())

@@ -130,11 +130,9 @@ fun TipCalcScreen(
                 TipSelectionItem(
                     tipCalcViewModel = tipCalcViewModel,
                     scrollToSection = scrollToSection,
-                    onSplitClicked = { navController.navigate("split") },
-                    onSettingsClicked = {
-                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        navController.navigate("settings")
-                    }
+                    onSplitClicked = withHaptics { navController.navigate("split") },
+                    onSettingsClicked = withHaptics { navController.navigate("settings") }
+
                 )
             }
 
@@ -277,8 +275,6 @@ fun BillKeyboardButton(
     onLongClick: () -> Unit = {},
     onClick: () -> Unit
 ) {
-    val haptics = LocalHapticFeedback.current
-
     Button(
         onClick = onClick,
         colors = buttonColors,
@@ -288,14 +284,8 @@ fun BillKeyboardButton(
             .padding(start = 1.dp, end = 1.dp, top = 1.dp, bottom = 1.dp)
     ) {
         val buttonModifier = Modifier.combinedClickable(
-            onLongClick = {
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                onLongClick()
-            },
-            onClick = {
-                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onClick()
-            }
+            onLongClick = withHaptics(block = onLongClick),
+            onClick = withHaptics(block = onClick)
         )
         icon?.let {
             Image(
@@ -391,7 +381,7 @@ fun TipSelectionItem(
                 onTipSliderDownClicked = tipCalcViewModel::tipPercentageDecrement,
                 onTipPercentageLongClicked = tipCalcViewModel::resetTipPercentage,
                 tipSliderHeight = tipSliderHeight,
-                maxTipPercentage = TipCalcViewModel.MAX_TIP_PERCENT,
+                maxTipPercentage = DataStoreManager.MAX_TIP_PERCENT,
                 roundUpClicked = tipCalcViewModel::onRoundUpClicked,
                 roundDownClicked = tipCalcViewModel::onRoundDownClicked,
                 modifier = modifier
@@ -424,11 +414,11 @@ fun TipSelectionItem(
                 Image(
                     imageVector = Icons.Default.Settings,
                     contentDescription = "Settings Button",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSecondary),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
                     modifier = Modifier.height(16.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = onSplitClicked,
                 colors = ButtonDefaults.secondaryButtonColors()

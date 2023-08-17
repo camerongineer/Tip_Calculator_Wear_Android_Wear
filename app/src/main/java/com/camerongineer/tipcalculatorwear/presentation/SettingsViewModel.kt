@@ -1,36 +1,37 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
 
-    private val _defaultTipPercentage = mutableDoubleStateOf(DataStoreManager.DEFAULT_TIP_PERCENTAGE.toDouble())
-
+    private val _defaultTipPercentage = mutableIntStateOf(DataStoreManager.DEFAULT_TIP_PERCENTAGE)
+    val defaultTipPercentage = _defaultTipPercentage
     private val _rememberTipPercentage = mutableStateOf(true)
+
     val rememberTipPercentage = _rememberTipPercentage
 
     private val _defaultNumSplit = mutableIntStateOf(DataStoreManager.DEFAULT_NUM_SPLIT)
-
+    val defaultNumSplit = _defaultNumSplit
     private val _rememberNumSplit = mutableStateOf(false)
+
     val rememberNumSplit = _rememberNumSplit
-
     private val _isPreciseSplit = mutableStateOf(true)
-    val isPreciseSplit = _isPreciseSplit
 
-    private val _currencySymbol = mutableStateOf("$")
+    val isPreciseSplit = _isPreciseSplit
+    private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
+
     val currencySymbol = _currencySymbol
 
     init {
         viewModelScope.launch {
-            _defaultTipPercentage.doubleValue = dataStore.defaultTipPercentageFlow.first().toDouble()
+            _defaultTipPercentage.intValue = dataStore.defaultTipPercentageFlow.first()
             _rememberTipPercentage.value = dataStore.rememberTipPercentageFlow.first()
             _defaultNumSplit.intValue = dataStore.defaultNumSplitFlow.first()
             _rememberNumSplit.value = dataStore.rememberNumSplitFlow.first()
@@ -39,10 +40,7 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
         }
     }
 
-    fun getDefaultTipPercentage(): Int = _defaultTipPercentage.doubleValue.roundToInt()
-
     fun setDefaultTipPercentage(defaultTipPercentage: Int) {
-        _defaultTipPercentage.doubleValue = defaultTipPercentage.toDouble()
         viewModelScope.launch {
             dataStore.saveDefaultTipPercentage(defaultTipPercentage)
         }
