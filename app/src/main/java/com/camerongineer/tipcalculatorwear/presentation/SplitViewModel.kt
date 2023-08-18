@@ -14,6 +14,7 @@ class SplitViewModel(
     private val dataStore: DataStoreManager,
     subTotal: Int,
     tipAmount: Int,
+    private val isPreciseTip: Boolean
 ): ViewModel() {
 
     private val _numSplit = mutableIntStateOf(DataStoreManager.DEFAULT_NUM_SPLIT)
@@ -33,19 +34,29 @@ class SplitViewModel(
     }
 
     private val _splitSubTotal = derivedStateOf {
-        subTotal / _numSplit.intValue
+        if (isPreciseTip || subTotal % _numSplit.intValue == 0) {
+            subTotal / _numSplit.intValue
+        } else {
+            (subTotal / _numSplit.intValue) + 1
+        }
     }
 
     private val _splitSubTotalRemainder = derivedStateOf {
-        subTotal % _numSplit.intValue
+        val remainder = subTotal % _numSplit.intValue
+        if (isPreciseTip) remainder else 0
     }
 
     private val _splitTipAmount = derivedStateOf {
-        tipAmount / _numSplit.intValue
+        if (isPreciseTip || tipAmount % _numSplit.intValue == 0) {
+            tipAmount / _numSplit.intValue
+        } else {
+            (tipAmount / _numSplit.intValue) + 1
+        }
     }
 
     private val _splitTipRemainder = derivedStateOf {
-        tipAmount % _numSplit.intValue
+        val remainder = tipAmount % _numSplit.intValue
+        if (isPreciseTip) remainder else 0
     }
 
     private val _splitGrandTotal = derivedStateOf {

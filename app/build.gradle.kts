@@ -12,8 +12,8 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
         targetSdk = 33
-        versionCode = 8
-        versionName = "1.3.0"
+        versionCode = 9
+        versionName = "1.3.1"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -22,8 +22,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
