@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -91,7 +92,7 @@ fun SettingsScreen(
 
             item {
                 DefaultTipPercentageItem(
-                    labelText = "Default Tip",
+                    labelText = stringResource(id = R.string.default_tip),
                     defaultTipPercentage = settingsViewModel.defaultTipPercentage,
                     onDefaultTipPercentageChanged = { navController.navigate("default_tip_picker") }
                 )
@@ -114,7 +115,7 @@ fun SettingsScreen(
 
             item {
                 DefaultSplitItem(
-                    labelText = "Default Split",
+                    labelText = stringResource(id = R.string.default_split),
                     defaultSplitValue = settingsViewModel.defaultNumSplit,
                     onDefaultSplitValueChanged = { navController.navigate("default_split_picker") }
                 )
@@ -128,8 +129,15 @@ fun SettingsScreen(
             }
 
             item {
+                PreciseSplitModeItem(
+                    isPreciseSplit = settingsViewModel.getIsPreciseSplit(),
+                    onPreciseSplitModeChanged = settingsViewModel::setIsPreciseSplit
+                )
+            }
+
+            item {
                 CompactChip(
-                    label = {Text(text = "Back")},
+                    label = {Text(text = stringResource(id = R.string.back))},
                     onClick = withHaptics { navController.navigateUp() },
                     modifier = Modifier.padding(bottom = 30.dp)
                 )
@@ -145,7 +153,7 @@ fun SettingsScreen(
                     }
                 ) {
                     Text(
-                        text = "If you enjoy this app, please consider leaving a review in the Play Store!",
+                        text = stringResource(id = R.string.review_request),
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
 
@@ -275,7 +283,7 @@ fun RetainTipPercentageItem(
     modifier: Modifier = Modifier
 ) {
     SettingsToggleChip(
-        labelText = "Save Last Tip %",
+        labelText = stringResource(id = R.string.retain_tip_percentage),
         checked = isRememberTipPercentage,
         onCheckedChanged = onRememberTipPercentageChanged,
         modifier = modifier
@@ -289,9 +297,23 @@ fun RetainNumSplitItem(
     modifier: Modifier = Modifier
 ) {
     SettingsToggleChip(
-        labelText = "Save Last Split",
+        labelText = stringResource(id = R.string.retain_num_split),
         checked = isRememberNumSplit,
         onCheckedChanged = onRememberNumSplitChanged,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun PreciseSplitModeItem(
+    isPreciseSplit: Boolean,
+    onPreciseSplitModeChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    SettingsToggleChip(
+        labelText = stringResource(id = R.string.precise_split_mode),
+        checked = isPreciseSplit,
+        onCheckedChanged = onPreciseSplitModeChanged,
         modifier = modifier
     )
 }

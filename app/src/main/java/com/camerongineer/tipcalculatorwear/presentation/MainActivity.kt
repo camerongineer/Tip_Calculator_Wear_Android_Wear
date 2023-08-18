@@ -33,12 +33,13 @@ fun TipCalcApp(
     tipCalcViewModel: TipCalcViewModel
 ) {
     val navController = rememberSwipeDismissableNavController()
+    val settingsViewModel = SettingsViewModel(dataStore = tipCalcViewModel.dataStore)
     val splitViewModel = SplitViewModel(
         dataStore = tipCalcViewModel.dataStore,
         subTotal = tipCalcViewModel.getSubtotal(),
         tipAmount = tipCalcViewModel.getTipAmount(),
+        isPreciseTip = settingsViewModel.getIsPreciseSplit()
     )
-    val settingsViewModel = SettingsViewModel(dataStore = tipCalcViewModel.dataStore)
     val defaultTipPercentageViewModel = PickerViewModel(
         state = settingsViewModel.defaultTipPercentage,
         optionsList = OptionsLists.TIP_PERCENT_OPTIONS)

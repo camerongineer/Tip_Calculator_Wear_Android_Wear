@@ -343,6 +343,7 @@ fun SplitPreview() {
                 dataStore = DataStoreManager(LocalContext.current),
                 subTotal = 3000,
                 tipAmount = 1000,
+                isPreciseTip = false
             ),
             modifier = Modifier.background(color = Color.Black)
         )
