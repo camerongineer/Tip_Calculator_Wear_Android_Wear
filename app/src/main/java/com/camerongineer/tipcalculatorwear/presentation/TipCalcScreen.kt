@@ -394,7 +394,7 @@ fun TipSelectionItem(
                 billAmountString = tipCalcViewModel.getFormattedSubTotal(),
                 billAmountClicked = { scrollToSection(0) },
                 tipAmountString = tipCalcViewModel.getFormattedTipAmount(),
-                tipAmountClicked = { scrollToSection(1) },
+                tipAmountClicked = { scrollToSection(0) },
                 grandTotalString = tipCalcViewModel.getFormattedGrandTotal(),
                 modifier = modifier
                     .padding(top = screenHeight / 20)
