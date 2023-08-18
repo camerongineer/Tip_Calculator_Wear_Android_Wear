@@ -23,6 +23,7 @@
     <string name="precise_split_mode">Precision Mode</string>
     <string name="back">Back</string>
     <string name="review_request">If you enjoy this app, please consider leaving a review in the Play Store!</string>
+    <string name="play_store_url">https://play.google.com/store/apps/details?id=com.camerongineer.tipcalculatorwear</string>
 
     <string name="title_activity_presentation._main">presentation.MainActivity</string>
     <string name="title_activity_main">MainActivity</string>

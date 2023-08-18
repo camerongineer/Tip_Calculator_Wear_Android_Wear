@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -343,7 +344,7 @@ fun SplitPreview() {
                 dataStore = DataStoreManager(LocalContext.current),
                 subTotal = 3000,
                 tipAmount = 1000,
-                isPreciseTip = false
+                isPreciseSplit = mutableStateOf(false)
             ),
             modifier = Modifier.background(color = Color.Black)
         )

@@ -63,6 +63,7 @@ fun SettingsScreen(
     val listState = rememberScalingLazyListState()
     val context = LocalContext.current
     val intent = Intent(Intent.ACTION_VIEW)
+    val playStoreUrl = Uri.parse(stringResource(id = R.string.play_store_url))
 
 
     Scaffold(
@@ -130,7 +131,7 @@ fun SettingsScreen(
 
             item {
                 PreciseSplitModeItem(
-                    isPreciseSplit = settingsViewModel.getIsPreciseSplit(),
+                    isPreciseSplit = settingsViewModel.isPreciseSplit.value,
                     onPreciseSplitModeChanged = settingsViewModel::setIsPreciseSplit
                 )
             }
@@ -147,8 +148,7 @@ fun SettingsScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.clickable {
-                        intent.data =
-                            Uri.parse("https://play.google.com/store/apps/details?id=com.camerongineer.tipcalculatorwear")
+                        intent.data = playStoreUrl
                         context.startActivity(intent)
                     }
                 ) {
@@ -331,7 +331,7 @@ fun SettingsToggleChip(
             checkedStartBackgroundColor = MaterialTheme.colors.primary,
             checkedEndBackgroundColor = MaterialTheme.colors.primary
         ),
-        onCheckedChange = onCheckedChanged,
+        onCheckedChange = withBooleanHaptics(block = onCheckedChanged),
         label = {
             Text(
                 text = labelText,

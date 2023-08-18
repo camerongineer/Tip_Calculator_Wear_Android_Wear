@@ -24,7 +24,7 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
     val rememberNumSplit = _rememberNumSplit
 
     private val _isPreciseSplit = mutableStateOf(true)
-    fun getIsPreciseSplit() = _isPreciseSplit.value
+    val isPreciseSplit = _isPreciseSplit
 
     private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
 
