@@ -12,8 +12,8 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
         targetSdk = 33
-        versionCode = 9
-        versionName = "1.3.1"
+        versionCode = 10
+        versionName = "1.3.2"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -22,8 +22,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -83,6 +83,7 @@ dependencies {
     implementation("androidx.wear.watchface:watchface-complications-data-source-ktx:1.1.1")
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
+    implementation("androidx.compose.material3:material3:1.1.1")
     testImplementation("junit:junit:4.13.2")
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
@@ -97,5 +98,7 @@ dependencies {
     // Compose testing dependencies
     androidTestImplementation("androidx.compose.ui:ui-test")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("org.mockito:mockito-core:3.11.2")
+    androidTestImplementation("androidx.test:runner:1.5.2")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

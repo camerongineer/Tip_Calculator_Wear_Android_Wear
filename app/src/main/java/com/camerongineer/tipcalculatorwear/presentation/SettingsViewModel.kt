@@ -27,8 +27,10 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
     val isPreciseSplit = _isPreciseSplit
 
     private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
-
     val currencySymbol = _currencySymbol
+
+    private val _roundingNum = mutableIntStateOf(DataStoreManager.DEFAULT_ROUNDING_NUM)
+    val roundingNum = _roundingNum
 
     init {
         viewModelScope.launch {
@@ -37,6 +39,7 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
             _defaultNumSplit.intValue = dataStore.defaultNumSplitFlow.first()
             _rememberNumSplit.value = dataStore.rememberNumSplitFlow.first()
             _isPreciseSplit.value = dataStore.preciseSplitFlow.first()
+            _roundingNum.intValue = dataStore.roundingNumFlow.first()
             _currencySymbol.value = dataStore.currencySymbolFlow.first()
         }
     }
@@ -72,6 +75,13 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
         _isPreciseSplit.value = isPreciseSplit
         viewModelScope.launch {
             dataStore.savePreciseSplit(isPreciseSplit)
+        }
+    }
+
+    fun setRoundingNum(roundingNum: Int) {
+        _roundingNum.intValue = roundingNum
+        viewModelScope.launch {
+            dataStore.saveRoundingNum(roundingNum)
         }
     }
 }

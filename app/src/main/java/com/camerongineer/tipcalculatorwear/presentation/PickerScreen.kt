@@ -42,7 +42,8 @@ fun PickerScreen(
     pickerViewModel: PickerViewModel,
     callbackCommand: (Int) -> Unit
 ) {
-    val startIndex = pickerViewModel.optionsList.indexOf(pickerViewModel.state.intValue.toString())
+    val startIndex = pickerViewModel.optionsList
+        .indexOfFirst { it.value == pickerViewModel.state.intValue }
     val state = rememberPickerState(
         initialNumberOfOptions = pickerViewModel.optionsList.size,
         initiallySelectedOption = startIndex,
@@ -71,7 +72,7 @@ fun PickerScreen(
                 flingBehavior = PickerDefaults.flingBehavior(state = state),
             ) {
                 Text(
-                    text = pickerViewModel.optionsList[it],
+                    text = pickerViewModel.optionsList[it].toString(),
                     fontSize = 28.sp,
                     color = MaterialTheme.colors.primaryVariant
                 )
@@ -84,7 +85,7 @@ fun PickerScreen(
         ) {
             Button(
                 onClick = withHaptics {
-                    val savedOption = pickerViewModel.optionsList[state.selectedOption].toInt()
+                    val savedOption = pickerViewModel.optionsList[state.selectedOption].value
                     callbackCommand(savedOption)
                     pickerViewModel.state.intValue = savedOption
                     navController.navigateUp()
@@ -113,7 +114,7 @@ fun PickerPreview() {
     TipCalculatorWearTheme {
         PickerScreen(
             rememberSwipeDismissableNavController(),
-            PickerViewModel(remember {mutableIntStateOf(2)}, OptionsLists.NUM_SPLIT_OPTIONS),
+            PickerViewModel(remember {mutableIntStateOf(2)}, OptionsLists.ROUNDING_INCREMENTS),
         ) { }
     }
 }

@@ -46,6 +46,9 @@ fun TipCalcApp(
     val defaultNumSplitViewModel = PickerViewModel(
         state = settingsViewModel.defaultNumSplit,
         optionsList = OptionsLists.NUM_SPLIT_OPTIONS)
+    val roundingNumViewModel = PickerViewModel(
+        state = tipCalcViewModel.roundingNum,
+        optionsList = OptionsLists.ROUNDING_INCREMENTS)
 
     SwipeDismissableNavHost(
         navController = navController,
@@ -81,6 +84,13 @@ fun TipCalcApp(
                 navController = navController,
                 pickerViewModel = defaultNumSplitViewModel,
                 callbackCommand = settingsViewModel::setDefaultNumSplit
+            )
+        }
+        composable("rounding_num_picker") {
+            PickerScreen(
+                navController = navController,
+                pickerViewModel = roundingNumViewModel,
+                callbackCommand = settingsViewModel::setRoundingNum
             )
         }
     }

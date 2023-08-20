@@ -33,3 +33,4 @@ inline fun withBooleanHaptics(
         block(it)
     }
 }
+
