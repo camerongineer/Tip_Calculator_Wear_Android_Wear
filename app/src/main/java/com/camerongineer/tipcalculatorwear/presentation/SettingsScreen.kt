@@ -102,11 +102,19 @@ fun SettingsScreen(
                 )
             }
 
-
             item {
                 RetainTipPercentageItem(
                     isRememberTipPercentage = settingsViewModel.rememberTipPercentage.value,
                     onRememberTipPercentageChanged = settingsViewModel::setRememberTipPercentage
+                )
+            }
+
+            item {
+                RoundIncrementItem(
+                    labelText = stringResource(id = R.string.round_increment),
+                    roundingNumValue = settingsViewModel.roundingNum,
+                    currencySymbol = settingsViewModel.currencySymbol,
+                    onRoundingNumChanged = { navController.navigate("rounding_num_picker") }
                 )
             }
 
@@ -138,24 +146,6 @@ fun SettingsScreen(
                     onPreciseSplitModeChanged = settingsViewModel::setIsPreciseSplit
                 )
             }
-
-
-            //Misc Settings
-            item {
-                Text(
-                    text = stringResource(id = R.string.misc_settings),
-                    modifier = Modifier.padding(bottom = 6.dp, top = 12.dp))
-            }
-
-            item {
-                RoundIncrementItem(
-                    labelText = stringResource(id = R.string.round_increment),
-                    roundingNumValue = settingsViewModel.roundingNum,
-                    currencySymbol = settingsViewModel.currencySymbol,
-                    onRoundingNumChanged = { navController.navigate("rounding_num_picker") }
-                )
-            }
-
 
 
             item {
@@ -216,7 +206,7 @@ fun DefaultTipPercentageItem(
         modifier = modifier) {
         Text(
             text = "${defaultTipPercentage.intValue}",
-            fontSize = 17.sp,
+            fontSize = 16.sp,
             color = MaterialTheme.colors.secondary,
             textAlign = TextAlign.Right,
             modifier = modifier
@@ -245,7 +235,7 @@ fun DefaultSplitItem(labelText: String,
         modifier = modifier) {
         Text(
             text = "${defaultSplitValue.intValue}",
-            fontSize = 17.sp,
+            fontSize = 16.sp,
             color = MaterialTheme.colors.secondary,
             modifier = modifier
                 .wrapContentWidth()
@@ -268,7 +258,7 @@ fun RoundIncrementItem(
         modifier = modifier) {
         Text(
             text = currencySymbol.value,
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             color = Color.Black,
             textAlign = TextAlign.Right,
             modifier = modifier
@@ -277,7 +267,7 @@ fun RoundIncrementItem(
         )
         Text(
             text = getFormattedAmountString(roundingNumValue.intValue),
-            fontSize = 15.sp,
+            fontSize = 14.sp,
             color = MaterialTheme.colors.secondary,
             textAlign = TextAlign.Left,
             modifier = modifier
@@ -308,7 +298,7 @@ fun SettingsChip(
             ) {
                 Text(
                     text = labelText,
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                 )
@@ -388,7 +378,7 @@ fun SettingsToggleChip(
         label = {
             Text(
                 text = labelText,
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 color = if (checked) {
                     MaterialTheme.colors.background
                 } else MaterialTheme.colors.primaryVariant,

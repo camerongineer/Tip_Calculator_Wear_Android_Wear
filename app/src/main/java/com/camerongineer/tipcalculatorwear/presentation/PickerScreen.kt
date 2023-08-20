@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.rememberPickerState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 
@@ -49,6 +51,13 @@ fun PickerScreen(
         initiallySelectedOption = startIndex,
         repeatItems = false
     )
+
+    val returnCommand = withHaptics {
+        val savedOption = pickerViewModel.optionsList[state.selectedOption].value
+        callbackCommand(savedOption)
+        pickerViewModel.state.intValue = savedOption
+        navController.navigateUp()
+    }
     Scaffold(
         timeText = {
             TimeText(
@@ -68,13 +77,13 @@ fun PickerScreen(
         ) {
             Picker(
                 state = state,
-                contentDescription = "Select Value",
-                flingBehavior = PickerDefaults.flingBehavior(state = state),
+                contentDescription = stringResource(id = R.string.values),
+                flingBehavior = PickerDefaults.flingBehavior(state = state)
             ) {
                 Text(
                     text = pickerViewModel.optionsList[it].toString(),
                     fontSize = 28.sp,
-                    color = MaterialTheme.colors.primaryVariant
+                    color = MaterialTheme.colors.primaryVariant,
                 )
             }
         }
@@ -84,19 +93,14 @@ fun PickerScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Button(
-                onClick = withHaptics {
-                    val savedOption = pickerViewModel.optionsList[state.selectedOption].value
-                    callbackCommand(savedOption)
-                    pickerViewModel.state.intValue = savedOption
-                    navController.navigateUp()
-                },
+                onClick = returnCommand,
                 modifier = Modifier
                     .size(60.dp)
                     .padding(10.dp)
             ) {
                 Image(
                     imageVector = Icons.Default.Check,
-                    contentDescription = "Value Selected",
+                    contentDescription = stringResource(id = R.string.submit),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.background),
                 )
             }

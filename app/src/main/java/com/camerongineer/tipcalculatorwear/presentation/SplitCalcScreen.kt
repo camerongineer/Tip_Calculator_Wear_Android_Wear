@@ -20,10 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,16 +46,13 @@ fun SplitCalcScreen(
     modifier: Modifier = Modifier
 ) {
     val configuration = LocalConfiguration.current
-    val haptics = LocalHapticFeedback.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
     val topBottomMarginHeight = screenHeight * .10f
     val splitButtonsWidth = screenWidth * .22f
 
-    val returnToKeyboard = {
-        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-        navController.navigateUp()
-    }
+    val returnToKeyboard = withHaptics(block = navController::navigateUp)
+
     Scaffold(
         timeText = {
             TimeText(
@@ -130,9 +125,9 @@ fun SplitDisplay(
     splitSubTotalString: String,
     splitTipString: String,
     splitGrandTotalString: String,
-    onSplitSubtotalClicked: () -> Boolean,
-    onSplitTipAmountClicked: () -> Boolean,
-    onSplitGrandTotalClicked: () -> Boolean,
+    onSplitSubtotalClicked: () -> Unit,
+    onSplitTipAmountClicked: () -> Unit,
+    onSplitGrandTotalClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -152,7 +147,7 @@ fun SplitDisplay(
                 currencySymbol = currencySymbol,
                 amountString = splitGrandTotalString,
                 fontSize = 24.sp,
-                onClick = { onSplitGrandTotalClicked() }
+                onClick = onSplitGrandTotalClicked
             )
         }
         Row(
@@ -168,13 +163,13 @@ fun SplitDisplay(
                     labelText = stringResource(id = R.string.display_sub_total),
                     color = MaterialTheme.colors.onBackground,
                     fontSize = 10.sp,
-                    onClick = { onSplitSubtotalClicked() },
+                    onClick = onSplitSubtotalClicked,
                     modifier = Modifier.height(14.dp))
                 InputLabel(
                     labelText = stringResource(id = R.string.display_tip),
                     color = MaterialTheme.colors.onBackground,
                     fontSize = 10.sp,
-                    onClick = { onSplitTipAmountClicked() },
+                    onClick = onSplitTipAmountClicked,
                     modifier = Modifier.height(14.dp))
             }
             Column(
@@ -185,14 +180,14 @@ fun SplitDisplay(
                     currencySymbol = currencySymbol,
                     amountString = splitSubTotalString,
                     fontSize = 12.sp,
-                    onClick = { onSplitSubtotalClicked() },
+                    onClick = onSplitSubtotalClicked,
                     modifier = Modifier.height(14.dp)
                 )
                 AmountDisplay(
                     currencySymbol = currencySymbol,
                     amountString = splitTipString,
                     fontSize = 12.sp,
-                    onClick = { onSplitTipAmountClicked() },
+                    onClick = onSplitTipAmountClicked,
                     modifier = Modifier.height(14.dp)
                 )
             }
@@ -211,7 +206,6 @@ fun SplitButtons(
     onNumSplitLongClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val haptics = LocalHapticFeedback.current
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -220,11 +214,8 @@ fun SplitButtons(
     ) {
         BillKeyboardButton(
             icon = Icons.Default.ArrowDropUp,
-            contentDescription = "Split Up",
-            onClick = {
-                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onSplitUpClicked()
-            },
+            contentDescription = stringResource(id = R.string.increase),
+            onClick = onSplitUpClicked,
             modifier = Modifier
                 .width(30.dp)
                 .height(32.dp)
@@ -234,22 +225,17 @@ fun SplitButtons(
             fontSize = 28.sp,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.combinedClickable(
-                onLongClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onNumSplitLongClicked()
-                },
-                onClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                }
+                onLongClick = withHaptics(
+                    block = onNumSplitLongClicked,
+                    isLongPress = true
+                ),
+                onClick = withHaptics { }
             )
         )
         BillKeyboardButton(
             icon = Icons.Default.ArrowDropDown,
-            contentDescription = "Split Down",
-            onClick = {
-                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onSplitDownClicked()
-            },
+            contentDescription = stringResource(id = R.string.decrease),
+            onClick = onSplitDownClicked,
             modifier = Modifier
                 .width(30.dp)
                 .height(32.dp)

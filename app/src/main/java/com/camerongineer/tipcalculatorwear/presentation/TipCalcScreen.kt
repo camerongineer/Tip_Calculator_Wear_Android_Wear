@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -132,7 +131,6 @@ fun TipCalcScreen(
                     scrollToSection = scrollToSection,
                     onSplitClicked = withHaptics { navController.navigate("split") },
                     onSettingsClicked = withHaptics { navController.navigate("settings") }
-
                 )
             }
 
@@ -188,9 +186,9 @@ fun KeyboardItem(
         ) {
             BillKeyboardButton(
                 icon = Icons.Default.KeyboardBackspace,
-                contentDescription = "Keyboard Backspace",
+                contentDescription = stringResource(id = R.string.backspace),
                 onClick = tipCalcViewModel::onDeleteTyped,
-                onLongClick = { tipCalcViewModel.setSubTotalBlank() },
+                onLongClick = tipCalcViewModel::setSubTotalBlank,
                 modifier = Modifier
                     .weight(.33f)
                     .height(buttonHeight)
@@ -204,7 +202,7 @@ fun KeyboardItem(
             )
             BillKeyboardButton(
                 icon = Icons.Default.Done,
-                contentDescription = "Keyboard Bottom Of Screen",
+                contentDescription = stringResource(id = R.string.submit),
                 onClick = scrollToTipSection,
                 modifier = Modifier
                     .weight(.33f)
@@ -275,24 +273,23 @@ fun BillKeyboardButton(
     onLongClick: () -> Unit = {},
     onClick: () -> Unit
 ) {
+    val buttonModifier = modifier.combinedClickable(
+        onLongClick = withHaptics(block = onLongClick, isLongPress = true),
+        onClick = withHaptics(block = onClick)
+    )
     Button(
-        onClick = onClick,
+        onClick = {},
         colors = buttonColors,
         shape = RoundedCornerShape(30),
-        modifier = modifier
+        modifier = buttonModifier
             .height(30.dp)
             .padding(start = 1.dp, end = 1.dp, top = 1.dp, bottom = 1.dp)
     ) {
-        val buttonModifier = Modifier.combinedClickable(
-            onLongClick = withHaptics(block = onLongClick),
-            onClick = withHaptics(block = onClick)
-        )
         icon?.let {
             Image(
                 imageVector = icon,
                 contentDescription = contentDescription,
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
-                modifier = buttonModifier
             )
         }
         if (icon == null) {
@@ -301,7 +298,6 @@ fun BillKeyboardButton(
                     text = it,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colors.onPrimary,
-                    modifier = buttonModifier
                 )
             }
         }
@@ -316,28 +312,23 @@ fun SubTotalDisplay(
     modifier: Modifier = Modifier
 ) {
     Button(
-        onClick = onClick,
+        onClick = withHaptics(block = onClick),
         colors = ButtonDefaults.secondaryButtonColors(),
         modifier = modifier
     ) {
-        Box {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                InputLabel(
-                    labelText = stringResource(id = R.string.display_sub_total),
-                    fontSize = 12.sp,
-                    onClick = onClick
-                )
-                AmountDisplay(
-                    currencySymbol = currencySymbol,
-                    amountString = billAmountString,
-                    fontSize = 14.sp,
-                    onClick = onClick
-                )
-            }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            InputLabel(
+                labelText = stringResource(id = R.string.display_sub_total),
+                fontSize = 12.sp,
+            )
+            AmountDisplay(
+                currencySymbol = currencySymbol,
+                amountString = billAmountString,
+                fontSize = 14.sp,
+            )
         }
-
     }
 }
 
@@ -366,6 +357,7 @@ fun TipSelectionItem(
         Spacer(
             modifier = Modifier
                 .weight(.10f)
+                .fillMaxWidth()
                 .clickable(onClick = scrollToKeyboard)
         )
         Column(
@@ -387,17 +379,14 @@ fun TipSelectionItem(
                 modifier = modifier
                     .padding(top = 2.dp, bottom = 2.dp)
                     .fillMaxWidth(.9f)
-            ) { scrollToSection(1) }
+            )
 
             GrandTotalDisplay(
                 currencySymbol = tipCalcViewModel.getCurrencySymbol(),
                 billAmountString = tipCalcViewModel.getFormattedSubTotal(),
-                billAmountClicked = { scrollToSection(0) },
+                onClick = withHaptics { scrollToSection(0) },
                 tipAmountString = tipCalcViewModel.getFormattedTipAmount(),
-                tipAmountClicked = { scrollToSection(0) },
-                grandTotalString = tipCalcViewModel.getFormattedGrandTotal(),
-                modifier = modifier
-                    .padding(top = screenHeight / 20)
+                grandTotalString = tipCalcViewModel.getFormattedGrandTotal()
             )
         }
         Row(
@@ -413,7 +402,7 @@ fun TipSelectionItem(
             ) {
                 Image(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings Button",
+                    contentDescription = stringResource(id = R.string.settings),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
                     modifier = Modifier.height(16.dp)
                 )
@@ -446,15 +435,13 @@ fun TipSlider(
     maxTipPercentage: Int,
     roundUpClicked: () -> Unit,
     roundDownClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
     ) {
-        val haptics = LocalHapticFeedback.current
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -464,14 +451,11 @@ fun TipSlider(
         ) {
             InputLabel(
                 labelText = stringResource(id = R.string.tip_percentage),
-                fontSize = 14.sp,
-                modifier = Modifier,
-                onClick = onClick)
+                fontSize = 14.sp)
             SmallText(
                 text = equalitySymbol,
                 color = MaterialTheme.colors.error,
-                fontSize = 12.sp,
-                modifier = Modifier)
+                fontSize = 12.sp)
             Text(
                 text = tipPercentageString,
                 color = MaterialTheme.colors.error,
@@ -479,20 +463,17 @@ fun TipSlider(
                 modifier = Modifier
                     .padding(end = 1.dp)
                     .combinedClickable(
-                        onLongClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onTipPercentageLongClicked()
-                        },
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        }
+                        onLongClick = withHaptics(
+                            block = onTipPercentageLongClicked,
+                            isLongPress = true
+                        ),
+                        onClick = { }
                     )
             )
             SmallText(
                 text = "%",
                 color = MaterialTheme.colors.error,
-                fontSize = 12.sp,
-                modifier = Modifier)
+                fontSize = 12.sp)
         }
         InlineSlider(
             value = tipPercentage,
@@ -501,32 +482,20 @@ fun TipSlider(
             decreaseIcon = {
                 Image(
                     imageVector = Icons.Default.ArrowLeft,
-                    contentDescription = "Tip Percentage Down",
+                    contentDescription = stringResource(id = R.string.decrease),
                     Modifier.combinedClickable(
-                        onLongClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            roundDownClicked()
-                        },
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onTipSliderDownClicked()
-                        }
+                        onLongClick = withHaptics(block = roundDownClicked, isLongPress = true),
+                        onClick = withHaptics(block = onTipSliderDownClicked)
                     )
                 )
             },
             increaseIcon = {
                 Image(
                     imageVector = Icons.Default.ArrowRight,
-                    contentDescription = "Tip Percentage Up",
+                    contentDescription = stringResource(id = R.string.increase),
                     Modifier.combinedClickable(
-                        onLongClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            roundUpClicked()
-                        },
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onTipSliderUpClicked()
-                        }
+                        onLongClick = withHaptics(block = roundUpClicked, isLongPress = true),
+                        onClick = withHaptics(block = onTipSliderUpClicked)
                     )
                 )
             },
@@ -535,9 +504,7 @@ fun TipSlider(
                 .height(tipSliderHeight)
         )
         SmallText(
-            text = stringResource(
-                id = R.string.round_up_down
-            ),
+            text = stringResource(id = R.string.round_up_down),
             fontSize = 8.sp,
             color = MaterialTheme.colors.secondaryVariant)
 
@@ -551,15 +518,12 @@ fun GrandTotalDisplay(
     tipAmountString: String,
     grandTotalString: String,
     modifier: Modifier = Modifier,
-    billAmountClicked: () -> Unit = {},
-    tipAmountClicked: () -> Unit = {},
-    grandTotalClicked: () -> Unit = {},
-
+    onClick: () -> Unit = {},
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(.85f)
             .padding(bottom = 2.dp)
         )
@@ -568,24 +532,22 @@ fun GrandTotalDisplay(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .padding(start = 4.dp, end = 4.dp)
+                .padding(end = 2.dp)
+                .clickable(onClick = onClick)
         ) {
             InputLabel(
                 labelText = stringResource(id = R.string.display_sub_total),
                 color = MaterialTheme.colors.onBackground,
-                onClick = billAmountClicked,
                 modifier = Modifier.height(16.dp)
             )
             InputLabel(
                 labelText = stringResource(id = R.string.display_tip),
                 color = MaterialTheme.colors.onBackground,
-                onClick = tipAmountClicked,
                 modifier = Modifier.height(16.dp)
             )
             InputLabel(
                 labelText = stringResource(id = R.string.display_total),
                 color = MaterialTheme.colors.onBackground,
-                onClick = grandTotalClicked,
                 modifier = Modifier.height(16.dp)
             )
         }
@@ -593,24 +555,22 @@ fun GrandTotalDisplay(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
+                .clickable(onClick = onClick)
         ) {
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = billAmountString,
                 modifier = Modifier.height(16.dp),
-                onClick = billAmountClicked
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = tipAmountString,
                 modifier = Modifier.height(16.dp),
-                onClick = tipAmountClicked
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = grandTotalString,
                 modifier = Modifier.height(16.dp),
-                onClick = grandTotalClicked
             )
         }
     }
@@ -622,26 +582,24 @@ fun AmountDisplay(
     amountString: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 14.sp,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null,
 ) {
+    val clickModifier = if (onClick == null) modifier else modifier.clickable(onClick = onClick)
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = clickModifier
             .wrapContentSize()
     ) {
         SmallText(
             text = currencySymbol,
             color = MaterialTheme.colors.primary,
-            fontSize = fontSize * .60f
+            fontSize = fontSize * .60f,
         )
         Text(
             color = MaterialTheme.colors.primaryVariant,
             text = amountString,
             fontSize = fontSize,
-            modifier = modifier
-                .wrapContentSize()
-                .clickable(onClick = onClick)
         )
     }
 }
@@ -652,16 +610,16 @@ fun InputLabel(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
     fontSize: TextUnit = 11.sp,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
 ) {
+    val clickModifier = if (onClick == null) modifier else modifier.clickable(onClick = onClick)
     Text(
         color = color,
         fontSize = fontSize,
         textAlign = TextAlign.Right,
         text = "$labelText: ",
-        modifier = modifier
+        modifier = clickModifier
             .wrapContentSize()
-            .clickable(onClick = onClick)
     )
 }
 
