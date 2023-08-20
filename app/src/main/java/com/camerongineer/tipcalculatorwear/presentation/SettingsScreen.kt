@@ -90,7 +90,7 @@ fun SettingsScreen(
             //Tip Settings
             item {
                 Text(
-                    text = "Tip Settings",
+                    text = stringResource(id = R.string.tip_settings),
                     modifier = Modifier.padding(6.dp))
             }
 
@@ -113,7 +113,7 @@ fun SettingsScreen(
             //Split Settings
             item {
                 Text(
-                    text = "Split Settings",
+                    text = stringResource(id = R.string.split_settings),
                     modifier = Modifier.padding(bottom = 6.dp, top = 12.dp))
             }
 
@@ -140,10 +140,10 @@ fun SettingsScreen(
             }
 
 
-            //Other Settings
+            //Misc Settings
             item {
                 Text(
-                    text = "Other Settings",
+                    text = stringResource(id = R.string.misc_settings),
                     modifier = Modifier.padding(bottom = 6.dp, top = 12.dp))
             }
 
@@ -268,11 +268,12 @@ fun RoundIncrementItem(
         modifier = modifier) {
         Text(
             text = currencySymbol.value,
-            fontSize = 12.sp,
+            fontSize = 11.sp,
             color = Color.Black,
             textAlign = TextAlign.Right,
             modifier = modifier
                 .wrapContentWidth()
+                .padding(end = 1.dp)
         )
         Text(
             text = getFormattedAmountString(roundingNumValue.intValue),
@@ -306,7 +307,7 @@ fun SettingsChip(
                     .fillMaxSize()
             ) {
                 Text(
-                    text = "$labelText:",
+                    text = labelText,
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
