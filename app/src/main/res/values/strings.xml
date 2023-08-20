@@ -21,7 +21,8 @@
     <string name="default_split">Default Split</string>
     <string name="retain_num_split">Save Last Split</string>
     <string name="precise_split_mode">Precision Mode</string>
-    <string name="round_increment">Round Increment</string>
+    <string name="misc_settings">Misc Settings</string>
+    <string name="round_increment">Rounding\nIncrement</string>
 
 
     <string name="back">Back</string>

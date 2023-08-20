@@ -1,6 +1,9 @@
 <resources>
-    <string name="default_tip">Default Percentage</string>
+
+    <!--Settings Screen-->
+    <string name="default_tip">Default Tip Percent</string>
     <string name="retain_tip_percentage">Save Last Tip Percent</string>
     <string name="precise_split_mode">Precision Split Mode</string>
+    <string name="round_increment">Rounding Increment</string>
 
 </resources>
