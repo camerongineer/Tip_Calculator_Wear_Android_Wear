@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +55,7 @@ import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 
 @Composable
 fun SettingsScreen(
@@ -84,6 +86,7 @@ fun SettingsScreen(
             autoCentering = AutoCenteringParams(itemIndex = 0),
             modifier = Modifier.fillMaxWidth()
         ) {
+
             //Tip Settings
             item {
                 Text(
@@ -136,6 +139,25 @@ fun SettingsScreen(
                 )
             }
 
+
+            //Other Settings
+            item {
+                Text(
+                    text = "Other Settings",
+                    modifier = Modifier.padding(bottom = 6.dp, top = 12.dp))
+            }
+
+            item {
+                RoundIncrementItem(
+                    labelText = stringResource(id = R.string.round_increment),
+                    roundingNumValue = settingsViewModel.roundingNum,
+                    currencySymbol = settingsViewModel.currencySymbol,
+                    onRoundingNumChanged = { navController.navigate("rounding_num_picker") }
+                )
+            }
+
+
+
             item {
                 CompactChip(
                     label = {Text(text = stringResource(id = R.string.back))},
@@ -179,6 +201,7 @@ fun SettingsScreen(
     }
 }
 
+
 @Composable
 fun DefaultTipPercentageItem(
     labelText: String,
@@ -213,7 +236,7 @@ fun DefaultTipPercentageItem(
 fun DefaultSplitItem(labelText: String,
                      defaultSplitValue: MutableIntState,
                      onDefaultSplitValueChanged: (Int) -> Unit,
-                     modifier: Modifier = Modifier,
+                     modifier: Modifier = Modifier
 ) {
     SettingsChip(
         labelText = labelText,
@@ -224,12 +247,42 @@ fun DefaultSplitItem(labelText: String,
             text = "${defaultSplitValue.intValue}",
             fontSize = 17.sp,
             color = MaterialTheme.colors.secondary,
-            textAlign = TextAlign.Right,
             modifier = modifier
                 .wrapContentWidth()
         )
     }
+}
 
+@Composable
+fun RoundIncrementItem(
+    labelText: String,
+    roundingNumValue: MutableIntState,
+    currencySymbol: MutableState<String>,
+    onRoundingNumChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingsChip(
+        labelText = labelText,
+        defaultValue = roundingNumValue,
+        onDefaultValueChanged = onRoundingNumChanged,
+        modifier = modifier) {
+        Text(
+            text = currencySymbol.value,
+            fontSize = 12.sp,
+            color = Color.Black,
+            textAlign = TextAlign.Right,
+            modifier = modifier
+                .wrapContentWidth()
+        )
+        Text(
+            text = getFormattedAmountString(roundingNumValue.intValue),
+            fontSize = 15.sp,
+            color = MaterialTheme.colors.secondary,
+            textAlign = TextAlign.Left,
+            modifier = modifier
+                .wrapContentWidth()
+        )
+    }
 }
 
 
@@ -266,7 +319,6 @@ fun SettingsChip(
                         verticalAlignment = Alignment.CenterVertically
                     ) { this@Chip.content() }
                 }
-
             } },
         modifier = modifier
             .fillMaxWidth()

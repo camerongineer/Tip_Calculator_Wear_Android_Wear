@@ -342,8 +342,8 @@ fun SplitPreview() {
             navController = rememberSwipeDismissableNavController(),
             splitViewModel = SplitViewModel(
                 dataStore = DataStoreManager(LocalContext.current),
-                subTotal = 3000,
-                tipAmount = 1000,
+                subTotal = 3001,
+                tipAmount = 1001,
                 isPreciseSplit = mutableStateOf(false)
             ),
             modifier = Modifier.background(color = Color.Black)

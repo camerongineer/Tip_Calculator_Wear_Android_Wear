@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.round
 import kotlin.math.roundToInt
 
@@ -42,7 +43,8 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
     fun getCurrencySymbol() = _currencySymbol.value
 
-    private val _roundingNum = DataStoreManager.DEFAULT_ROUNDING_NUM
+    private val _roundingNum = mutableIntStateOf(DataStoreManager.DEFAULT_ROUNDING_NUM)
+    val roundingNum = _roundingNum
 
     init {
         viewModelScope.launch {
@@ -53,6 +55,7 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
                 dataStore.defaultTipPercentageFlow.first().toDouble()
             }
             _currencySymbol.value = dataStore.currencySymbolFlow.first()
+            _roundingNum.intValue = dataStore.roundingNumFlow.first()
         }
     }
 
@@ -120,7 +123,7 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     fun onRoundUpClicked() {
         viewModelScope.launch {
             if (_subTotal.intValue > 0) {
-                val nextTotal = roundUp(_grandTotal.value, _roundingNum)
+                val nextTotal = roundUp(_grandTotal.value, _roundingNum.intValue)
                 _tipAmount.intValue = nextTotal - _subTotal.intValue
                 setTipPercentage()
             }
@@ -130,8 +133,8 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
     fun onRoundDownClicked() {
         viewModelScope.launch {
             if (_subTotal.intValue > 0) {
-                val nextTotal = roundDown(_grandTotal.value, _roundingNum)
-                _tipAmount.intValue = nextTotal - _subTotal.intValue
+                val nextTotal = roundDown(_grandTotal.value, _roundingNum.intValue)
+                _tipAmount.intValue = max(0, nextTotal - _subTotal.intValue)
                 setTipPercentage()
             }
         }
