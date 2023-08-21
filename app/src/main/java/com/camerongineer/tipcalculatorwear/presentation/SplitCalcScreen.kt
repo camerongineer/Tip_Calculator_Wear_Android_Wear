@@ -160,7 +160,7 @@ fun SplitDisplay(
                 verticalArrangement = Arrangement.SpaceBetween,
             ){
                 InputLabel(
-                    labelText = stringResource(id = R.string.display_sub_total),
+                    labelText = stringResource(id = R.string.display_subtotal),
                     color = MaterialTheme.colors.onBackground,
                     fontSize = 10.sp,
                     onClick = onSplitSubtotalClicked,
@@ -274,7 +274,7 @@ fun UnevenSplitWarning(
                 ){
                     if (subTotalRemainder > 0) {
                         InputLabel(
-                            labelText = stringResource(id = R.string.display_sub_total),
+                            labelText = stringResource(id = R.string.display_subtotal),
                             color = MaterialTheme.colors.onBackground,
                             fontSize = 12.sp,
                             modifier = Modifier.height(16.dp)

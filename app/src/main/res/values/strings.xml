@@ -2,12 +2,16 @@
     <string name="app_name">Tip Calculator Wear</string>
 
     <!--Main Screen-->
+    <string name="tag_keyboard_subtotal">Keyboard Subtotal</string>
     <string name="backspace">Backspace</string>
     <string name="tip_percentage">Tip Percentage</string>
     <string name="round_up_down">HOLD ARROW TO ROUND GRANDTOTAL</string>
     <string name="decrease">Decrease</string>
     <string name="increase">Increase</string>
-    <string name="display_sub_total">SUBTOTAL</string>
+    <string name="display_subtotal">SUBTOTAL</string>
+    <string name="tag_display_subtotal">Display Subtotal</string>
+    <string name="tag_display_tip">Display Tip</string>
+    <string name="tag_display_grand_total">Display Grand Total</string>
     <string name="display_tip">TIP</string>
     <string name="display_total">GRANDTOTAL</string>
     <string name="settings">Settings</string>
