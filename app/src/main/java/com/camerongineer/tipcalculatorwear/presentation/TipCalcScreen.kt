@@ -39,6 +39,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -320,13 +322,14 @@ fun SubTotalDisplay(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             InputLabel(
-                labelText = stringResource(id = R.string.display_sub_total),
+                labelText = stringResource(id = R.string.display_subtotal),
                 fontSize = 12.sp,
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = billAmountString,
                 fontSize = 14.sp,
+                tag = stringResource(id = R.string.tag_keyboard_subtotal)
             )
         }
     }
@@ -467,8 +470,10 @@ fun TipSlider(
                             block = onTipPercentageLongClicked,
                             isLongPress = true
                         ),
-                        onClick = { }
+                        onClick = withHaptics { }
                     )
+                    .semantics { contentDescription = "Percentage" }
+
             )
             SmallText(
                 text = "%",
@@ -536,7 +541,7 @@ fun GrandTotalDisplay(
                 .clickable(onClick = onClick)
         ) {
             InputLabel(
-                labelText = stringResource(id = R.string.display_sub_total),
+                labelText = stringResource(id = R.string.display_subtotal),
                 color = MaterialTheme.colors.onBackground,
                 modifier = Modifier.height(16.dp)
             )
@@ -560,16 +565,19 @@ fun GrandTotalDisplay(
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = billAmountString,
+                tag = stringResource(id = R.string.tag_display_subtotal),
                 modifier = Modifier.height(16.dp),
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = tipAmountString,
+                tag = stringResource(id = R.string.tag_display_tip),
                 modifier = Modifier.height(16.dp),
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = grandTotalString,
+                tag = stringResource(id = R.string.tag_display_grand_total),
                 modifier = Modifier.height(16.dp),
             )
         }
@@ -582,6 +590,7 @@ fun AmountDisplay(
     amountString: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 14.sp,
+    tag: String? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val clickModifier = if (onClick == null) modifier else modifier.clickable(onClick = onClick)
@@ -596,10 +605,12 @@ fun AmountDisplay(
             color = MaterialTheme.colors.primary,
             fontSize = fontSize * .60f,
         )
+        val amountModifier = if (tag == null) Modifier else Modifier.semantics { contentDescription = tag }
         Text(
             color = MaterialTheme.colors.primaryVariant,
             text = amountString,
             fontSize = fontSize,
+            modifier = amountModifier
         )
     }
 }
