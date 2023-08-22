@@ -1,13 +1,48 @@
 <resources>
     <string name="app_name">Tip Calculator Wear</string>
+
+    <!--Main Screen-->
+    <string name="tag_keyboard_subtotal">Keyboard Subtotal</string>
+    <string name="backspace">Backspace</string>
     <string name="tip_percentage">Tip Percentage</string>
     <string name="round_up_down">HOLD ARROW TO ROUND GRANDTOTAL</string>
-    <string name="display_sub_total">SUBTOTAL</string>
+    <string name="decrease">Decrease</string>
+    <string name="increase">Increase</string>
+    <string name="display_subtotal">SUBTOTAL</string>
+    <string name="tag_display_subtotal">Display Subtotal</string>
+    <string name="tag_display_tip">Display Tip</string>
+    <string name="tag_display_grand_total">Display Grand Total</string>
     <string name="display_tip">TIP</string>
     <string name="display_total">GRANDTOTAL</string>
+    <string name="settings">Settings</string>
     <string name="split">Split</string>
+
+
+    <!--Split Screen-->
     <string name="split_grand_total">Each payee owes</string>
     <string name="split_warning">Uneven Split, additional amount(s) are required to satisfy grand total.</string>
+
+    <!--Settings Screen-->
+    <string name="tip_settings">Tip Settings</string>
+    <string name="default_tip">Default Tip</string>
+    <string name="retain_tip_percentage">Save Last Tip %</string>
+    <string name="round_increment">Rounding Step</string>
+    <string name="split_settings">Split Settings</string>
+    <string name="default_split">Default Split</string>
+    <string name="retain_num_split">Save Last Split</string>
+    <string name="precise_split_mode">Precision Mode</string>
+    <string name="misc_settings">Misc Settings</string>
+    <string name="back">Back</string>
+    <string name="review_request">If you enjoy this app, please consider leaving a review in the Play Store!</string>
+    <string name="play_store_url">https://play.google.com/store/apps/details?id=com.camerongineer.tipcalculatorwear</string>
+
+
+    <!--Picker Screen-->
+    <string name="values">Values</string>
+    <string name="submit">Submit</string>
+
+
+
     <string name="title_activity_presentation._main">presentation.MainActivity</string>
     <string name="title_activity_main">MainActivity</string>
 </resources>

@@ -11,14 +11,15 @@ import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         val dataStore = DataStoreManager(this)
         val tipCalcViewModel = TipCalcViewModel(dataStore)
-        super.onCreate(savedInstanceState)
         setContent {
             TipCalculatorWearTheme {
                 TipCalcApp(tipCalcViewModel)
@@ -32,11 +33,22 @@ fun TipCalcApp(
     tipCalcViewModel: TipCalcViewModel
 ) {
     val navController = rememberSwipeDismissableNavController()
+    val settingsViewModel = SettingsViewModel(dataStore = tipCalcViewModel.dataStore)
     val splitViewModel = SplitViewModel(
-        datastore = tipCalcViewModel.dataStore,
-        subTotal = tipCalcViewModel.getSubtotal(),
-        tipAmount = tipCalcViewModel.getTipAmount(),
+        dataStore = tipCalcViewModel.dataStore,
+        subTotal = tipCalcViewModel.subTotal,
+        tipAmount = tipCalcViewModel.tipAmount,
+        isPreciseSplit = settingsViewModel.isPreciseSplit
     )
+    val defaultTipPercentageViewModel = PickerViewModel(
+        state = settingsViewModel.defaultTipPercentage,
+        optionsList = OptionsLists.TIP_PERCENT_OPTIONS)
+    val defaultNumSplitViewModel = PickerViewModel(
+        state = settingsViewModel.defaultNumSplit,
+        optionsList = OptionsLists.NUM_SPLIT_OPTIONS)
+    val roundingNumViewModel = PickerViewModel(
+        state = tipCalcViewModel.roundingNum,
+        optionsList = OptionsLists.ROUNDING_INCREMENTS)
 
     SwipeDismissableNavHost(
         navController = navController,
@@ -52,6 +64,33 @@ fun TipCalcApp(
             SplitCalcScreen(
                 navController = navController,
                 splitViewModel = splitViewModel
+            )
+        }
+        composable("settings") {
+            SettingsScreen(
+                navController = navController,
+                settingsViewModel = settingsViewModel
+            )
+        }
+        composable("default_tip_picker") {
+            PickerScreen(
+                navController = navController,
+                pickerViewModel = defaultTipPercentageViewModel,
+                callbackCommand = settingsViewModel::setDefaultTipPercentage
+            )
+        }
+        composable("default_split_picker") {
+            PickerScreen(
+                navController = navController,
+                pickerViewModel = defaultNumSplitViewModel,
+                callbackCommand = settingsViewModel::setDefaultNumSplit
+            )
+        }
+        composable("rounding_num_picker") {
+            PickerScreen(
+                navController = navController,
+                pickerViewModel = roundingNumViewModel,
+                callbackCommand = settingsViewModel::setRoundingNum
             )
         }
     }
