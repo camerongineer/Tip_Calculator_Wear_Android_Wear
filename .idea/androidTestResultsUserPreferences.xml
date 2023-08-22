@@ -42,6 +42,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-1727959527">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="Wear_OS_Rectangular_API_30" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-1675933835">
           <value>
             <AndroidTestResultsTableState>
@@ -50,6 +63,19 @@
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
                   <entry key="Wear_OS_Large_Round_API_30" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-1244718002">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="Wear_OS_Rectangular_API_30" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -126,8 +152,10 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="GP_Wear_OS_Large_Round_API_30" value="120" />
                   <entry key="Tests" value="360" />
                   <entry key="Wear_OS_Large_Round_API_30" value="120" />
+                  <entry key="Wear_OS_Large_Round_API_33" value="120" />
                   <entry key="Wear_OS_Rectangular_API_30" value="120" />
                 </map>
               </option>
@@ -182,6 +210,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
                   <entry key="Wear_OS_Large_Round_API_30" value="120" />
+                  <entry key="Wear_OS_Rectangular_API_30" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -234,6 +263,19 @@
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
                   <entry key="Wear_OS_Rectangular_API_30" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1271466814">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="Wear_OS_Large_Round_API_33" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

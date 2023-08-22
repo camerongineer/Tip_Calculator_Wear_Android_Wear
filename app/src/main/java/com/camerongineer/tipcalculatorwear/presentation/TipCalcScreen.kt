@@ -1,5 +1,6 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -84,6 +85,7 @@ fun TipCalcScreen(
     val scrollToSection: (Int) -> Unit = { index ->
         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         coroutineScope.launch {
+            Log.d("NAV", "Scroll to index: $index")
             listState.animateScrollToItem(index)
         }
     }
@@ -93,6 +95,7 @@ fun TipCalcScreen(
         if (tipCalcViewModel.isFirstLaunch()) {
             tipCalcViewModel.markAsNotFirstLaunch()
             coroutineScope.launch {
+                Log.d("NAV", "To Keyboard")
                 listState.scrollToItem(0)
             }
         }
@@ -131,8 +134,14 @@ fun TipCalcScreen(
                 TipSelectionItem(
                     tipCalcViewModel = tipCalcViewModel,
                     scrollToSection = scrollToSection,
-                    onSplitClicked = withHaptics { navController.navigate("split") },
-                    onSettingsClicked = withHaptics { navController.navigate("settings") }
+                    onSplitClicked = withHaptics {
+                        Log.d("NAV", "To Split Screen")
+                        navController.navigate("split")
+                                                 },
+                    onSettingsClicked = withHaptics {
+                        Log.d("NAV", "To Settings Screen")
+                        navController.navigate("settings")
+                    }
                 )
             }
 

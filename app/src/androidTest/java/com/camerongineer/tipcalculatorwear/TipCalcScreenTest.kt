@@ -93,6 +93,8 @@ class TipCalcScreenTest {
         composeTestRule.onNode(buttonNine).performClick()
         composeTestRule.onNode(buttonZero).performClick()
         composeTestRule.onNode(textKeyboardSubtotal and hasText("5678.90")).assertExists()
+        repeat(3) { composeTestRule.onNode(buttonOne).performClick() }
+        composeTestRule.onNode(textKeyboardSubtotal and hasText("5678.90")).assertExists()
         repeat(6) { composeTestRule.onNode(buttonBackSpace).performClick() }
         composeTestRule.onNode(textKeyboardSubtotal and hasText("0.00")).assertExists()
     }
@@ -108,7 +110,7 @@ class TipCalcScreenTest {
     fun correctTotalsDisplayed() {
         composeTestRule.onNode(buttonThree).performClick()
         composeTestRule.onNode(textKeyboardSubtotal and hasText("0.03")).assertExists()
-        composeTestRule.onNode(buttonSubmit).performClick()
+        navigateToTipSelection()
         composeTestRule.onNode(textDisplaySubtotal and hasText("0.03")).assertExists()
         composeTestRule.onNode(textDisplayTip and hasText("0.00")).assertExists()
         composeTestRule.onNode(textDisplayGrandTotal and hasText("0.03")).assertExists()
@@ -116,7 +118,7 @@ class TipCalcScreenTest {
         composeTestRule.onNode(textDisplayTip).performClick()
         composeTestRule.onNode(buttonFive).performClick()
         composeTestRule.onNode(textKeyboardSubtotal and hasText("0.35")).assertExists()
-        composeTestRule.onNode(buttonSubmit).performClick()
+        navigateToTipSelection()
         composeTestRule.onNode(textDisplaySubtotal and hasText("0.35")).assertExists()
         composeTestRule.onNode(textDisplayTip and hasText("0.05")).assertExists()
         composeTestRule.onNode(textDisplayGrandTotal and hasText("0.40")).assertExists()
@@ -124,7 +126,7 @@ class TipCalcScreenTest {
         composeTestRule.onNode(textDisplayTip).performClick()
         composeTestRule.onNode(buttonSeven).performClick()
         composeTestRule.onNode(textKeyboardSubtotal and hasText("3.57")).assertExists()
-        composeTestRule.onNode(buttonSubmit).performClick()
+        navigateToTipSelection()
         composeTestRule.onNode(textDisplaySubtotal and hasText("3.57")).assertExists()
         composeTestRule.onNode(textDisplayTip and hasText("0.54")).assertExists()
         composeTestRule.onNode(textDisplayGrandTotal and hasText("4.11")).assertExists()
@@ -132,7 +134,7 @@ class TipCalcScreenTest {
         composeTestRule.onNode(textDisplayTip).performClick()
         composeTestRule.onNode(buttonNine).performClick()
         composeTestRule.onNode(textKeyboardSubtotal and hasText("35.79")).assertExists()
-        composeTestRule.onNode(buttonSubmit).performClick()
+        navigateToTipSelection()
         composeTestRule.onNode(textDisplaySubtotal and hasText("35.79")).assertExists()
         composeTestRule.onNode(textDisplayTip and hasText("5.37")).assertExists()
         composeTestRule.onNode(textDisplayGrandTotal and hasText("41.16")).assertExists()
@@ -147,7 +149,7 @@ class TipCalcScreenTest {
         composeTestRule.onNode(buttonEight).performClick()
         composeTestRule.onNode(buttonZero).performClick()
         composeTestRule.onNode(textKeyboardSubtotal and hasText("246.80")).assertExists()
-        composeTestRule.onNode(buttonSubmit).performClick()
+        navigateToTipSelection()
         composeTestRule.onNode(textDisplaySubtotal and hasText("246.80")).assertExists()
         composeTestRule.onNode(textDisplayTip and hasText("37.02")).assertExists()
         composeTestRule.onNode(textDisplayGrandTotal and hasText("283.82")).assertExists()
@@ -172,7 +174,7 @@ class TipCalcScreenTest {
 
     @Test
     fun tipSliderGreaterOrEqualZero() {
-        composeTestRule.onNode(buttonSubmit).performClick()
+        navigateToTipSelection()
         while(tipCalcViewModel.getTipPercentage() > 0) {
             composeTestRule.onNode(buttonTipSliderDecrease).performClick()
         }
@@ -193,15 +195,38 @@ class TipCalcScreenTest {
 
     @Test
     fun canNavigateToSettingsScreen() {
-        composeTestRule.onNode(buttonSubmit).performClick()
-        composeTestRule.onNode(buttonSettings).performClick()
+        navigateToSettingsScreen()
         composeTestRule.onNodeWithText("Tip Settings").assertIsDisplayed()
     }
 
     @Test
     fun canNavigateToSplitScreen() {
-        composeTestRule.onNode(buttonSubmit).performClick()
-        composeTestRule.onNode(buttonSplit).performClick()
+        navigateToSplitScreen()
         composeTestRule.onNodeWithText("Each payee owes").assertIsDisplayed()
+    }
+
+    @Test
+    fun canResetTipPercentage() {
+        navigateToTipSelection()
+        repeat(5) { composeTestRule.onNode(buttonTipSliderIncrease).performClick() }
+        val tipPercentage = tipCalcViewModel.getTipPercentage().toInt()
+        composeTestRule.onNode(textTipPercentage and hasText(tipPercentage.toString())).assertExists()
+        composeTestRule.onNode(textTipPercentage)
+            .performTouchInput { longClick(center, 1000) }
+        composeTestRule.onNode(textTipPercentage and hasText((tipPercentage - 5).toString())).assertExists()
+    }
+
+    private fun navigateToTipSelection() {
+        composeTestRule.onNode(buttonSubmit).performClick()
+    }
+
+    private fun navigateToSplitScreen() {
+        navigateToTipSelection()
+        composeTestRule.onNode(buttonSplit).performClick()
+    }
+
+    private fun navigateToSettingsScreen() {
+        navigateToTipSelection()
+        composeTestRule.onNode(buttonSettings).performClick()
     }
 }
