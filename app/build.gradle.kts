@@ -12,8 +12,8 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
         targetSdk = 33
-        versionCode = 12
-        versionName = "1.3.4"
+        versionCode = 13
+        versionName = "1.3.5"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -72,6 +72,7 @@ dependencies {
     implementation("androidx.wear.compose:compose-navigation:1.2.0")
     implementation("androidx.wear.compose:compose-material:1.2.0")
     implementation("androidx.wear.compose:compose-foundation:1.2.0")
+    implementation("androidx.wear:wear-remote-interactions:1.0.0")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 

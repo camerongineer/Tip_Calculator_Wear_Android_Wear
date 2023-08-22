@@ -1,5 +1,6 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,7 @@ fun PickerScreen(
         val savedOption = pickerViewModel.optionsList[state.selectedOption].value
         callbackCommand(savedOption)
         pickerViewModel.state.intValue = savedOption
+        Log.d("NAV", "To Settings Screen")
         navController.navigateUp()
     }
     Scaffold(

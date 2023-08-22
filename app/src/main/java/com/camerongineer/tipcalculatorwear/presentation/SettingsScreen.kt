@@ -2,6 +2,7 @@ package com.camerongineer.tipcalculatorwear.presentation
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -98,7 +99,10 @@ fun SettingsScreen(
                 DefaultTipPercentageItem(
                     labelText = stringResource(id = R.string.default_tip),
                     defaultTipPercentage = settingsViewModel.defaultTipPercentage,
-                    onDefaultTipPercentageChanged = { navController.navigate("default_tip_picker") }
+                    onDefaultTipPercentageChanged = {
+                        Log.d("NAV", "To Default Tip Picker Screen")
+                        navController.navigate("default_tip_picker")
+                    }
                 )
             }
 
@@ -114,7 +118,10 @@ fun SettingsScreen(
                     labelText = stringResource(id = R.string.round_increment),
                     roundingNumValue = settingsViewModel.roundingNum,
                     currencySymbol = settingsViewModel.currencySymbol,
-                    onRoundingNumChanged = { navController.navigate("rounding_num_picker") }
+                    onRoundingNumChanged = {
+                        Log.d("NAV", "To Round Step Picker Screen")
+                        navController.navigate("rounding_num_picker")
+                    }
                 )
             }
 
@@ -129,7 +136,10 @@ fun SettingsScreen(
                 DefaultSplitItem(
                     labelText = stringResource(id = R.string.default_split),
                     defaultSplitValue = settingsViewModel.defaultNumSplit,
-                    onDefaultSplitValueChanged = { navController.navigate("default_split_picker") }
+                    onDefaultSplitValueChanged = {
+                        Log.d("NAV", "To Default Split Picker Screen")
+                        navController.navigate("default_split_picker")
+                    }
                 )
             }
 
@@ -151,7 +161,10 @@ fun SettingsScreen(
             item {
                 CompactChip(
                     label = {Text(text = stringResource(id = R.string.back))},
-                    onClick = withHaptics { navController.navigateUp() },
+                    onClick = withHaptics {
+                        Log.d("NAV", "To Tip Selection")
+                        navController.navigateUp()
+                                          },
                     modifier = Modifier.padding(bottom = 30.dp)
                 )
             }
@@ -160,8 +173,12 @@ fun SettingsScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.clickable {
-                        intent.data = playStoreUrl
-                        context.startActivity(intent)
+                        try {
+                            intent.data = playStoreUrl
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 ) {
                     Text(

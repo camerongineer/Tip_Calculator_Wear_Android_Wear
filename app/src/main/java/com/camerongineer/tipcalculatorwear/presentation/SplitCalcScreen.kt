@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -328,8 +329,8 @@ fun SplitPreview() {
             navController = rememberSwipeDismissableNavController(),
             splitViewModel = SplitViewModel(
                 dataStore = DataStoreManager(LocalContext.current),
-                subTotal = 3001,
-                tipAmount = 1001,
+                subTotal = mutableIntStateOf(3001),
+                tipAmount = mutableIntStateOf(1001),
                 isPreciseSplit = mutableStateOf(false)
             ),
             modifier = Modifier.background(color = Color.Black)

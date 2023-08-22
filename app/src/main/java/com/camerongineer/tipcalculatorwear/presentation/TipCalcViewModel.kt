@@ -24,12 +24,12 @@ import kotlin.math.roundToInt
 class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
 
     private val _subTotal = mutableIntStateOf(0)
-    fun getSubtotal() = _subTotal.intValue
+    val subTotal = _subTotal
 
     private val _subTotalString = mutableStateOf("")
 
     private val _tipAmount = mutableIntStateOf(0)
-    fun getTipAmount() = _tipAmount.intValue
+    val tipAmount = _tipAmount
 
     private val _tipPercentage =
         mutableDoubleStateOf(

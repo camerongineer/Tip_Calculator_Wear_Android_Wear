@@ -1,5 +1,6 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -13,8 +14,8 @@ import kotlinx.coroutines.launch
 
 class SplitViewModel(
     private val dataStore: DataStoreManager,
-    subTotal: Int,
-    tipAmount: Int,
+    subTotal: MutableIntState,
+    tipAmount: MutableIntState,
     private val isPreciseSplit: MutableState<Boolean>
 ): ViewModel() {
 
@@ -35,24 +36,24 @@ class SplitViewModel(
     }
 
     private val _splitSubTotal = derivedStateOf {
-        if (isPreciseSplit.value || subTotal % _numSplit.intValue == 0) {
-            subTotal / _numSplit.intValue
+        if (isPreciseSplit.value || subTotal.intValue % _numSplit.intValue == 0) {
+            subTotal.intValue / _numSplit.intValue
         } else {
-            (subTotal / _numSplit.intValue) + 1
+            (subTotal.intValue / _numSplit.intValue) + 1
         }
     }
 
     private val _splitSubTotalRemainder = derivedStateOf {
-        val remainder = subTotal % _numSplit.intValue
+        val remainder = subTotal.intValue % _numSplit.intValue
         if (isPreciseSplit.value) remainder else 0
     }
 
     private val _splitTipAmount = derivedStateOf {
-        tipAmount / _numSplit.intValue
+        tipAmount.intValue / _numSplit.intValue
     }
 
     private val _splitTipRemainder = derivedStateOf {
-        val remainder = tipAmount % _numSplit.intValue
+        val remainder = tipAmount.intValue % _numSplit.intValue
         if (isPreciseSplit.value) remainder else 0
     }
 

@@ -36,8 +36,8 @@ fun TipCalcApp(
     val settingsViewModel = SettingsViewModel(dataStore = tipCalcViewModel.dataStore)
     val splitViewModel = SplitViewModel(
         dataStore = tipCalcViewModel.dataStore,
-        subTotal = tipCalcViewModel.getSubtotal(),
-        tipAmount = tipCalcViewModel.getTipAmount(),
+        subTotal = tipCalcViewModel.subTotal,
+        tipAmount = tipCalcViewModel.tipAmount,
         isPreciseSplit = settingsViewModel.isPreciseSplit
     )
     val defaultTipPercentageViewModel = PickerViewModel(
