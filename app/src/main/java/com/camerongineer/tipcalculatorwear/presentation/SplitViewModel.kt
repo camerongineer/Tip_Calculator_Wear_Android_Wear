@@ -1,46 +1,60 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SplitViewModel(
-    private val datastore: DataStoreManager,
-    subTotal: Int,
-    tipAmount: Int,
+    private val dataStore: DataStoreManager,
+    subTotal: MutableIntState,
+    tipAmount: MutableIntState,
+    private val isPreciseSplit: MutableState<Boolean>
 ): ViewModel() {
 
-    companion object {
-        const val DEFAULT_SPLIT_NUM = 2
-        const val MAX_NUM_SPLIT = 20
-    }
+    private val _numSplit = mutableIntStateOf(DataStoreManager.DEFAULT_NUM_SPLIT)
 
-    private val _numSplit = mutableIntStateOf(DEFAULT_SPLIT_NUM)
+    private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
+    fun getCurrencySymbol() = _currencySymbol.value
 
     init {
         viewModelScope.launch {
-            _numSplit.intValue = datastore.numSplitFlow.first()
+            _numSplit.intValue = if (dataStore.rememberNumSplitFlow.first()) {
+                dataStore.numSplitFlow.first()
+            } else {
+                dataStore.defaultNumSplitFlow.first()
+            }
+            _currencySymbol.value = dataStore.currencySymbolFlow.first()
         }
     }
 
     private val _splitSubTotal = derivedStateOf {
-        subTotal / _numSplit.intValue
+        if (isPreciseSplit.value || subTotal.intValue % _numSplit.intValue == 0) {
+            subTotal.intValue / _numSplit.intValue
+        } else {
+            (subTotal.intValue / _numSplit.intValue) + 1
+        }
     }
 
     private val _splitSubTotalRemainder = derivedStateOf {
-        subTotal % _numSplit.intValue
+        val remainder = subTotal.intValue % _numSplit.intValue
+        if (isPreciseSplit.value) remainder else 0
     }
 
     private val _splitTipAmount = derivedStateOf {
-        tipAmount / _numSplit.intValue
+        tipAmount.intValue / _numSplit.intValue
     }
 
     private val _splitTipRemainder = derivedStateOf {
-        tipAmount % _numSplit.intValue
+        val remainder = tipAmount.intValue % _numSplit.intValue
+        if (isPreciseSplit.value) remainder else 0
     }
 
     private val _splitGrandTotal = derivedStateOf {
@@ -49,7 +63,7 @@ class SplitViewModel(
 
 
     fun onSplitUpClicked() {
-        if (_numSplit.intValue < MAX_NUM_SPLIT) {
+        if (_numSplit.intValue < DataStoreManager.MAX_NUM_SPLIT) {
             _numSplit.intValue++
             saveNumSplit()
         }
@@ -64,7 +78,7 @@ class SplitViewModel(
 
     fun resetNumSplit() {
         viewModelScope.launch {
-            _numSplit.intValue = datastore.defaultNumSplitFlow.first()
+            _numSplit.intValue = dataStore.defaultNumSplitFlow.first()
             saveNumSplit()
         }
     }
@@ -75,21 +89,24 @@ class SplitViewModel(
 
     fun getSplitTipAmountRemainder(): Int = _splitTipRemainder.value
 
-    fun getFormattedSplitSubTotal() = getFormattedAmountString(_splitSubTotal.value)
+    fun getFormattedSplitSubTotal() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitSubTotal.value)
 
-    fun getFormattedSplitSubTotalRemainder() = getFormattedAmountString(_splitSubTotalRemainder.value)
+    fun getFormattedSplitSubTotalRemainder() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitSubTotalRemainder.value)
 
-    fun getFormattedSplitTipAmount() = getFormattedAmountString(_splitTipAmount.value)
+    fun getFormattedSplitTipAmount() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitTipAmount.value)
 
-    fun getFormattedSplitTipAmountRemainder() = getFormattedAmountString(_splitTipRemainder.value)
+    fun getFormattedSplitTipAmountRemainder() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitTipRemainder.value)
 
-    fun getFormattedSplitGrandTotal() = getFormattedAmountString(_splitGrandTotal.value)
+    fun getFormattedSplitGrandTotal() =
+        com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString(_splitGrandTotal.value)
 
     private fun saveNumSplit() {
         viewModelScope.launch {
-            datastore.saveNumSplit(numSplit = _numSplit.intValue)
+            dataStore.saveNumSplit(numSplit = _numSplit.intValue)
         }
     }
 }
-
-private fun getFormattedAmountString(amount: Int) = "%.2f".format(amount.toDouble() / 100)
