@@ -1,6 +1,5 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -22,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Picker
@@ -34,32 +30,25 @@ import androidx.wear.compose.material.TimeTextDefaults
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.rememberPickerState
-import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.R
+import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsItem
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 
 @Composable
 fun PickerScreen(
-    navController: NavHostController,
-    pickerViewModel: PickerViewModel,
-    callbackCommand: (Int) -> Unit
+    initialValue: Int,
+    optionsList: List<OptionsItem>,
+    onSubmitPressed: (Int) -> Unit
 ) {
-    val startIndex = pickerViewModel.optionsList
-        .indexOfFirst { it.value == pickerViewModel.state.intValue }
+    val pickerViewModel = PickerViewModel(initialValue, optionsList)
+
     val state = rememberPickerState(
         initialNumberOfOptions = pickerViewModel.optionsList.size,
-        initiallySelectedOption = startIndex,
+        initiallySelectedOption = pickerViewModel.initialIndex,
         repeatItems = false
     )
 
-    val returnCommand = withHaptics {
-        val savedOption = pickerViewModel.optionsList[state.selectedOption].value
-        callbackCommand(savedOption)
-        pickerViewModel.state.intValue = savedOption
-        Log.d("NAV", "To Settings Screen")
-        navController.navigateUp()
-    }
     Scaffold(
         timeText = {
             TimeText(
@@ -95,7 +84,9 @@ fun PickerScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Button(
-                onClick = returnCommand,
+                onClick = withHaptics { onSubmitPressed(
+                    pickerViewModel.optionsList[state.selectedOption].value
+                ) } ,
                 modifier = Modifier
                     .size(60.dp)
                     .padding(10.dp)
@@ -119,8 +110,7 @@ fun PickerScreen(
 fun PickerPreview() {
     TipCalculatorWearTheme {
         PickerScreen(
-            rememberSwipeDismissableNavController(),
-            PickerViewModel(remember {mutableIntStateOf(2)}, OptionsLists.ROUNDING_INCREMENTS),
+            2, OptionsLists.ROUNDING_INCREMENTS
         ) { }
     }
 }

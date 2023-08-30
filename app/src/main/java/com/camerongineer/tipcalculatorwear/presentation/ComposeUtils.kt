@@ -20,10 +20,10 @@ inline fun withHaptics(
 }
 
 @Composable
-inline fun withBooleanHaptics(
+inline fun <T> withHapticsAndValue(
     isLongPress: Boolean = false,
-    crossinline block: (Boolean) -> Unit
-): (Boolean) -> Unit {
+    crossinline block: (T) -> Unit
+): (T) -> Unit {
     val haptics = LocalHapticFeedback.current
     return {
         haptics.performHapticFeedback(if (isLongPress) {

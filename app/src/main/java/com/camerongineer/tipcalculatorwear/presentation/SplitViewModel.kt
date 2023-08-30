@@ -1,7 +1,5 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -14,15 +12,17 @@ import kotlinx.coroutines.launch
 
 class SplitViewModel(
     private val dataStore: DataStoreManager,
-    subTotal: MutableIntState,
-    tipAmount: MutableIntState,
-    private val isPreciseSplit: MutableState<Boolean>
+    subTotal: Int,
+    tipAmount: Int
 ): ViewModel() {
 
     private val _numSplit = mutableIntStateOf(DataStoreManager.DEFAULT_NUM_SPLIT)
 
     private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
+
     fun getCurrencySymbol() = _currencySymbol.value
+
+    private val _isPreciseSplit = mutableStateOf(true)
 
     init {
         viewModelScope.launch {
@@ -32,35 +32,36 @@ class SplitViewModel(
                 dataStore.defaultNumSplitFlow.first()
             }
             _currencySymbol.value = dataStore.currencySymbolFlow.first()
+            _isPreciseSplit.value = dataStore.preciseSplitFlow.first()
         }
     }
 
     private val _splitSubTotal = derivedStateOf {
-        if (isPreciseSplit.value || subTotal.intValue % _numSplit.intValue == 0) {
-            subTotal.intValue / _numSplit.intValue
+        if (_isPreciseSplit.value || subTotal % _numSplit.intValue == 0) {
+            subTotal / _numSplit.intValue
         } else {
-            (subTotal.intValue / _numSplit.intValue) + 1
+            (subTotal / _numSplit.intValue) + 1
         }
     }
 
     private val _splitSubTotalRemainder = derivedStateOf {
-        val remainder = subTotal.intValue % _numSplit.intValue
-        if (isPreciseSplit.value) remainder else 0
+        val remainder = subTotal % _numSplit.intValue
+        if (_isPreciseSplit.value) remainder else 0
     }
 
     private val _splitTipAmount = derivedStateOf {
-        tipAmount.intValue / _numSplit.intValue
+        tipAmount / _numSplit.intValue
     }
 
     private val _splitTipRemainder = derivedStateOf {
-        val remainder = tipAmount.intValue % _numSplit.intValue
-        if (isPreciseSplit.value) remainder else 0
+        val remainder = tipAmount % _numSplit.intValue
+        if (_isPreciseSplit.value) remainder else 0
     }
+
 
     private val _splitGrandTotal = derivedStateOf {
         _splitSubTotal.value + _splitTipAmount.value
     }
-
 
     fun onSplitUpClicked() {
         if (_numSplit.intValue < DataStoreManager.MAX_NUM_SPLIT) {
@@ -83,7 +84,7 @@ class SplitViewModel(
         }
     }
 
-    fun getNumSplit() = _numSplit.intValue
+    fun getNumSplit(): Int = _numSplit.intValue
 
     fun getSplitSubTotalRemainder(): Int = _splitSubTotalRemainder.value
 

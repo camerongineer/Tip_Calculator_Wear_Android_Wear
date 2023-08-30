@@ -36,6 +36,7 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
+                  <entry key="Wear_OS_Large_Round_API_30" value="120" />
                   <entry key="Wear_OS_Rectangular_API_30" value="120" />
                 </map>
               </option>
@@ -75,6 +76,7 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
+                  <entry key="Wear_OS_Large_Round_API_30" value="120" />
                   <entry key="Wear_OS_Rectangular_API_30" value="120" />
                 </map>
               </option>
@@ -100,7 +102,9 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="GP_Wear_OS_Large_Round_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="Wear_OS_Large_Round_API_30" value="120" />
                   <entry key="Wear_OS_Rectangular_API_30" value="120" />
                 </map>
               </option>

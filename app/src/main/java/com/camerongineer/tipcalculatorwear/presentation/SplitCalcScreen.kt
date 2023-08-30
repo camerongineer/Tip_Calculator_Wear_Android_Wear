@@ -1,23 +1,23 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,13 +28,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
-import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
@@ -42,9 +40,8 @@ import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearT
 
 @Composable
 fun SplitCalcScreen(
-    navController: NavHostController,
     splitViewModel: SplitViewModel,
-    modifier: Modifier = Modifier
+    onBackButtonPressed: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -52,17 +49,14 @@ fun SplitCalcScreen(
     val topBottomMarginHeight = screenHeight * .10f
     val splitButtonsWidth = screenWidth * .22f
 
-    val returnToKeyboard = withHaptics(block = navController::navigateUp)
 
     Scaffold(
-        timeText = {
-            TimeText(
-                timeTextStyle = TimeTextDefaults.timeTextStyle(
-                    color = MaterialTheme.colors.onSecondary)
-            )
-        },
+        timeText = { TimeText(
+                timeTextStyle = TimeTextDefaults
+                    .timeTextStyle(color = MaterialTheme.colors.onSecondary)) },
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .background(color = MaterialTheme.colors.background)
     ) {
         Row(
@@ -73,7 +67,7 @@ fun SplitCalcScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = modifier
+                modifier = Modifier
                     .height(screenHeight)
                     .width(screenWidth - splitButtonsWidth)
                     .padding(
@@ -85,16 +79,13 @@ fun SplitCalcScreen(
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.Top,
-                    modifier = modifier
                 ) {
                     SplitDisplay(
                         currencySymbol = splitViewModel.getCurrencySymbol(),
                         splitSubTotalString = splitViewModel.getFormattedSplitSubTotal(),
                         splitTipString = splitViewModel.getFormattedSplitTipAmount(),
                         splitGrandTotalString = splitViewModel.getFormattedSplitGrandTotal(),
-                        onSplitSubtotalClicked = returnToKeyboard,
-                        onSplitTipAmountClicked = returnToKeyboard,
-                        onSplitGrandTotalClicked = returnToKeyboard
+                        onClick = onBackButtonPressed
                     )
                 }
 
@@ -126,15 +117,14 @@ fun SplitDisplay(
     splitSubTotalString: String,
     splitTipString: String,
     splitGrandTotalString: String,
-    onSplitSubtotalClicked: () -> Unit,
-    onSplitTipAmountClicked: () -> Unit,
-    onSplitGrandTotalClicked: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
+            .clickable(onClick = withHaptics(block = onClick))
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -147,8 +137,7 @@ fun SplitDisplay(
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = splitGrandTotalString,
-                fontSize = 24.sp,
-                onClick = onSplitGrandTotalClicked
+                fontSize = 24.sp
             )
         }
         Row(
@@ -164,13 +153,11 @@ fun SplitDisplay(
                     labelText = stringResource(id = R.string.display_subtotal),
                     color = MaterialTheme.colors.onBackground,
                     fontSize = 10.sp,
-                    onClick = onSplitSubtotalClicked,
                     modifier = Modifier.height(14.dp))
                 InputLabel(
                     labelText = stringResource(id = R.string.display_tip),
                     color = MaterialTheme.colors.onBackground,
                     fontSize = 10.sp,
-                    onClick = onSplitTipAmountClicked,
                     modifier = Modifier.height(14.dp))
             }
             Column(
@@ -181,14 +168,12 @@ fun SplitDisplay(
                     currencySymbol = currencySymbol,
                     amountString = splitSubTotalString,
                     fontSize = 12.sp,
-                    onClick = onSplitSubtotalClicked,
                     modifier = Modifier.height(14.dp)
                 )
                 AmountDisplay(
                     currencySymbol = currencySymbol,
                     amountString = splitTipString,
                     fontSize = 12.sp,
-                    onClick = onSplitTipAmountClicked,
                     modifier = Modifier.height(14.dp)
                 )
             }
@@ -222,7 +207,7 @@ fun SplitButtons(
                 .height(32.dp)
         )
         Text(
-            text = numSplit.toString(),
+            text = "$numSplit",
             fontSize = 28.sp,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.combinedClickable(
@@ -317,7 +302,6 @@ fun UnevenSplitWarning(
 }
 
 
-@SuppressLint("UnrememberedMutableState")
 @Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
@@ -326,14 +310,8 @@ fun UnevenSplitWarning(
 fun SplitPreview() {
     TipCalculatorWearTheme {
         SplitCalcScreen(
-            navController = rememberSwipeDismissableNavController(),
-            splitViewModel = SplitViewModel(
-                dataStore = DataStoreManager(LocalContext.current),
-                subTotal = mutableIntStateOf(3001),
-                tipAmount = mutableIntStateOf(1001),
-                isPreciseSplit = mutableStateOf(false)
-            ),
-            modifier = Modifier.background(color = Color.Black)
+                SplitViewModel(dataStore = DataStoreManager(LocalContext.current), 3001, 250),
+                onBackButtonPressed = {}
         )
     }
 }

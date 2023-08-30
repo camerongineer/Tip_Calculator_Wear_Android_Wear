@@ -2,7 +2,6 @@ package com.camerongineer.tipcalculatorwear.presentation
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -60,11 +58,14 @@ import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 
 @Composable
 fun SettingsScreen(
-    navController: NavHostController,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    navigateToDefaultTipScreen: () -> Unit,
+    navigateToRoundingNumScreen: () -> Unit,
+    navigateToDefaultSplitScreen: () -> Unit,
+    onBackButtonPressed: () -> Unit
 ) {
-    val listState = rememberScalingLazyListState()
     val context = LocalContext.current
+    val listState = rememberScalingLazyListState()
     val intent = Intent(Intent.ACTION_VIEW)
     val playStoreUrl = Uri.parse(stringResource(id = R.string.play_store_url))
 
@@ -92,7 +93,8 @@ fun SettingsScreen(
             item {
                 Text(
                     text = stringResource(id = R.string.tip_settings),
-                    modifier = Modifier.padding(6.dp))
+                    modifier = Modifier.padding(6.dp)
+                )
             }
 
             item {
@@ -100,8 +102,7 @@ fun SettingsScreen(
                     labelText = stringResource(id = R.string.default_tip),
                     defaultTipPercentage = settingsViewModel.defaultTipPercentage,
                     onDefaultTipPercentageChanged = {
-                        Log.d("NAV", "To Default Tip Picker Screen")
-                        navController.navigate("default_tip_picker")
+                        navigateToDefaultTipScreen()
                     }
                 )
             }
@@ -119,8 +120,7 @@ fun SettingsScreen(
                     roundingNumValue = settingsViewModel.roundingNum,
                     currencySymbol = settingsViewModel.currencySymbol,
                     onRoundingNumChanged = {
-                        Log.d("NAV", "To Round Step Picker Screen")
-                        navController.navigate("rounding_num_picker")
+                        navigateToRoundingNumScreen()
                     }
                 )
             }
@@ -129,7 +129,8 @@ fun SettingsScreen(
             item {
                 Text(
                     text = stringResource(id = R.string.split_settings),
-                    modifier = Modifier.padding(bottom = 6.dp, top = 12.dp))
+                    modifier = Modifier.padding(bottom = 6.dp, top = 12.dp)
+                )
             }
 
             item {
@@ -137,8 +138,7 @@ fun SettingsScreen(
                     labelText = stringResource(id = R.string.default_split),
                     defaultSplitValue = settingsViewModel.defaultNumSplit,
                     onDefaultSplitValueChanged = {
-                        Log.d("NAV", "To Default Split Picker Screen")
-                        navController.navigate("default_split_picker")
+                        navigateToDefaultSplitScreen()
                     }
                 )
             }
@@ -160,11 +160,10 @@ fun SettingsScreen(
 
             item {
                 CompactChip(
-                    label = {Text(text = stringResource(id = R.string.back))},
+                    label = { Text(text = stringResource(id = R.string.back)) },
                     onClick = withHaptics {
-                        Log.d("NAV", "To Tip Selection")
-                        navController.navigateUp()
-                                          },
+                        onBackButtonPressed()
+                    },
                     modifier = Modifier.padding(bottom = 30.dp)
                 )
             }
@@ -186,7 +185,7 @@ fun SettingsScreen(
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
 
-                    )
+                        )
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -203,7 +202,6 @@ fun SettingsScreen(
                     }
                 }
             }
-
         }
     }
 }
@@ -391,7 +389,7 @@ fun SettingsToggleChip(
             checkedStartBackgroundColor = MaterialTheme.colors.primary,
             checkedEndBackgroundColor = MaterialTheme.colors.primary
         ),
-        onCheckedChange = withBooleanHaptics(block = onCheckedChanged),
+        onCheckedChange = withHapticsAndValue(block = onCheckedChanged),
         label = {
             Text(
                 text = labelText,
@@ -429,8 +427,11 @@ fun SettingsToggleChip(
 fun SettingsPreview() {
     TipCalculatorWearTheme {
         SettingsScreen(
-            navController = NavHostController(LocalContext.current),
-            settingsViewModel = SettingsViewModel(DataStoreManager(LocalContext.current))
+            SettingsViewModel(DataStoreManager(LocalContext.current)),
+            {},
+            {},
+            {},
+            {}
         )
     }
 }

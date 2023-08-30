@@ -16,4 +16,3 @@ dependencyResolutionManagement {
 rootProject.name = "Tip Calculator Wear"
 include(":app")
 include(":benchmark")
-include(":baselineprofile")

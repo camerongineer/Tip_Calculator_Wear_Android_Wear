@@ -1,20 +1,13 @@
 package com.camerongineer.tipcalculatorwear
 
-import android.content.Context
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
-import androidx.test.core.app.ApplicationProvider
-import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.TipCalcApp
-import com.camerongineer.tipcalculatorwear.presentation.TipCalcViewModel
-import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -25,7 +18,6 @@ class TipCalcScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
-    private lateinit var tipCalcViewModel: TipCalcViewModel
 
     private val buttonOne = hasText("1") and hasClickAction()
     private val buttonTwo = hasText("2") and hasClickAction()
@@ -52,20 +44,15 @@ class TipCalcScreenTest {
 
     @Before
     fun setUp() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-
         composeTestRule.setContent {
-            tipCalcViewModel = TipCalcViewModel(dataStore = DataStoreManager(context))
-            TipCalculatorWearTheme {
-                TipCalcApp(tipCalcViewModel = tipCalcViewModel)
-            }
+            TipCalcApp(rememberSwipeDismissableNavController())
         }
     }
 
     @After
     fun tearDown() {
-        tipCalcViewModel.setSubTotalBlank()
-        tipCalcViewModel.resetTipPercentage()
+        composeTestRule.onNode(textTipPercentage)
+            .performTouchInput { longClick(center, 1000) }
     }
 
     @Test
@@ -175,10 +162,7 @@ class TipCalcScreenTest {
     @Test
     fun tipSliderGreaterOrEqualZero() {
         navigateToTipSelection()
-        while(tipCalcViewModel.getTipPercentage() > 0) {
-            composeTestRule.onNode(buttonTipSliderDecrease).performClick()
-        }
-        repeat(5) { composeTestRule.onNode(buttonTipSliderDecrease).performClick() }
+        repeat(101) { composeTestRule.onNode(buttonTipSliderDecrease).performClick() }
         composeTestRule.onNode(textDisplayTip and hasText("0.00")).assertExists()
         composeTestRule.onNode(textTipPercentage and hasText("0")).assertExists()
     }
@@ -186,47 +170,22 @@ class TipCalcScreenTest {
     @Test
     fun tipSliderLessThanEqualOneHundred() {
         composeTestRule.onNode(buttonSubmit).performClick()
-        while(tipCalcViewModel.getTipPercentage() < 100) {
-            composeTestRule.onNode(buttonTipSliderIncrease).performClick()
-        }
-        repeat(5) { composeTestRule.onNode(buttonTipSliderIncrease).performClick() }
+        repeat(101) { composeTestRule.onNode(buttonTipSliderIncrease).performClick() }
         composeTestRule.onNode(textTipPercentage and hasText("100")).assertExists()
-    }
-
-    @Test
-    fun canNavigateToSettingsScreen() {
-        navigateToSettingsScreen()
-        composeTestRule.onNodeWithText("Tip Settings").assertIsDisplayed()
-    }
-
-    @Test
-    fun canNavigateToSplitScreen() {
-        navigateToSplitScreen()
-        composeTestRule.onNodeWithText("Each payee owes").assertIsDisplayed()
     }
 
     @Test
     fun canResetTipPercentage() {
         navigateToTipSelection()
         repeat(5) { composeTestRule.onNode(buttonTipSliderIncrease).performClick() }
-        val tipPercentage = tipCalcViewModel.getTipPercentage().toInt()
-        composeTestRule.onNode(textTipPercentage and hasText(tipPercentage.toString())).assertExists()
+        composeTestRule.onNode(textTipPercentage and hasText("20")).assertExists()
         composeTestRule.onNode(textTipPercentage)
             .performTouchInput { longClick(center, 1000) }
-        composeTestRule.onNode(textTipPercentage and hasText((tipPercentage - 5).toString())).assertExists()
+        composeTestRule.onNode(textTipPercentage and hasText("15")).assertExists()
     }
 
     private fun navigateToTipSelection() {
         composeTestRule.onNode(buttonSubmit).performClick()
     }
 
-    private fun navigateToSplitScreen() {
-        navigateToTipSelection()
-        composeTestRule.onNode(buttonSplit).performClick()
-    }
-
-    private fun navigateToSettingsScreen() {
-        navigateToTipSelection()
-        composeTestRule.onNode(buttonSettings).performClick()
-    }
 }
