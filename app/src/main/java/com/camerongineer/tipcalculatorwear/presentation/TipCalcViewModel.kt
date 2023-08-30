@@ -21,7 +21,9 @@ import kotlin.math.round
 import kotlin.math.roundToInt
 
 
-class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
+class TipCalcViewModel(
+    private val dataStore: DataStoreManager
+) : ViewModel() {
 
     private val _subTotal = mutableIntStateOf(0)
     val subTotal = _subTotal
@@ -157,10 +159,10 @@ class TipCalcViewModel(val dataStore: DataStoreManager) : ViewModel() {
 
     fun getFormattedSubTotal(): String {
         val subTotalDouble = _subTotalString.value.toDoubleOrNull()
-        return if (subTotalDouble != null && subTotalDouble > 0) {
+        return if (subTotalDouble != null) {
             getFormattedAmountString(subTotalDouble.roundToInt())
         } else {
-            "0.00"
+            getFormattedAmountString(0)
         }
     }
 

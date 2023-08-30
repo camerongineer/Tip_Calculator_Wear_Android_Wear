@@ -13,14 +13,14 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
 
     private val _defaultTipPercentage = mutableIntStateOf(DataStoreManager.DEFAULT_TIP_PERCENTAGE)
     val defaultTipPercentage = _defaultTipPercentage
-    private val _rememberTipPercentage = mutableStateOf(true)
 
+    private val _rememberTipPercentage = mutableStateOf(true)
     val rememberTipPercentage = _rememberTipPercentage
 
     private val _defaultNumSplit = mutableIntStateOf(DataStoreManager.DEFAULT_NUM_SPLIT)
     val defaultNumSplit = _defaultNumSplit
-    private val _rememberNumSplit = mutableStateOf(false)
 
+    private val _rememberNumSplit = mutableStateOf(false)
     val rememberNumSplit = _rememberNumSplit
 
     private val _isPreciseSplit = mutableStateOf(true)
@@ -45,6 +45,7 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
     }
 
     fun setDefaultTipPercentage(defaultTipPercentage: Int) {
+        _defaultTipPercentage.intValue = defaultTipPercentage
         viewModelScope.launch {
             dataStore.saveDefaultTipPercentage(defaultTipPercentage)
         }

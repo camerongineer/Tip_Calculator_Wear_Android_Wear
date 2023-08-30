@@ -1,6 +1,5 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,7 +49,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
@@ -75,8 +73,9 @@ import kotlin.math.roundToInt
 
 @Composable
 fun TipCalcScreen(
-    navController: NavHostController,
-    tipCalcViewModel: TipCalcViewModel
+    tipCalcViewModel: TipCalcViewModel,
+    onSettingsButtonClicked: () -> Unit,
+    onSplitButtonClicked: () -> Unit
 ) {
     val listState = rememberScalingLazyListState()
     val haptics = LocalHapticFeedback.current
@@ -85,7 +84,6 @@ fun TipCalcScreen(
     val scrollToSection: (Int) -> Unit = { index ->
         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         coroutineScope.launch {
-            Log.d("NAV", "Scroll to index: $index")
             listState.animateScrollToItem(index)
         }
     }
@@ -95,7 +93,6 @@ fun TipCalcScreen(
         if (tipCalcViewModel.isFirstLaunch()) {
             tipCalcViewModel.markAsNotFirstLaunch()
             coroutineScope.launch {
-                Log.d("NAV", "To Keyboard")
                 listState.scrollToItem(0)
             }
         }
@@ -135,16 +132,13 @@ fun TipCalcScreen(
                     tipCalcViewModel = tipCalcViewModel,
                     scrollToSection = scrollToSection,
                     onSplitClicked = withHaptics {
-                        Log.d("NAV", "To Split Screen")
-                        navController.navigate("split")
-                                                 },
+                        onSplitButtonClicked()
+                    },
                     onSettingsClicked = withHaptics {
-                        Log.d("NAV", "To Settings Screen")
-                        navController.navigate("settings")
+                        onSettingsButtonClicked()
                     }
                 )
             }
-
         }
     }
 }
@@ -410,7 +404,7 @@ fun TipSelectionItem(
                 onClick = onSettingsClicked,
                 colors = ButtonDefaults.secondaryButtonColors(),
                 modifier = Modifier
-                    .width(26.dp)
+                    .width(32.dp)
             ) {
                 Image(
                     imageVector = Icons.Default.Settings,
@@ -419,7 +413,7 @@ fun TipSelectionItem(
                     modifier = Modifier.height(16.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
             Button(
                 onClick = onSplitClicked,
                 colors = ButtonDefaults.secondaryButtonColors()
@@ -430,7 +424,7 @@ fun TipSelectionItem(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(9.dp))
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 

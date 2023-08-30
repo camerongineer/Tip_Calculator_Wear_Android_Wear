@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("androidx.baselineprofile")
 }
 
 android {
@@ -12,8 +11,8 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
         targetSdk = 33
-        versionCode = 13
-        versionName = "1.3.5"
+        versionCode = 15
+        versionName = "1.3.7"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -60,13 +59,14 @@ android {
 }
 
 dependencies {
+
+    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("com.google.android.gms:play-services-wearable:18.0.0")
     implementation("androidx.percentlayout:percentlayout:1.0.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.1")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.wear.compose:compose-navigation:1.2.0")
@@ -83,11 +83,9 @@ dependencies {
     implementation("com.google.android.horologist:horologist-compose-tools:0.5.3")
     implementation("com.google.android.horologist:horologist-tiles:0.5.3")
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
-    implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     implementation("androidx.compose.material3:material3:1.1.1")
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    "baselineProfile"(project(":baselineprofile"))
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     // Testing dependencies
