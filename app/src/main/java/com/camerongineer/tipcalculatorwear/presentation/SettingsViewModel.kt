@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
+import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -31,6 +32,9 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
 
     private val _roundingNum = mutableIntStateOf(DataStoreManager.DEFAULT_ROUNDING_NUM)
     val roundingNum = _roundingNum
+
+    fun getThemeFlow() = dataStore.themeFlow
+    fun saveTheme(theme: Theme) = viewModelScope.launch { dataStore.saveTheme(theme.name) }
 
     init {
         viewModelScope.launch {

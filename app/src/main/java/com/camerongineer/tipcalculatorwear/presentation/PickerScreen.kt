@@ -32,7 +32,7 @@ import androidx.wear.compose.material.rememberPickerState
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsItem
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
-import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 
 @Composable
@@ -53,7 +53,7 @@ fun PickerScreen(
         timeText = {
             TimeText(
                 timeTextStyle = TimeTextDefaults
-                    .timeTextStyle(color = MaterialTheme.colors.onSecondary))
+                    .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
         },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         modifier = Modifier
@@ -108,7 +108,7 @@ fun PickerScreen(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun PickerPreview() {
-    OriginalTheme {
+    TipCalculatorWearTheme {
         PickerScreen(
             2, OptionsLists.ROUNDING_INCREMENTS
         ) { }
