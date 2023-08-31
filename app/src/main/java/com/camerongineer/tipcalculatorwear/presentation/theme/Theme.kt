@@ -1,84 +1,114 @@
 package com.camerongineer.tipcalculatorwear.presentation.theme
 
 
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material.Colors
 import androidx.wear.compose.material.MaterialTheme
-
-internal val LightColors = Colors(
-    primary = md_theme_light_primary,
-    onPrimary = md_theme_light_onPrimary,
-//    primaryContainer = md_theme_light_primaryContainer,
-//    onPrimaryContainer = md_theme_light_onPrimaryContainer,
-    secondary = md_theme_light_secondary,
-    onSecondary = md_theme_light_onSecondary,
-//    secondaryContainer = md_theme_light_secondaryContainer,
-//    onSecondaryContainer = md_theme_light_onSecondaryContainer,
-//    tertiary = md_theme_light_tertiary,
-//    onTertiary = md_theme_light_onTertiary,
-//    tertiaryContainer = md_theme_light_tertiaryContainer,
-//    onTertiaryContainer = md_theme_light_onTertiaryContainer,
-    error = md_theme_light_error,
-//    errorContainer = md_theme_light_errorContainer,
-    onError = md_theme_light_onError,
-//    onErrorContainer = md_theme_light_onErrorContainer,
-    background = md_theme_light_background,
-    onBackground = md_theme_light_onBackground,
-    surface = md_theme_light_surface,
-    onSurface = md_theme_light_onSurface,
-//    surfaceVariant = md_theme_light_surfaceVariant,
-    onSurfaceVariant = md_theme_light_onSurfaceVariant,
-//    outline = md_theme_light_outline,
-//    inverseOnSurface = md_theme_light_inverseOnSurface,
-//    inverseSurface = md_theme_light_inverseSurface,
-//    inversePrimary = md_theme_light_inversePrimary,
-//    surfaceTint = md_theme_light_surfaceTint,
-//    outlineVariant = md_theme_light_outlineVariant,
-//    scrim = md_theme_light_scrim,
-)
+import androidx.wear.compose.material.Scaffold
+import androidx.wear.compose.material.TimeText
+import androidx.wear.compose.material.TimeTextDefaults
+import androidx.wear.compose.material.Vignette
+import androidx.wear.compose.material.VignettePosition
+import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.KeyboardItem
+import com.camerongineer.tipcalculatorwear.presentation.SettingsScreen
+import com.camerongineer.tipcalculatorwear.presentation.SettingsViewModel
+import com.camerongineer.tipcalculatorwear.presentation.SplitCalcScreen
+import com.camerongineer.tipcalculatorwear.presentation.SplitViewModel
+import com.camerongineer.tipcalculatorwear.presentation.TipCalcViewModel
+import com.camerongineer.tipcalculatorwear.presentation.TipSelectionItem
 
 
-internal val DarkColors = Colors(
-    primary = md_theme_dark_primary,
-    onPrimary = md_theme_dark_onPrimary,
-//    primaryContainer = md_theme_dark_primaryContainer,
-//    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
-    secondary = md_theme_dark_secondary,
-    onSecondary = md_theme_dark_onSecondary,
-//    secondaryContainer = md_theme_dark_secondaryContainer,
-//    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
-//    tertiary = md_theme_dark_tertiary,
-//    onTertiary = md_theme_dark_onTertiary,
-//    tertiaryContainer = md_theme_dark_tertiaryContainer,
-//    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
-    error = md_theme_dark_error,
-//    errorContainer = md_theme_dark_errorContainer,
-    onError = md_theme_dark_onError,
-//    onErrorContainer = md_theme_dark_onErrorContainer,
-    background = md_theme_dark_background,
-    onBackground = md_theme_dark_onBackground,
-    surface = md_theme_dark_surface,
-    onSurface = md_theme_dark_onSurface,
-//    surfaceVariant = md_theme_dark_surfaceVariant,
-    onSurfaceVariant = md_theme_dark_onSurfaceVariant,
-//    outline = md_theme_dark_outline,
-//    inverseOnSurface = md_theme_dark_inverseOnSurface,
-//    inverseSurface = md_theme_dark_inverseSurface,
-//    inversePrimary = md_theme_dark_inversePrimary,
-//    surfaceTint = md_theme_dark_surfaceTint,
-//    outlineVariant = md_theme_dark_outlineVariant,
-//    scrim = md_theme_dark_scrim,
-)
+enum class Theme(val colors: Colors, val description: String) {
+    Dark(darkColorPalette, "Dark Theme"),
+    Light(lightColorPalette, "Light Theme");
+}
 
 @Composable
-fun OriginalTheme(
+fun TipCalculatorWearTheme(
+    themeName: String = Theme.Dark.name,
     content: @Composable () -> Unit
 ) {
+    val theme = Theme.valueOf(themeName)
     MaterialTheme(
-        colors = originalColorPalette,
+        colors = theme.colors,
         typography = Typography,
         content = content
     )
 }
 
+@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Composable
+fun ThemeKeyboardPreview(theme: Theme = Theme.Dark) {
+    TipCalculatorWearTheme(theme.name) {
+        Scaffold(
+            timeText = {
+                TimeText(
+                    timeTextStyle = TimeTextDefaults
+                        .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
+            },
+            vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
+            modifier = Modifier.background(MaterialTheme.colors.background)
+        ) {
+            KeyboardItem(TipCalcViewModel(DataStoreManager(LocalContext.current)), {})
+        }
+    }
+}
 
+@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Composable
+fun ThemeTipSelectionPreview(theme: Theme = Theme.Dark) {
+    TipCalculatorWearTheme(theme.name) {
+        Scaffold(
+            timeText = {
+                TimeText(
+                    timeTextStyle = TimeTextDefaults
+                        .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
+            },
+            vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
+            modifier = Modifier.background(MaterialTheme.colors.background)
+        ) {
+            TipSelectionItem(TipCalcViewModel(DataStoreManager(LocalContext.current)), {}, {}, {}) }
+    }
+}
+
+@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Composable
+fun ThemeSplitCalcPreview(theme: Theme = Theme.Dark) {
+    TipCalculatorWearTheme(theme.name) {
+        Scaffold(
+            timeText = {
+                TimeText(
+                    timeTextStyle = TimeTextDefaults
+                        .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
+            },
+            vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
+            modifier = Modifier.background(MaterialTheme.colors.background)
+        ) {
+            SplitCalcScreen(SplitViewModel(DataStoreManager(LocalContext.current), 3001, 251), {})
+        }
+    }
+}
+
+@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Composable
+fun ThemeSettingsPreview(theme: Theme = Theme.Dark) {
+    TipCalculatorWearTheme(theme.name) {
+        Scaffold(
+            timeText = {
+                TimeText(
+                    timeTextStyle = TimeTextDefaults
+                        .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
+             },
+            vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
+            modifier = Modifier.background(MaterialTheme.colors.background)
+        ) {
+            SettingsScreen(SettingsViewModel(DataStoreManager(LocalContext.current)), {}, {}, {}, {})
+        }
+    }
+}

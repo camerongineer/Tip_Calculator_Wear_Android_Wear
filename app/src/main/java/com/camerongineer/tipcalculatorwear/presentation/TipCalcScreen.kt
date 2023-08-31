@@ -66,7 +66,7 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 import com.camerongineer.tipcalculatorwear.presentation.theme.caption4
 import kotlinx.coroutines.launch
@@ -104,7 +104,7 @@ fun TipCalcScreen(
         timeText = { if (!listState.isScrollInProgress) {
             TimeText(
                 timeTextStyle = TimeTextDefaults
-                    .timeTextStyle(color = MaterialTheme.colors.onSecondary))
+                    .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
         } },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         modifier = Modifier
@@ -295,15 +295,14 @@ fun BillKeyboardButton(
             Image(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurfaceVariant),
             )
         }
         if (icon == null) {
             text?.let {
                 Text(
                     text = it,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.onPrimary,
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -664,7 +663,7 @@ fun SmallText(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun TipSelectionPreview() {
-    OriginalTheme {
+    TipCalculatorWearTheme {
         TipSelectionItem(
             tipCalcViewModel = TipCalcViewModel(DataStoreManager(LocalContext.current)),
             scrollToSection = {},
@@ -681,7 +680,7 @@ fun TipSelectionPreview() {
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun KeyboardPreview() {
-    OriginalTheme {
+    TipCalculatorWearTheme {
         KeyboardItem(
             tipCalcViewModel = TipCalcViewModel(DataStoreManager(LocalContext.current)),
             scrollToSection = {},

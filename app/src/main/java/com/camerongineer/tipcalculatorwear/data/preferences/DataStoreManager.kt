@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
+import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -41,6 +42,7 @@ class DataStoreManager(context: Context) {
         val preciseSplitKey = booleanPreferencesKey("PRECISE_SPLIT_KEY")
         val roundNumKey = intPreferencesKey("ROUNDING_NUM_KEY")
         val currencySymbolKey = stringPreferencesKey("CURRENCY_SYMBOL_KEY")
+        val themeKey = stringPreferencesKey("THEME_KEY")
     }
 
     private val tipCurrency = try {
@@ -56,6 +58,15 @@ class DataStoreManager(context: Context) {
         key = currencySymbolKey,
         defaultValue = tipCurrency.symbol
     )
+
+    val themeFlow: Flow<String> = dataFlow(
+        key = themeKey,
+        defaultValue = Theme.Dark.name
+    )
+
+    suspend fun saveTheme(themeName: String) {
+        dataSave(themeName, themeKey)
+    }
 
     val launchCountFlow: Flow<Int> = dataFlow(
         key = launchCountKey,
@@ -109,7 +120,6 @@ class DataStoreManager(context: Context) {
     suspend fun saveNumSplit(numSplit: Int) {
         dataSave(numSplit, numSplitKey)
     }
-
 
 
     val defaultNumSplitFlow: Flow<Int> = dataFlow(

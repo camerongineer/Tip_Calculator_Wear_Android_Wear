@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Typography
 
 val Typography = Typography(
-    title1 = TextStyle(fontSize = 20.sp),
+    title1 = TextStyle(fontSize = 22.sp),
     title2 = TextStyle(fontSize = 14.sp),
     title3 = TextStyle(fontSize = 12.sp),
     button = TextStyle(fontSize = 14.sp),

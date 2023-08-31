@@ -33,7 +33,7 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 
 
@@ -52,7 +52,7 @@ fun SplitCalcScreen(
     Scaffold(
         timeText = { TimeText(
                 timeTextStyle = TimeTextDefaults
-                    .timeTextStyle(color = MaterialTheme.colors.onSecondary)) },
+                    .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant)) },
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
@@ -131,7 +131,8 @@ fun SplitDisplay(
         ) {
             Text(
                 text = stringResource(id = R.string.split_grand_total),
-                style = Typography.title2
+                style = Typography.title2,
+                color = MaterialTheme.colors.onBackground
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
@@ -203,7 +204,7 @@ fun SplitButtons(
         )
         Text(
             text = "$numSplit",
-            style = Typography.display2,
+            style = Typography.display1,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.combinedClickable(
                 onLongClick = withHaptics(
@@ -299,7 +300,7 @@ fun UnevenSplitWarning(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun SplitPreview() {
-    OriginalTheme {
+    TipCalculatorWearTheme {
         SplitCalcScreen(
                 SplitViewModel(dataStore = DataStoreManager(LocalContext.current), 3001, 251),
                 onBackButtonPressed = {}

@@ -19,9 +19,10 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,7 +53,8 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
+import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 
@@ -74,7 +76,7 @@ fun SettingsScreen(
         timeText = { if (!listState.isScrollInProgress) {
             TimeText(
                 timeTextStyle = TimeTextDefaults
-                    .timeTextStyle(color = MaterialTheme.colors.onSecondary))
+                    .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
         } },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = listState)},
@@ -94,6 +96,7 @@ fun SettingsScreen(
                 Text(
                     text = stringResource(id = R.string.tip_settings),
                     style = Typography.title1,
+                    color = MaterialTheme.colors.onBackground,
                     modifier = Modifier.padding(6.dp)
                 )
             }
@@ -130,6 +133,8 @@ fun SettingsScreen(
             item {
                 Text(
                     text = stringResource(id = R.string.split_settings),
+                    style = Typography.title1,
+                    color = MaterialTheme.colors.onBackground,
                     modifier = Modifier.padding(bottom = 6.dp, top = 12.dp)
                 )
             }
@@ -158,6 +163,27 @@ fun SettingsScreen(
                 )
             }
 
+            //Misc Settings
+            item {
+                Text(
+                    text = stringResource(id = R.string.misc_settings),
+                    style = Typography.title1,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(bottom = 6.dp, top = 12.dp)
+                )
+            }
+
+            item {
+                val themeName by settingsViewModel.getThemeFlow().collectAsState(Theme.Dark.name)
+                val theme = Theme.valueOf(themeName)
+                ThemeSelectionItem(
+                    theme = theme,
+                    onThemeChanged = { settingsViewModel.saveTheme(if (theme == Theme.Dark) {
+                        Theme.Light
+                    } else Theme.Dark) }
+                )
+            }
+
 
             item {
                 CompactChip(
@@ -168,7 +194,7 @@ fun SettingsScreen(
                     onClick = withHaptics {
                         onBackButtonPressed()
                     },
-                    modifier = Modifier.padding(bottom = 30.dp)
+                    modifier = Modifier.padding(top = 10.dp, bottom = 30.dp)
                 )
             }
 
@@ -187,6 +213,7 @@ fun SettingsScreen(
                     Text(
                         text = stringResource(id = R.string.review_request),
                         style = Typography.body2,
+                        color = MaterialTheme.colors.onBackground,
                         textAlign = TextAlign.Center)
                     Box(
                         contentAlignment = Alignment.Center,
@@ -194,7 +221,7 @@ fun SettingsScreen(
                             .size(60.dp)
                             .padding(top = 10.dp)
                             .fillMaxWidth()
-                            .background(Color.Black)
+                            .background(MaterialTheme.colors.background)
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.play_store_logo),
@@ -232,6 +259,7 @@ fun DefaultTipPercentageItem(
         Text(
             text = "%",
             style = Typography.caption1,
+            color = MaterialTheme.colors.onPrimary,
             textAlign = TextAlign.Left,
             modifier = Modifier
                 .padding(2.dp)
@@ -273,11 +301,11 @@ fun RoundIncrementItem(
         defaultValue = roundingNumValue,
         onDefaultValueChanged = onRoundingNumChanged,
         modifier = modifier) {
-        val style = Typography.caption1
+        val style = Typography.title2
         Text(
             text = currencySymbol.value,
             style = style,
-            color = Color.Black,
+            color = MaterialTheme.colors.onPrimary,
             fontSize = style.fontSize * .66,
             textAlign = TextAlign.Right,
             modifier = modifier
@@ -399,8 +427,8 @@ fun SettingsToggleChip(
                 text = labelText,
                 style = Typography.button,
                 color = if (checked) {
-                    MaterialTheme.colors.background
-                } else MaterialTheme.colors.primaryVariant,
+                    MaterialTheme.colors.onPrimary
+                } else MaterialTheme.colors.onSurfaceVariant,
                 modifier = modifier
             ) },
         toggleControl = {
@@ -420,6 +448,39 @@ fun SettingsToggleChip(
     )
 }
 
+@Composable
+fun ThemeSelectionItem(
+    theme: Theme,
+    onThemeChanged: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Chip(
+        onClick = withHaptics { onThemeChanged() },
+        colors = ChipDefaults.chipColors(
+            backgroundColor = MaterialTheme.colors.surface
+        ),
+        label = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Text(
+                    text = "${theme.description} Enabled",
+                    style = Typography.title2,
+                    color = MaterialTheme.colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } },
+        modifier = modifier
+            .fillMaxWidth()
+            .defaultMinSize(
+                minHeight = ToggleChipDefaults.Height * .75f
+            )
+    )
+}
+
 
 
 
@@ -429,7 +490,7 @@ fun SettingsToggleChip(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun SettingsPreview() {
-    OriginalTheme {
+    TipCalculatorWearTheme {
         SettingsScreen(
             SettingsViewModel(DataStoreManager(LocalContext.current)),
             {},
