@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_tip">Pourboire par défaut</string>
+    <string name="retain_tip_percentage">Conserver le dernier %</string>
+    <string name="precise_split_mode">Mode Précision</string>
+    <string name="app_name">Calculateur de Pourboire (Tip Calculator Wear)</string>
+    <string name="tip_percentage">Pourcentage</string>
+    <string name="round_up_down">MAINTENIR POUR ARRONDIR LE TOTAL GÉNÉRAL</string>
+    <string name="display_subtotal">SOUS-TOTAL</string>
+    <string name="display_tip">POURBOIRE</string>
+    <string name="display_total">TOTAL GÉNÉRAL</string>
+    <string name="split">Diviser</string>
+    <string name="split_grand_total">Les bénéficiaires doivent</string>
+    <string name="split_warning">Répartition inégale, montant(s) additionnel(s) requis pour atteindre le total général.</string>
+    <string name="tip_settings">Paramètres de pourboire</string>
+    <string name="round_increment">Incrément d’arrondi</string>
+    <string name="split_settings">Paramètres de partage</string>
+    <string name="default_split">Répartition par défaut</string>
+    <string name="retain_num_split">Conserver le dernier partage</string>
+    <string name="misc_settings">Paramètres divers</string>
+    <string name="dark_theme">Thème sombre</string>
+    <string name="light_theme">Thème clair</string>
+    <string name="enabled">%s activé</string>
+    <string name="back">Rendre</string>
+    <string name="review_request">Si vous appréciez cette application, veuillez envisager de laisser un avis sur le Play Store !</string>
+</resources>

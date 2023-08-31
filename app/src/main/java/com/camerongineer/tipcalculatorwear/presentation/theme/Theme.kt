@@ -14,6 +14,7 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
+import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.KeyboardItem
 import com.camerongineer.tipcalculatorwear.presentation.SettingsScreen
@@ -24,9 +25,9 @@ import com.camerongineer.tipcalculatorwear.presentation.TipCalcViewModel
 import com.camerongineer.tipcalculatorwear.presentation.TipSelectionItem
 
 
-enum class Theme(val colors: Colors, val description: String) {
-    Dark(darkColorPalette, "Dark Theme"),
-    Light(lightColorPalette, "Light Theme");
+enum class Theme(val colors: Colors, val descriptionID: Int) {
+    Dark(darkColorPalette, R.string.dark_theme),
+    Light(lightColorPalette, R.string.light_theme);
 }
 
 @Composable

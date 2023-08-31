@@ -95,9 +95,12 @@ fun SettingsScreen(
             item {
                 Text(
                     text = stringResource(id = R.string.tip_settings),
+                    textAlign = TextAlign.Center,
                     style = Typography.title1,
                     color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier.padding(6.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(6.dp)
                 )
             }
 
@@ -133,9 +136,12 @@ fun SettingsScreen(
             item {
                 Text(
                     text = stringResource(id = R.string.split_settings),
+                    textAlign = TextAlign.Center,
                     style = Typography.title1,
                     color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier.padding(bottom = 6.dp, top = 12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 6.dp, top = 12.dp)
                 )
             }
 
@@ -167,9 +173,12 @@ fun SettingsScreen(
             item {
                 Text(
                     text = stringResource(id = R.string.misc_settings),
+                    textAlign = TextAlign.Center,
                     style = Typography.title1,
                     color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier.padding(bottom = 6.dp, top = 12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 6.dp, top = 12.dp)
                 )
             }
 
@@ -465,8 +474,12 @@ fun ThemeSelectionItem(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
+                val formattedString = String.format(
+                    stringResource(R.string.enabled),
+                    stringResource(theme.descriptionID)
+                )
                 Text(
-                    text = "${theme.description} Enabled",
+                    text = formattedString,
                     style = Typography.title2,
                     color = MaterialTheme.colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
