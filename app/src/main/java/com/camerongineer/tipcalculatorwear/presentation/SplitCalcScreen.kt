@@ -20,14 +20,12 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
@@ -35,7 +33,8 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 
 
 @Composable
@@ -132,12 +131,12 @@ fun SplitDisplay(
         ) {
             Text(
                 text = stringResource(id = R.string.split_grand_total),
-                fontSize = 14.sp,
-                color = Color.White)
+                style = Typography.title2
+            )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = splitGrandTotalString,
-                fontSize = 24.sp
+                style = Typography.display1
             )
         }
         Row(
@@ -152,12 +151,10 @@ fun SplitDisplay(
                 InputLabel(
                     labelText = stringResource(id = R.string.display_subtotal),
                     color = MaterialTheme.colors.onBackground,
-                    fontSize = 10.sp,
                     modifier = Modifier.height(14.dp))
                 InputLabel(
                     labelText = stringResource(id = R.string.display_tip),
                     color = MaterialTheme.colors.onBackground,
-                    fontSize = 10.sp,
                     modifier = Modifier.height(14.dp))
             }
             Column(
@@ -167,13 +164,11 @@ fun SplitDisplay(
                 AmountDisplay(
                     currencySymbol = currencySymbol,
                     amountString = splitSubTotalString,
-                    fontSize = 12.sp,
                     modifier = Modifier.height(14.dp)
                 )
                 AmountDisplay(
                     currencySymbol = currencySymbol,
                     amountString = splitTipString,
-                    fontSize = 12.sp,
                     modifier = Modifier.height(14.dp)
                 )
             }
@@ -208,7 +203,7 @@ fun SplitButtons(
         )
         Text(
             text = "$numSplit",
-            fontSize = 28.sp,
+            style = Typography.display2,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.combinedClickable(
                 onLongClick = withHaptics(
@@ -247,7 +242,7 @@ fun UnevenSplitWarning(
             SmallText(
                 text = stringResource(id = R.string.split_warning),
                 color = MaterialTheme.colors.secondaryVariant,
-                fontSize = 9.sp,
+                style = Typography.caption3
             )
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -262,7 +257,6 @@ fun UnevenSplitWarning(
                         InputLabel(
                             labelText = stringResource(id = R.string.display_subtotal),
                             color = MaterialTheme.colors.onBackground,
-                            fontSize = 12.sp,
                             modifier = Modifier.height(16.dp)
                         )
                     }
@@ -270,7 +264,6 @@ fun UnevenSplitWarning(
                         InputLabel(
                             labelText = stringResource(id = R.string.display_tip),
                             color = MaterialTheme.colors.onBackground,
-                            fontSize = 12.sp,
                             modifier = Modifier.height(16.dp)
                         )
                     }
@@ -283,7 +276,6 @@ fun UnevenSplitWarning(
                         AmountDisplay(
                             currencySymbol = currencySymbol,
                             amountString = subTotalRemainderString,
-                            fontSize = 14.sp,
                             modifier = Modifier.height(16.dp)
                         )
                     }
@@ -291,7 +283,6 @@ fun UnevenSplitWarning(
                         AmountDisplay(
                             currencySymbol = currencySymbol,
                             amountString = tipAmountRemainderString,
-                            fontSize = 14.sp,
                             modifier = Modifier.height(16.dp)
                         )
                     }
@@ -308,9 +299,9 @@ fun UnevenSplitWarning(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun SplitPreview() {
-    TipCalculatorWearTheme {
+    OriginalTheme {
         SplitCalcScreen(
-                SplitViewModel(dataStore = DataStoreManager(LocalContext.current), 3001, 250),
+                SplitViewModel(dataStore = DataStoreManager(LocalContext.current), 3001, 251),
                 onBackButtonPressed = {}
         )
     }

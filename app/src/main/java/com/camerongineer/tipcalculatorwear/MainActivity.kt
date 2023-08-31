@@ -9,7 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.navigation.Navigation
-import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -19,11 +19,12 @@ class MainActivity : ComponentActivity() {
             TipCalcApp()
         }
     }
+
 }
 
 @Composable
 fun TipCalcApp(navController: NavHostController = rememberSwipeDismissableNavController()) {
-    TipCalculatorWearTheme {
+    OriginalTheme {
         Navigation(navController)
     }
 }

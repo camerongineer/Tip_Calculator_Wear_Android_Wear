@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Picker
@@ -33,7 +32,8 @@ import androidx.wear.compose.material.rememberPickerState
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsItem
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
-import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 
 @Composable
 fun PickerScreen(
@@ -73,7 +73,7 @@ fun PickerScreen(
             ) {
                 Text(
                     text = pickerViewModel.optionsList[it].toString(),
-                    fontSize = 28.sp,
+                    style = Typography.display1,
                     color = MaterialTheme.colors.primaryVariant,
                 )
             }
@@ -108,7 +108,7 @@ fun PickerScreen(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun PickerPreview() {
-    TipCalculatorWearTheme {
+    OriginalTheme {
         PickerScreen(
             2, OptionsLists.ROUNDING_INCREMENTS
         ) { }
