@@ -41,14 +41,13 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
@@ -67,7 +66,9 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
+import com.camerongineer.tipcalculatorwear.presentation.theme.caption4
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -325,13 +326,11 @@ fun SubTotalDisplay(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             InputLabel(
-                labelText = stringResource(id = R.string.display_subtotal),
-                fontSize = 12.sp,
+                labelText = stringResource(id = R.string.display_subtotal)
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = billAmountString,
-                fontSize = 14.sp,
                 tag = stringResource(id = R.string.tag_keyboard_subtotal)
             )
         }
@@ -362,7 +361,7 @@ fun TipSelectionItem(
     ) {
         Spacer(
             modifier = Modifier
-                .weight(.10f)
+                .weight(.11f)
                 .fillMaxWidth()
                 .clickable(onClick = scrollToKeyboard)
         )
@@ -424,7 +423,7 @@ fun TipSelectionItem(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(11.dp))
     }
 }
 
@@ -457,15 +456,17 @@ fun TipSlider(
         ) {
             InputLabel(
                 labelText = stringResource(id = R.string.tip_percentage),
-                fontSize = 14.sp)
+                style = Typography.body1
+            )
             SmallText(
                 text = equalitySymbol,
                 color = MaterialTheme.colors.error,
-                fontSize = 12.sp)
+                style = Typography.caption3
+)
             Text(
                 text = tipPercentageString,
                 color = MaterialTheme.colors.error,
-                fontSize = 18.sp,
+                style = Typography.display2,
                 modifier = Modifier
                     .padding(end = 1.dp)
                     .combinedClickable(
@@ -481,7 +482,8 @@ fun TipSlider(
             SmallText(
                 text = "%",
                 color = MaterialTheme.colors.error,
-                fontSize = 12.sp)
+                style = Typography.caption3
+)
         }
         InlineSlider(
             value = tipPercentage,
@@ -513,7 +515,7 @@ fun TipSlider(
         )
         SmallText(
             text = stringResource(id = R.string.round_up_down),
-            fontSize = 8.sp,
+
             color = MaterialTheme.colors.secondaryVariant)
 
     }
@@ -592,7 +594,7 @@ fun AmountDisplay(
     currencySymbol: String,
     amountString: String,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 14.sp,
+    style: TextStyle = Typography.caption1,
     tag: String? = null,
     onClick: (() -> Unit)? = null,
 ) {
@@ -601,19 +603,20 @@ fun AmountDisplay(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
         modifier = clickModifier
-            .wrapContentSize()
     ) {
-        SmallText(
+
+        Text(
             text = currencySymbol,
             color = MaterialTheme.colors.primary,
-            fontSize = fontSize * .60f,
+            fontSize = style.fontSize * .66,
+            style = style
         )
         val amountModifier = if (tag == null) Modifier else Modifier.semantics { contentDescription = tag }
         Text(
             color = MaterialTheme.colors.primaryVariant,
             text = amountString,
-            fontSize = fontSize,
-            modifier = amountModifier
+            style = style,
+            modifier = amountModifier.wrapContentSize()
         )
     }
 }
@@ -623,17 +626,18 @@ fun InputLabel(
     labelText: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
-    fontSize: TextUnit = 11.sp,
+    style: TextStyle = Typography.caption2,
     onClick: (() -> Unit)? = null,
 ) {
     val clickModifier = if (onClick == null) modifier else modifier.clickable(onClick = onClick)
     Text(
         color = color,
-        fontSize = fontSize,
+        style = style,
         textAlign = TextAlign.Right,
-        text = "$labelText: ",
+        text = "$labelText:",
         modifier = clickModifier
             .wrapContentSize()
+            .padding(end = 2.dp)
     )
 }
 
@@ -642,13 +646,13 @@ fun SmallText(
     text: String,
     color: Color,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 11.sp
+    style: TextStyle = Typography.caption4
 ) {
     Text(
         color = color,
         text = text,
-        fontSize = fontSize,
         textAlign = TextAlign.Center,
+        style = style,
         modifier = modifier
     )
 }
@@ -660,7 +664,7 @@ fun SmallText(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun TipSelectionPreview() {
-    TipCalculatorWearTheme {
+    OriginalTheme {
         TipSelectionItem(
             tipCalcViewModel = TipCalcViewModel(DataStoreManager(LocalContext.current)),
             scrollToSection = {},
@@ -677,7 +681,7 @@ fun TipSelectionPreview() {
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun KeyboardPreview() {
-    TipCalculatorWearTheme {
+    OriginalTheme {
         KeyboardItem(
             tipCalcViewModel = TipCalcViewModel(DataStoreManager(LocalContext.current)),
             scrollToSection = {},

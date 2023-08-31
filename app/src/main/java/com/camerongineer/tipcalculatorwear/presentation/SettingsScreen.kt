@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -53,7 +52,8 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.OriginalTheme
+import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 
 @Composable
@@ -93,6 +93,7 @@ fun SettingsScreen(
             item {
                 Text(
                     text = stringResource(id = R.string.tip_settings),
+                    style = Typography.title1,
                     modifier = Modifier.padding(6.dp)
                 )
             }
@@ -160,7 +161,10 @@ fun SettingsScreen(
 
             item {
                 CompactChip(
-                    label = { Text(text = stringResource(id = R.string.back)) },
+                    label = { Text(
+                        text = stringResource(id = R.string.back),
+                        style = Typography.button
+                    ) },
                     onClick = withHaptics {
                         onBackButtonPressed()
                     },
@@ -182,10 +186,8 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.review_request),
-                        fontSize = 13.sp,
-                        textAlign = TextAlign.Center,
-
-                        )
+                        style = Typography.body2,
+                        textAlign = TextAlign.Center)
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -221,7 +223,7 @@ fun DefaultTipPercentageItem(
         modifier = modifier) {
         Text(
             text = "${defaultTipPercentage.intValue}",
-            fontSize = 16.sp,
+            style = Typography.display2,
             color = MaterialTheme.colors.secondary,
             textAlign = TextAlign.Right,
             modifier = modifier
@@ -229,7 +231,7 @@ fun DefaultTipPercentageItem(
         )
         Text(
             text = "%",
-            fontSize = 11.sp,
+            style = Typography.caption1,
             textAlign = TextAlign.Left,
             modifier = Modifier
                 .padding(2.dp)
@@ -250,7 +252,7 @@ fun DefaultSplitItem(labelText: String,
         modifier = modifier) {
         Text(
             text = "${defaultSplitValue.intValue}",
-            fontSize = 16.sp,
+            style = Typography.display2,
             color = MaterialTheme.colors.secondary,
             modifier = modifier
                 .wrapContentWidth()
@@ -271,10 +273,12 @@ fun RoundIncrementItem(
         defaultValue = roundingNumValue,
         onDefaultValueChanged = onRoundingNumChanged,
         modifier = modifier) {
+        val style = Typography.caption1
         Text(
             text = currencySymbol.value,
-            fontSize = 10.sp,
+            style = style,
             color = Color.Black,
+            fontSize = style.fontSize * .66,
             textAlign = TextAlign.Right,
             modifier = modifier
                 .wrapContentWidth()
@@ -282,7 +286,7 @@ fun RoundIncrementItem(
         )
         Text(
             text = getFormattedAmountString(roundingNumValue.intValue),
-            fontSize = 14.sp,
+            style = style,
             color = MaterialTheme.colors.secondary,
             textAlign = TextAlign.Left,
             modifier = modifier
@@ -313,7 +317,7 @@ fun SettingsChip(
             ) {
                 Text(
                     text = labelText,
-                    fontSize = 12.sp,
+                    style = Typography.button,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                 )
@@ -329,7 +333,7 @@ fun SettingsChip(
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(
-                minHeight = ToggleChipDefaults.Height * .66f
+                minHeight = ToggleChipDefaults.Height * .75f
             )
     )
 }
@@ -393,7 +397,7 @@ fun SettingsToggleChip(
         label = {
             Text(
                 text = labelText,
-                fontSize = 12.sp,
+                style = Typography.button,
                 color = if (checked) {
                     MaterialTheme.colors.background
                 } else MaterialTheme.colors.primaryVariant,
@@ -411,7 +415,7 @@ fun SettingsToggleChip(
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(
-                minHeight = ToggleChipDefaults.Height * .66f,
+                minHeight = ToggleChipDefaults.Height * .75f,
             )
     )
 }
@@ -425,7 +429,7 @@ fun SettingsToggleChip(
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun SettingsPreview() {
-    TipCalculatorWearTheme {
+    OriginalTheme {
         SettingsScreen(
             SettingsViewModel(DataStoreManager(LocalContext.current)),
             {},
