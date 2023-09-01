@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -262,8 +264,10 @@ fun DefaultTipPercentageItem(
             style = Typography.display2,
             color = MaterialTheme.colors.secondary,
             textAlign = TextAlign.Right,
+            maxLines = 1,
+            overflow = TextOverflow.Visible,
             modifier = modifier
-                .wrapContentWidth()
+                .wrapContentSize()
         )
         Text(
             text = "%",
@@ -350,20 +354,20 @@ fun SettingsChip(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxSize()
             ) {
                 Text(
                     text = labelText,
                     style = Typography.button,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.weight(1f)
                 )
                 Box(
                     contentAlignment = Alignment.CenterEnd,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().weight(.4f)
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
                     ) { this@Chip.content() }
                 }
             } },
@@ -499,7 +503,7 @@ fun ThemeSelectionItem(
 
 @Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true, locale = "DE")
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun SettingsPreview() {

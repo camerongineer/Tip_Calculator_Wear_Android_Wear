@@ -11,7 +11,7 @@
     <string name="display_total">TOTAL</string>
     <string name="split">Partager</string>
     <string name="split_grand_total">Chaque bénéficiaire doit</string>
-    <string name="split_warning">Répartition inégale, montant supplémentaire requis pour atteindre le total général.</string>
+    <string name="split_warning">Division inégale, un montant supplémentaire est requis.</string>
     <string name="tip_settings">Paramètres de pourboire</string>
     <string name="round_increment">Incrément d’arrondi</string>
     <string name="split_settings">Paramètres de partage</string>
