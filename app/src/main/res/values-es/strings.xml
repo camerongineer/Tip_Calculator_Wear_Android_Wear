@@ -17,9 +17,10 @@
     <string name="split_settings">Configuración dividida</string>
     <string name="default_split">División predeterminada</string>
     <string name="retain_num_split">Guardar última división</string>
-    <string name="misc_settings">Varios. Ajustes</string>
+    <string name="misc_settings">Otras configuraciones</string>
     <string name="light_theme">Tema ligero</string>
     <string name="back">De vuelta</string>
     <string name="review_request">Si disfrutas de esta aplicación, ¡considera dejar una reseña en Play Store!</string>
     <string name="dark_theme">Tema oscuro</string>
+    <string name="enabled">%s habilitado</string>
 </resources>
