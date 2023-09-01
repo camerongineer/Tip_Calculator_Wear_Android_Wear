@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -43,6 +44,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -394,15 +396,17 @@ fun TipSelectionItem(
             )
         }
         Row(
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
-                .weight(.12f)
-        ) {
+                .fillMaxWidth()
 
+        ) {
             Button(
                 onClick = onSettingsClicked,
                 colors = ButtonDefaults.secondaryButtonColors(),
                 modifier = Modifier
                     .width(32.dp)
+                    .height(30.dp)
             ) {
                 Image(
                     imageVector = Icons.Default.Settings,
@@ -412,13 +416,23 @@ fun TipSelectionItem(
                 )
             }
             Spacer(modifier = Modifier.width(6.dp))
-            Button(
-                onClick = onSplitClicked,
-                colors = ButtonDefaults.secondaryButtonColors()
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .height(30.dp)
             ) {
+                Button(
+                    onClick = onSplitClicked,
+                    colors = ButtonDefaults.secondaryButtonColors(),
+                    modifier = Modifier.matchParentSize()
+                ) {}
                 Text(
                     text = stringResource(id = R.string.split),
-                    color = MaterialTheme.colors.primary
+                    maxLines = 1,
+                    overflow = TextOverflow.Visible,
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
                 )
             }
         }
@@ -658,7 +672,7 @@ fun SmallText(
 
 
 @Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true, locale = "FR")
 @Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable

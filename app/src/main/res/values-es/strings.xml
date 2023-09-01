@@ -9,9 +9,9 @@
     <string name="display_subtotal">TOTAL PARCIAL</string>
     <string name="display_tip">PROPINA</string>
     <string name="display_total">TOTAL</string>
-    <string name="split">" Dividir"</string>
+    <string name="split">"Dividir"</string>
     <string name="split_grand_total">Cada beneficiario debe</string>
-    <string name="split_warning">División desigual, se requiere una cantidad adicional para satisfacer el total.</string>
+    <string name="split_warning">División desigual, se requiere una cantidad adicional.</string>
     <string name="tip_settings">Configuración de propinas</string>
     <string name="round_increment">Paso de redondeo</string>
     <string name="split_settings">Configuración dividida</string>

@@ -11,8 +11,8 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
         targetSdk = 33
-        versionCode = 16
-        versionName = "1.4.0"
+        versionCode = 17
+        versionName = "1.4.1"
         vectorDrawables {
             useSupportLibrary = true
         }

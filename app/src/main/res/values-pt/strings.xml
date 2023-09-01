@@ -11,7 +11,7 @@
     <string name="display_total">TOTAL</string>
     <string name="split">Divisão</string>
     <string name="split_grand_total">Cada beneficiário deverá</string>
-    <string name="split_warning">Divisão desigual, valores adicionais são necessários para satisfazer o total geral.</string>
+    <string name="split_warning">Divisão desigual, é necessário um valor adicional.</string>
     <string name="tip_settings">Configurações de gorjeta</string>
     <string name="round_increment">Incremento de arredondamento</string>
     <string name="split_settings">Configurações de divisão</string>

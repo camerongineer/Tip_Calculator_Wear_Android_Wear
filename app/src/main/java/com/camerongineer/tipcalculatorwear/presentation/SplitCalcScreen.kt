@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -131,6 +132,7 @@ fun SplitDisplay(
         ) {
             Text(
                 text = stringResource(id = R.string.split_grand_total),
+                textAlign = TextAlign.Center,
                 style = Typography.title2,
                 color = MaterialTheme.colors.onBackground
             )
@@ -296,7 +298,7 @@ fun UnevenSplitWarning(
 
 @Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true, locale = "DE")
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable
 fun SplitPreview() {
