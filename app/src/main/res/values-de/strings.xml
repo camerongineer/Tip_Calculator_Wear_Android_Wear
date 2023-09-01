@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="default_tip">Standard Trinkgeld</string>
+    <string name="default_tip">Standard-Trinkgeld</string>
     <string name="retain_tip_percentage">Trinkgeld % beibehalten</string>
     <string name="precise_split_mode">Präzisionsmodus</string>
     <string name="app_name">Trinkgeldrechner (Tip Calculator Wear)</string>
     <string name="tip_percentage">Prozentsatz</string>
     <string name="round_up_down">PFEIL HALTEN, UM GESAMTSUMME ZU RUNDEN</string>
-    <string name="display_subtotal">ZWISCHENSUMME</string>
+    <string name="display_subtotal">ZW.SUMME</string>
     <string name="display_tip">TRINKGELD</string>
-    <string name="display_total">GESAMTSUMME</string>
-    <string name="split">Aufteilen</string>
-    <string name="split_grand_total">Zahlende schulden</string>
-    <string name="split_warning">In Ungleichmäßige Aufteilung, zusätzliche Beträge sind erforderlich, um den Gesamtbetrag zu begleichen.</string>
+    <string name="display_total">SUMME</string>
+    <string name="split">Teilen</string>
+    <string name="split_grand_total">Zahlungsempfänger schulden</string>
+    <string name="split_warning">Ungleichmäßige Aufteilung, zusätzliche Beträge sind erforderlich, um den Gesamtbetrag zu begleichen.</string>
     <string name="tip_settings">Trinkgeld-Einstellungen</string>
-    <string name="round_increment">Rundungsschritt</string>
-    <string name="split_settings">Split-Einstellungen</string>
+    <string name="round_increment">Inkrement abrunden</string>
+    <string name="split_settings">Teilen-Einstellungen</string>
     <string name="default_split">Standardaufteilung</string>
     <string name="retain_num_split">Teilung beibehalten</string>
     <string name="misc_settings">Diverse Einstellungen</string>
     <string name="light_theme">Helles Thema</string>
     <string name="back">zurück</string>
-    <string name="review_request">" Wenn Ihnen diese App gefällt, erwägen Sie bitte, eine Bewertung im \"Play Store\" zu hinterlassen!"</string>
+    <string name="review_request">Wenn Ihnen diese App gefällt, erwägen Sie bitte, eine Bewertung im Play Store zu hinterlassen!</string>
     <string name="dark_theme">Dunkles Thema</string>
     <string name="enabled">%s  aktiviert</string>
 </resources>
