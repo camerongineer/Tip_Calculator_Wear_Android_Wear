@@ -8,10 +8,10 @@
     <string name="round_up_down">MAINTENIR POUR ARRONDIR LE TOTAL GÉNÉRAL</string>
     <string name="display_subtotal">SOUS-TOTAL</string>
     <string name="display_tip">POURBOIRE</string>
-    <string name="display_total">TOTAL GÉNÉRAL</string>
-    <string name="split">Diviser</string>
-    <string name="split_grand_total">Les bénéficiaires doivent</string>
-    <string name="split_warning">Répartition inégale, montant(s) additionnel(s) requis pour atteindre le total général.</string>
+    <string name="display_total">TOTAL</string>
+    <string name="split">Partager</string>
+    <string name="split_grand_total">Chaque bénéficiaire doit</string>
+    <string name="split_warning">Répartition inégale, montant supplémentaire requis pour atteindre le total général.</string>
     <string name="tip_settings">Paramètres de pourboire</string>
     <string name="round_increment">Incrément d’arrondi</string>
     <string name="split_settings">Paramètres de partage</string>
@@ -21,6 +21,6 @@
     <string name="dark_theme">Thème sombre</string>
     <string name="light_theme">Thème clair</string>
     <string name="enabled">%s activé</string>
-    <string name="back">Rendre</string>
-    <string name="review_request">Si vous appréciez cette application, veuillez envisager de laisser un avis sur le Play Store !</string>
+    <string name="back">Retour</string>
+    <string name="review_request">Si vous appréciez cette application, pensez à laisser un avis sur le Play Store !</string>
 </resources>
