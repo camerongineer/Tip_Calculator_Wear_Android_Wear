@@ -42,7 +42,6 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
         dataStore.saveLanguage(tipLanguage.name)
     }
 
-
     init {
         viewModelScope.launch {
             _defaultTipPercentage.intValue = dataStore.defaultTipPercentageFlow.first()
