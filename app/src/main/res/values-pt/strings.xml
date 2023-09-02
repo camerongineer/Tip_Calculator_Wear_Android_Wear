@@ -23,4 +23,10 @@
     <string name="review_request">Se você gosta deste aplicativo, considere deixar um comentário na Play Store!</string>
     <string name="dark_theme">Tema escuro</string>
     <string name="enabled">%s ativado</string>
+    <string name="language">Linguagem: %s</string>
+    <string name="english">Inglês</string>
+    <string name="portuguese">Português</string>
+    <string name="french">Francesa</string>
+    <string name="spanish">Espanhola</string>
+    <string name="german">Alemã</string>
 </resources>

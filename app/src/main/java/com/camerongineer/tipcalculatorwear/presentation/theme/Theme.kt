@@ -109,7 +109,7 @@ fun ThemeSettingsPreview(theme: Theme = Theme.Dark) {
             vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
             modifier = Modifier.background(MaterialTheme.colors.background)
         ) {
-            SettingsScreen(SettingsViewModel(DataStoreManager(LocalContext.current)), {}, {}, {}, {})
+            SettingsScreen(SettingsViewModel(DataStoreManager(LocalContext.current)), {}, {}, {}, {}, {})
         }
     }
 }

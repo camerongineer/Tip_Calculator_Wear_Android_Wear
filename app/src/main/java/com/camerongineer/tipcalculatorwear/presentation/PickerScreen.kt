@@ -36,10 +36,11 @@ import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearT
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 
 @Composable
-fun PickerScreen(
-    initialValue: Int,
-    optionsList: List<OptionsItem>,
-    onSubmitPressed: (Int) -> Unit
+fun <T>PickerScreen(
+    initialValue: T,
+    optionsList: List<OptionsItem<T>>,
+    isResourceString: Boolean = false,
+    onSubmitPressed: (T) -> Unit = {}
 ) {
     val pickerViewModel = PickerViewModel(initialValue, optionsList)
 
@@ -71,8 +72,9 @@ fun PickerScreen(
                 contentDescription = stringResource(id = R.string.values),
                 flingBehavior = PickerDefaults.flingBehavior(state = state)
             ) {
+                val text = pickerViewModel.optionsList[it].toString()
                 Text(
-                    text = pickerViewModel.optionsList[it].toString(),
+                    text = if (isResourceString) stringResource(text.toInt()) else text,
                     style = Typography.display1,
                     color = MaterialTheme.colors.primaryVariant,
                 )
@@ -111,6 +113,6 @@ fun PickerPreview() {
     TipCalculatorWearTheme {
         PickerScreen(
             2, OptionsLists.ROUNDING_INCREMENTS
-        ) { }
+        )
     }
 }
