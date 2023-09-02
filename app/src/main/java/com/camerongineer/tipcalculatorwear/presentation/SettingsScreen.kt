@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,10 +56,12 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipLanguage
 import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
+import com.camerongineer.tipcalculatorwear.utils.getTipLanguage
 
 @Composable
 fun SettingsScreen(
@@ -66,6 +69,7 @@ fun SettingsScreen(
     navigateToDefaultTipScreen: () -> Unit,
     navigateToRoundingNumScreen: () -> Unit,
     navigateToDefaultSplitScreen: () -> Unit,
+    navigateToLanguageSelectionScreen: () -> Unit,
     onBackButtonPressed: () -> Unit
 ) {
     val context = LocalContext.current
@@ -181,6 +185,17 @@ fun SettingsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 6.dp, top = 12.dp)
+                )
+            }
+
+            item {
+                val languageCode by settingsViewModel.getLanguageFlow().collectAsState("")
+                val currentTipLanguage = getTipLanguage(languageCode)
+                LanguageSelectionItem(
+                    tipLanguage = currentTipLanguage,
+                    onLanguageSelected = {
+                        navigateToLanguageSelectionScreen()
+                    }
                 )
             }
 
@@ -334,6 +349,36 @@ fun RoundIncrementItem(
                 .wrapContentWidth()
         )
     }
+}
+
+@Composable
+fun LanguageSelectionItem(tipLanguage: TipLanguage, onLanguageSelected: () -> Unit) {
+    Chip(
+        onClick = withHaptics { onLanguageSelected() },
+        colors = ChipDefaults.chipColors(
+            backgroundColor = MaterialTheme.colors.primary
+        ),
+        label = {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = String.format(
+                        stringResource(R.string.language),
+                        stringResource(tipLanguage.languageNameID)
+                    ),
+                    style = Typography.button,
+                    textAlign = TextAlign.Center,
+                )
+            } },
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(
+                minHeight = ToggleChipDefaults.Height * .75f
+            )
+    )
 }
 
 
@@ -510,6 +555,7 @@ fun SettingsPreview() {
     TipCalculatorWearTheme {
         SettingsScreen(
             SettingsViewModel(DataStoreManager(LocalContext.current)),
+            {},
             {},
             {},
             {},

@@ -20,13 +20,27 @@ import com.camerongineer.tipcalculatorwear.presentation.TipCalcViewModel
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
 import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
+import com.camerongineer.tipcalculatorwear.utils.getLocale
+import com.camerongineer.tipcalculatorwear.utils.getTipLanguage
+import java.util.Locale
 
 @Composable
 fun Navigation(navController: NavHostController) {
     val context = LocalContext.current
     val dataStoreManager = DataStoreManager(context)
     val themeName by dataStoreManager.themeFlow.collectAsState(Theme.Dark.name)
+    val languageCode = dataStoreManager.languageFlow.collectAsState("")
 
+    if (languageCode.value.isNotEmpty()) {
+        val config = LocalContext.current.resources.configuration
+        val locale = getLocale(languageCode.value)
+        Locale.setDefault(locale)
+        config.setLocale(locale)
+        LocalContext.current.resources.updateConfiguration(
+            config,
+            LocalContext.current.resources.displayMetrics
+        )
+    }
 
     SwipeDismissableNavHost(
         navController = navController,
@@ -72,6 +86,8 @@ fun Navigation(navController: NavHostController) {
                             navController.navigate(Screen.RoundingNumScreen.route) },
                         navigateToDefaultSplitScreen = {
                             navController.navigate(Screen.DefaultSplitScreen.route) },
+                        navigateToLanguageSelectionScreen = {
+                            navController.navigate(Screen.LanguageSelectionScreen.route) },
                         onBackButtonPressed = { navController.navigateUp() }
                     )
                 }
@@ -116,6 +132,21 @@ fun Navigation(navController: NavHostController) {
                     )
                 }
                 Log.d("NAV", "To Rounding Num Picker Screen")
+            }
+            composable(route = Screen.LanguageSelectionScreen.route) {
+                val tipLanguage = getTipLanguage(languageCode.value)
+                TipCalculatorWearTheme(themeName) {
+                    PickerScreen(
+                        initialValue = tipLanguage,
+                        optionsList = OptionsLists.LANGUAGE_OPTIONS,
+                        isResourceString = true,
+                        onSubmitPressed = {
+                            navController.navigateUp()
+                            settingsViewModel.saveLanguage(it)
+                        }
+                    )
+                }
+                Log.d("NAV", "To Language Selection Screen")
             }
         }
     }

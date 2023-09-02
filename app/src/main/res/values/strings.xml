@@ -45,8 +45,16 @@
     <string name="values" translatable="false">Values</string>
     <string name="submit" translatable="false">Submit</string>
 
-
+    <!--Language Options-->
+    <string name="language">Language: %s</string>
+    <string name="english">English</string>
+    <string name="portuguese">Portuguese</string>
+    <string name="french">French</string>
+    <string name="spanish">Spanish</string>
+    <string name="german">German</string>
 
     <string name="title_activity_presentation._main" translatable="false">presentation.MainActivity</string>
     <string name="title_activity_main" translatable="false">MainActivity</string>
+
+
 </resources>
