@@ -1,5 +1,6 @@
 package com.camerongineer.tipcalculatorwear.presentation
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -63,6 +65,7 @@ import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 import com.camerongineer.tipcalculatorwear.utils.getTipLanguage
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
@@ -77,6 +80,9 @@ fun SettingsScreen(
     val intent = Intent(Intent.ACTION_VIEW)
     val playStoreUrl = Uri.parse(stringResource(id = R.string.play_store_url))
 
+    val tipSettingsTextID by mutableStateOf(stringResource(R.string.tip_settings))
+    val splitSettingsTextID by mutableStateOf(stringResource(R.string.split_settings))
+    val miscSettingsTextID by mutableStateOf(stringResource(R.string.misc_settings))
 
     Scaffold(
         timeText = { if (!listState.isScrollInProgress) {
@@ -99,15 +105,7 @@ fun SettingsScreen(
 
             //Tip Settings
             item {
-                Text(
-                    text = stringResource(id = R.string.tip_settings),
-                    textAlign = TextAlign.Center,
-                    style = Typography.title1,
-                    color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(6.dp)
-                )
+                SectionTextItem(textResourceID = tipSettingsTextID)
             }
 
             item {
@@ -140,15 +138,7 @@ fun SettingsScreen(
 
             //Split Settings
             item {
-                Text(
-                    text = stringResource(id = R.string.split_settings),
-                    textAlign = TextAlign.Center,
-                    style = Typography.title1,
-                    color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp, top = 12.dp)
-                )
+                SectionTextItem(textResourceID = splitSettingsTextID)
             }
 
             item {
@@ -177,15 +167,7 @@ fun SettingsScreen(
 
             //Misc Settings
             item {
-                Text(
-                    text = stringResource(id = R.string.misc_settings),
-                    textAlign = TextAlign.Center,
-                    style = Typography.title1,
-                    color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp, top = 12.dp)
-                )
+                SectionTextItem(textResourceID = miscSettingsTextID)
             }
 
             item {
@@ -193,9 +175,7 @@ fun SettingsScreen(
                 val currentTipLanguage = getTipLanguage(languageCode)
                 LanguageSelectionItem(
                     tipLanguage = currentTipLanguage,
-                    onLanguageSelected = {
-                        navigateToLanguageSelectionScreen()
-                    }
+                    onClick = navigateToLanguageSelectionScreen
                 )
             }
 
@@ -210,17 +190,10 @@ fun SettingsScreen(
                 )
             }
 
-
             item {
-                CompactChip(
-                    label = { Text(
-                        text = stringResource(id = R.string.back),
-                        style = Typography.button
-                    ) },
-                    onClick = withHaptics {
-                        onBackButtonPressed()
-                    },
-                    modifier = Modifier.padding(top = 10.dp, bottom = 30.dp)
+                BackButtonItem(
+                    text = stringResource(id = R.string.back),
+                    onBackButtonPressed = onBackButtonPressed
                 )
             }
 
@@ -261,6 +234,18 @@ fun SettingsScreen(
     }
 }
 
+@Composable
+private fun SectionTextItem(textResourceID: String) {
+    Text(
+        text = textResourceID,
+        textAlign = TextAlign.Center,
+        style = Typography.title1,
+        color = MaterialTheme.colors.onBackground,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 6.dp, top = 12.dp)
+    )
+}
 
 @Composable
 fun DefaultTipPercentageItem(
@@ -294,6 +279,7 @@ fun DefaultTipPercentageItem(
         )
     }
 }
+
 
 @Composable
 fun DefaultSplitItem(labelText: String,
@@ -352,9 +338,9 @@ fun RoundIncrementItem(
 }
 
 @Composable
-fun LanguageSelectionItem(tipLanguage: TipLanguage, onLanguageSelected: () -> Unit) {
+fun LanguageSelectionItem(tipLanguage: TipLanguage, onClick: () -> Unit) {
     Chip(
-        onClick = withHaptics { onLanguageSelected() },
+        onClick = withHaptics { onClick() },
         colors = ChipDefaults.chipColors(
             backgroundColor = MaterialTheme.colors.primary
         ),
@@ -380,7 +366,6 @@ fun LanguageSelectionItem(tipLanguage: TipLanguage, onLanguageSelected: () -> Un
             )
     )
 }
-
 
 @Composable
 fun SettingsChip(
@@ -423,6 +408,7 @@ fun SettingsChip(
             )
     )
 }
+
 
 @Composable
 fun RetainTipPercentageItem(
@@ -543,7 +529,21 @@ fun ThemeSelectionItem(
     )
 }
 
-
+@Composable
+private fun BackButtonItem(text: String, onBackButtonPressed: () -> Unit) {
+    CompactChip(
+        label = {
+            Text(
+                text = text,
+                style = Typography.button
+            )
+        },
+        onClick = withHaptics {
+            onBackButtonPressed()
+        },
+        modifier = Modifier.padding(top = 10.dp, bottom = 30.dp)
+    )
+}
 
 
 @Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)

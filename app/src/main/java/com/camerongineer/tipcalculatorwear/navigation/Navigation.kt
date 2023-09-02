@@ -99,8 +99,8 @@ fun Navigation(navController: NavHostController) {
                         initialValue = settingsViewModel.defaultTipPercentage.intValue,
                         optionsList = OptionsLists.TIP_PERCENT_OPTIONS,
                         onSubmitPressed = {
-                            navController.navigateUp()
                             settingsViewModel.setDefaultTipPercentage(it)
+                            navController.navigateUp()
                         }
                     )
                 }
@@ -112,8 +112,8 @@ fun Navigation(navController: NavHostController) {
                         initialValue = settingsViewModel.defaultNumSplit.intValue,
                         optionsList = OptionsLists.NUM_SPLIT_OPTIONS,
                         onSubmitPressed = {
-                            navController.navigateUp()
                             settingsViewModel.setDefaultNumSplit(it)
+                            navController.navigateUp()
                         }
                     )
                 }
@@ -125,9 +125,9 @@ fun Navigation(navController: NavHostController) {
                         initialValue = settingsViewModel.roundingNum.intValue,
                         optionsList = OptionsLists.ROUNDING_INCREMENTS,
                         onSubmitPressed = {
-                            navController.navigateUp()
                             settingsViewModel.setRoundingNum(it)
                             tipCalcViewModel.roundingNum.intValue = it
+                            navController.navigateUp()
                         }
                     )
                 }
@@ -141,8 +141,8 @@ fun Navigation(navController: NavHostController) {
                         optionsList = OptionsLists.LANGUAGE_OPTIONS,
                         isResourceString = true,
                         onSubmitPressed = {
-                            navController.navigateUp()
                             settingsViewModel.saveLanguage(it)
+                            navController.navigateUp()
                         }
                     )
                 }

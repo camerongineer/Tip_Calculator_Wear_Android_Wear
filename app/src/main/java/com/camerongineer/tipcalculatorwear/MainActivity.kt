@@ -26,8 +26,6 @@ fun TipCalcApp(navController: NavHostController = rememberSwipeDismissableNavCon
     Navigation(navController)
 }
 
-
-
 @Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
