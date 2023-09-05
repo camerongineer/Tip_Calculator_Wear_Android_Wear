@@ -24,9 +24,9 @@
     <string name="dark_theme">Dunkles Thema</string>
     <string name="enabled">%s  aktiviert</string>
     <string name="language">Sprache: %s</string>
-    <string name="english">Englisch</string>
-    <string name="portuguese">Portugiesisch</string>
-    <string name="french">Französisch</string>
-    <string name="spanish">Spanisch</string>
-    <string name="german">Deutsch</string>
+    <string name="en">Englisch</string>
+    <string name="pt">Portugiesisch</string>
+    <string name="fr">Französisch</string>
+    <string name="es">Spanisch</string>
+    <string name="de">Deutsch</string>
 </resources>
