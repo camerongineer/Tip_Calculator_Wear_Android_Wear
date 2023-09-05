@@ -351,8 +351,8 @@ fun LanguageSelectionItem(tipLanguage: TipLanguage, onClick: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = String.format(
-                        stringResource(R.string.language),
+                    text = stringResource(
+                        R.string.language,
                         stringResource(tipLanguage.languageNameID)
                     ),
                     style = Typography.button,
@@ -509,8 +509,8 @@ fun ThemeSelectionItem(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                val formattedString = String.format(
-                    stringResource(R.string.enabled),
+                val formattedString = stringResource(
+                    R.string.enabled,
                     stringResource(theme.descriptionID)
                 )
                 Text(

@@ -24,9 +24,9 @@
     <string name="back">Retour</string>
     <string name="review_request">Si vous appréciez cette application, pensez à laisser un avis sur le Play Store !</string>
     <string name="language">Langue: %s</string>
-    <string name="english">Anglaise</string>
-    <string name="portuguese">Portugais</string>
-    <string name="french">Français</string>
-    <string name="spanish">Espagnol</string>
-    <string name="german">Allemande</string>
+    <string name="en">Anglaise</string>
+    <string name="pt">Portugais</string>
+    <string name="fr">Français</string>
+    <string name="es">Espagnol</string>
+    <string name="de">Allemande</string>
 </resources>

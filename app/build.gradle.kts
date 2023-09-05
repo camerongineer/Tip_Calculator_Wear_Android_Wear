@@ -11,24 +11,29 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
         targetSdk = 33
-        versionCode = 17
-        versionName = "1.4.1"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
+        versionCode = 23
+        versionName = "1.4.2"
+        resourceConfigurations.addAll(listOf("en", "es", "de", "fr", "pt"))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     buildTypes {
+
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
             signingConfig = signingConfigs.getByName("debug")
@@ -63,7 +68,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation("androidx.core:core-ktx:1.10.1")
-    implementation("com.google.android.gms:play-services-wearable:18.0.0")
+    implementation("com.google.android.gms:play-services-wearable:18.1.0")
     implementation("androidx.percentlayout:percentlayout:1.0.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.1")
