@@ -42,6 +42,12 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
         dataStore.saveLanguage(tipLanguage.name)
     }
 
+    fun getLargeTextFlow() = dataStore.largeTextFlow
+
+    fun saveLargeText(isLargeText: Boolean) = viewModelScope.launch {
+        dataStore.saveLargeText(isLargeText)
+    }
+
     init {
         viewModelScope.launch {
             _defaultTipPercentage.intValue = dataStore.defaultTipPercentageFlow.first()

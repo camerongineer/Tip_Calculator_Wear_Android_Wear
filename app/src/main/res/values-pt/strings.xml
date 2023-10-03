@@ -29,4 +29,5 @@
     <string name="fr">Francesa</string>
     <string name="es">Espanhola</string>
     <string name="de">Alemã</string>
+    <string name="large_text">Tamanho de Texto Grande</string>
 </resources>

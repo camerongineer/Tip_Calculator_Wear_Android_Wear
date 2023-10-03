@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.KeyboardBackspace
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -71,6 +73,8 @@ import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 import com.camerongineer.tipcalculatorwear.presentation.theme.caption4
+import com.camerongineer.tipcalculatorwear.utils.getFontMultiplier
+import com.camerongineer.tipcalculatorwear.utils.scaleFont
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -102,11 +106,16 @@ fun TipCalcScreen(
         onDispose { }
     }
 
+
     Scaffold(
         timeText = { if (!listState.isScrollInProgress) {
             TimeText(
                 timeTextStyle = TimeTextDefaults
-                    .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
+                    .timeTextStyle(
+                        color = MaterialTheme.colors.onSurfaceVariant,
+                        fontSize = Typography.title3.fontSize
+                    )
+            )
         } },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         modifier = Modifier
@@ -126,7 +135,7 @@ fun TipCalcScreen(
             item {
                 KeyboardItem(
                     tipCalcViewModel = tipCalcViewModel,
-                    scrollToSection = scrollToSection
+                    scrollToSection = scrollToSection,
                 )
             }
 
@@ -156,6 +165,10 @@ fun KeyboardItem(
     val screenHeight = configuration.screenHeightDp.dp
     val buttonHeight = screenHeight * (if (configuration.isScreenRound) .15f else .17f)
     val scrollToTipSection = remember { { scrollToSection(1) } }
+
+    val isLargeFont by tipCalcViewModel.getLargeTextFlow().collectAsState(initial = false)
+    val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -172,18 +185,21 @@ fun KeyboardItem(
         BillDigitsRow(
             digits = listOf('1', '2', '3'),
             onDigitClick = tipCalcViewModel::onDigitTyped,
+            fontMultiplier = fontMultiplier,
             modifier = Modifier.height(buttonHeight)
         )
 
         BillDigitsRow(
             digits = listOf('4', '5', '6'),
             onDigitClick = tipCalcViewModel::onDigitTyped,
+            fontMultiplier = fontMultiplier,
             modifier = Modifier.height(buttonHeight)
         )
 
         BillDigitsRow(
             digits = listOf('7', '8', '9'),
             onDigitClick = tipCalcViewModel::onDigitTyped,
+            fontMultiplier = fontMultiplier,
             modifier = Modifier.height(buttonHeight)
         )
 
@@ -204,6 +220,7 @@ fun KeyboardItem(
             BillKeyboardDigit(
                 digitChar = '0',
                 onClick = { tipCalcViewModel.onDigitTyped('0') },
+                fontMultiplier = fontMultiplier,
                 modifier = Modifier
                     .weight(.33f)
                     .height(buttonHeight)
@@ -221,6 +238,7 @@ fun KeyboardItem(
         SubTotalDisplay(
             currencySymbol = tipCalcViewModel.getCurrencySymbol(),
             billAmountString = tipCalcViewModel.getFormattedSubTotal(),
+            fontMultiplier = fontMultiplier,
             onClick = scrollToTipSection,
             modifier = Modifier
                 .background(
@@ -240,6 +258,7 @@ fun KeyboardItem(
 fun BillDigitsRow(
     digits: List<Char>,
     onDigitClick: (Char) -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -251,6 +270,7 @@ fun BillDigitsRow(
             BillKeyboardDigit(
                 digitChar = digit,
                 onClick = { onDigitClick(digit) },
+                fontMultiplier = fontMultiplier,
                 modifier = modifier.weight(1f)
             )
         }
@@ -261,12 +281,14 @@ fun BillDigitsRow(
 fun BillKeyboardDigit(
     digitChar: Char,
     onClick: () -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier,
 ) {
     BillKeyboardButton(
         modifier = modifier,
         text = digitChar.toString(),
         buttonColors = ButtonDefaults.primaryButtonColors(),
+        fontMultiplier = fontMultiplier,
         onClick = onClick)
 }
 
@@ -278,6 +300,7 @@ fun BillKeyboardButton(
     icon: ImageVector? = null,
     contentDescription: String? = null,
     buttonColors: ButtonColors = ButtonDefaults.secondaryButtonColors(),
+    fontMultiplier: Float = 1f,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit
 ) {
@@ -304,7 +327,8 @@ fun BillKeyboardButton(
             text?.let {
                 Text(
                     text = it,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    style = scaleFont(Typography.button, fontMultiplier)
                 )
             }
         }
@@ -316,6 +340,7 @@ fun SubTotalDisplay(
     currencySymbol: String,
     billAmountString: String,
     onClick: () -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
     Button(
@@ -327,11 +352,13 @@ fun SubTotalDisplay(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             InputLabel(
-                labelText = stringResource(id = R.string.display_subtotal)
+                labelText = stringResource(id = R.string.display_subtotal),
+                style = scaleFont(Typography.caption2, fontMultiplier),
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = billAmountString,
+                style = scaleFont(Typography.caption1, fontMultiplier),
                 tag = stringResource(id = R.string.tag_keyboard_subtotal)
             )
         }
@@ -350,8 +377,18 @@ fun TipSelectionItem(
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val tipSliderHeight = screenHeight * .16f
+    val isLargeFont by tipCalcViewModel.getLargeTextFlow().collectAsState(initial = true)
+    val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
+    val tipSliderHeight = screenHeight * (if (isLargeFont) .13f else .15f)
     val scrollToKeyboard = remember { { scrollToSection(0) } }
+
+    val topPadding = if (screenHeight > 200.dp) {
+        screenHeight / 8
+    } else if (screenHeight > 180.dp) {
+        screenHeight / 7
+    } else {
+        10.dp
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -360,16 +397,12 @@ fun TipSelectionItem(
             .fillMaxSize()
             .height(screenHeight)
     ) {
-        Spacer(
-            modifier = Modifier
-                .weight(.11f)
-                .fillMaxWidth()
-                .clickable(onClick = scrollToKeyboard)
-        )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.weight(.8f)
+            modifier = Modifier
+                .weight(.8f)
+                .padding(top=topPadding)
         ) {
             TipSlider(
                 tipPercentage = tipCalcViewModel.getTipPercentage().roundToInt(),
@@ -382,23 +415,26 @@ fun TipSelectionItem(
                 maxTipPercentage = DataStoreManager.MAX_TIP_PERCENT,
                 roundUpClicked = tipCalcViewModel::onRoundUpClicked,
                 roundDownClicked = tipCalcViewModel::onRoundDownClicked,
+                fontMultiplier = fontMultiplier,
                 modifier = modifier
                     .padding(top = 2.dp, bottom = 2.dp)
-                    .fillMaxWidth(.9f)
+                    .fillMaxWidth(.8f)
             )
 
             GrandTotalDisplay(
                 currencySymbol = tipCalcViewModel.getCurrencySymbol(),
                 billAmountString = tipCalcViewModel.getFormattedSubTotal(),
-                onClick = withHaptics { scrollToSection(0) },
+                onClick = withHaptics { scrollToKeyboard() },
                 tipAmountString = tipCalcViewModel.getFormattedTipAmount(),
-                grandTotalString = tipCalcViewModel.getFormattedGrandTotal()
+                grandTotalString = tipCalcViewModel.getFormattedGrandTotal(),
+                fontMultiplier = fontMultiplier
             )
         }
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom=screenHeight / 25)
 
         ) {
             Button(
@@ -429,6 +465,7 @@ fun TipSelectionItem(
                 ) {}
                 Text(
                     text = stringResource(id = R.string.split),
+                    style = scaleFont(Typography.caption1, fontMultiplier),
                     maxLines = 1,
                     overflow = TextOverflow.Visible,
                     color = MaterialTheme.colors.primary,
@@ -436,7 +473,6 @@ fun TipSelectionItem(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(11.dp))
     }
 }
 
@@ -453,6 +489,7 @@ fun TipSlider(
     maxTipPercentage: Int,
     roundUpClicked: () -> Unit,
     roundDownClicked: () -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -460,7 +497,6 @@ fun TipSlider(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
     ) {
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -469,17 +505,19 @@ fun TipSlider(
         ) {
             InputLabel(
                 labelText = stringResource(id = R.string.tip_percentage),
-                style = Typography.body1
+                style = scaleFont(Typography.caption1, fontMultiplier),
+
             )
             SmallText(
                 text = equalitySymbol,
                 color = MaterialTheme.colors.error,
-                style = Typography.caption3
+                style = scaleFont(Typography.caption3, fontMultiplier)
 )
             Text(
                 text = tipPercentageString,
                 color = MaterialTheme.colors.error,
                 style = Typography.display2,
+                fontSize = Typography.display2.fontSize.times(fontMultiplier),
                 modifier = Modifier
                     .padding(end = 1.dp)
                     .combinedClickable(
@@ -495,7 +533,7 @@ fun TipSlider(
             SmallText(
                 text = "%",
                 color = MaterialTheme.colors.error,
-                style = Typography.caption3
+                style = scaleFont(Typography.caption3, fontMultiplier)
 )
         }
         InlineSlider(
@@ -528,7 +566,7 @@ fun TipSlider(
         )
         SmallText(
             text = stringResource(id = R.string.round_up_down),
-
+            style = scaleFont(Typography.caption4, fontMultiplier),
             color = MaterialTheme.colors.secondaryVariant)
 
     }
@@ -540,6 +578,7 @@ fun GrandTotalDisplay(
     billAmountString: String,
     tipAmountString: String,
     grandTotalString: String,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
@@ -547,10 +586,11 @@ fun GrandTotalDisplay(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .fillMaxSize(.85f)
+            .fillMaxSize()
             .padding(bottom = 2.dp)
         )
     {
+        val lineHeight = 17.dp * fontMultiplier
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.SpaceBetween,
@@ -561,17 +601,20 @@ fun GrandTotalDisplay(
             InputLabel(
                 labelText = stringResource(id = R.string.display_subtotal),
                 color = MaterialTheme.colors.onBackground,
-                modifier = Modifier.height(16.dp)
+                style = scaleFont(Typography.caption2, fontMultiplier),
+                modifier = Modifier.height(lineHeight)
             )
             InputLabel(
                 labelText = stringResource(id = R.string.display_tip),
                 color = MaterialTheme.colors.onBackground,
-                modifier = Modifier.height(16.dp)
+                style = scaleFont(Typography.caption2, fontMultiplier),
+                modifier = Modifier.height(lineHeight)
             )
             InputLabel(
                 labelText = stringResource(id = R.string.display_total),
                 color = MaterialTheme.colors.onBackground,
-                modifier = Modifier.height(16.dp)
+                style = scaleFont(Typography.caption2, fontMultiplier),
+                modifier = Modifier.height(lineHeight)
             )
         }
         Column(
@@ -584,19 +627,22 @@ fun GrandTotalDisplay(
                 currencySymbol = currencySymbol,
                 amountString = billAmountString,
                 tag = stringResource(id = R.string.tag_display_subtotal),
-                modifier = Modifier.height(16.dp),
+                style = scaleFont(Typography.caption1, fontMultiplier),
+                modifier = Modifier.height(lineHeight),
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = tipAmountString,
                 tag = stringResource(id = R.string.tag_display_tip),
-                modifier = Modifier.height(16.dp),
+                style = scaleFont(Typography.caption1, fontMultiplier),
+                modifier = Modifier.height(lineHeight),
             )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = grandTotalString,
                 tag = stringResource(id = R.string.tag_display_grand_total),
-                modifier = Modifier.height(16.dp),
+                style = scaleFont(Typography.caption1, fontMultiplier),
+                modifier = Modifier.height(lineHeight),
             )
         }
     }
@@ -621,7 +667,7 @@ fun AmountDisplay(
         Text(
             text = currencySymbol,
             color = MaterialTheme.colors.primary,
-            fontSize = style.fontSize * .66,
+            fontSize = style.fontSize * .65,
             style = style
         )
         val amountModifier = if (tag == null) Modifier else Modifier.semantics { contentDescription = tag }
@@ -629,7 +675,7 @@ fun AmountDisplay(
             color = MaterialTheme.colors.primaryVariant,
             text = amountString,
             style = style,
-            modifier = amountModifier.wrapContentSize()
+            modifier = amountModifier.wrapContentSize().padding(start=.4.dp)
         )
     }
 }
@@ -659,7 +705,7 @@ fun SmallText(
     text: String,
     color: Color,
     modifier: Modifier = Modifier,
-    style: TextStyle = Typography.caption4
+    style: TextStyle = Typography.caption4,
 ) {
     Text(
         color = color,
@@ -672,7 +718,7 @@ fun SmallText(
 
 
 @Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true, locale = "FR")
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
 @Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
 @Composable

@@ -44,6 +44,7 @@ class DataStoreManager(context: Context) {
         val currencySymbolKey = stringPreferencesKey("CURRENCY_SYMBOL_KEY")
         val themeKey = stringPreferencesKey("THEME_KEY")
         val languageKey = stringPreferencesKey("LANGUAGE_KEY")
+        val largeTextKey = booleanPreferencesKey("LARGE_TEXT_KEY")
     }
 
     private val tipCurrency = try {
@@ -65,13 +66,22 @@ class DataStoreManager(context: Context) {
         defaultValue = Theme.Dark.name
     )
 
+    suspend fun saveTheme(themeName: String) {
+        dataSave(themeName, themeKey)
+    }
+
     val languageFlow: Flow<String> = dataFlow(
         key = languageKey,
         defaultValue = ""
     )
 
-    suspend fun saveTheme(themeName: String) {
-        dataSave(themeName, themeKey)
+    val largeTextFlow: Flow<Boolean> = dataFlow(
+        key = largeTextKey,
+        defaultValue = false,
+    )
+
+    suspend fun saveLargeText(isLargeText: Boolean) {
+        dataSave(isLargeText, largeTextKey)
     }
 
     val launchCountFlow: Flow<Int> = dataFlow(

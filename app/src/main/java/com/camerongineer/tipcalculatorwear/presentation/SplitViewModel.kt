@@ -24,6 +24,8 @@ class SplitViewModel(
 
     private val _isPreciseSplit = mutableStateOf(true)
 
+    fun getLargeTextFlow() = dataStore.largeTextFlow
+
     init {
         viewModelScope.launch {
             _numSplit.intValue = if (dataStore.rememberNumSplitFlow.first()) {
