@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,8 +64,10 @@ import com.camerongineer.tipcalculatorwear.presentation.constants.TipLanguage
 import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
+import com.camerongineer.tipcalculatorwear.utils.getFontMultiplier
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 import com.camerongineer.tipcalculatorwear.utils.getTipLanguage
+import com.camerongineer.tipcalculatorwear.utils.scaleFont
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -75,6 +79,8 @@ fun SettingsScreen(
     navigateToLanguageSelectionScreen: () -> Unit,
     onBackButtonPressed: () -> Unit
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
     val context = LocalContext.current
     val listState = rememberScalingLazyListState()
     val intent = Intent(Intent.ACTION_VIEW)
@@ -84,11 +90,18 @@ fun SettingsScreen(
     val splitSettingsTextID by mutableStateOf(stringResource(R.string.split_settings))
     val miscSettingsTextID by mutableStateOf(stringResource(R.string.misc_settings))
 
+    val isLargeFont by settingsViewModel.getLargeTextFlow().collectAsState(initial = false)
+    val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
+
     Scaffold(
         timeText = { if (!listState.isScrollInProgress) {
             TimeText(
                 timeTextStyle = TimeTextDefaults
-                    .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
+                    .timeTextStyle(
+                        color = MaterialTheme.colors.onSurfaceVariant,
+                        fontSize = Typography.title3.fontSize
+                    )
+            )
         } },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = listState)},
@@ -105,12 +118,16 @@ fun SettingsScreen(
 
             //Tip Settings
             item {
-                SectionTextItem(textResourceID = tipSettingsTextID)
+                SectionTextItem(
+                    textResourceID = tipSettingsTextID,
+                    fontMultiplier = fontMultiplier
+                )
             }
 
             item {
                 DefaultTipPercentageItem(
                     labelText = stringResource(id = R.string.default_tip),
+                    fontMultiplier = fontMultiplier,
                     defaultTipPercentage = settingsViewModel.defaultTipPercentage,
                     onDefaultTipPercentageChanged = {
                         navigateToDefaultTipScreen()
@@ -121,13 +138,15 @@ fun SettingsScreen(
             item {
                 RetainTipPercentageItem(
                     isRememberTipPercentage = settingsViewModel.rememberTipPercentage.value,
-                    onRememberTipPercentageChanged = settingsViewModel::setRememberTipPercentage
+                    onRememberTipPercentageChanged = settingsViewModel::setRememberTipPercentage,
+                    fontMultiplier = fontMultiplier
                 )
             }
 
             item {
                 RoundIncrementItem(
                     labelText = stringResource(id = R.string.round_increment),
+                    fontMultiplier = fontMultiplier,
                     roundingNumValue = settingsViewModel.roundingNum,
                     currencySymbol = settingsViewModel.currencySymbol,
                     onRoundingNumChanged = {
@@ -138,12 +157,16 @@ fun SettingsScreen(
 
             //Split Settings
             item {
-                SectionTextItem(textResourceID = splitSettingsTextID)
+                SectionTextItem(
+                    textResourceID = splitSettingsTextID,
+                    fontMultiplier = fontMultiplier
+                )
             }
 
             item {
                 DefaultSplitItem(
                     labelText = stringResource(id = R.string.default_split),
+                    fontMultiplier = fontMultiplier,
                     defaultSplitValue = settingsViewModel.defaultNumSplit,
                     onDefaultSplitValueChanged = {
                         navigateToDefaultSplitScreen()
@@ -154,20 +177,33 @@ fun SettingsScreen(
             item {
                 RetainNumSplitItem(
                     isRememberNumSplit = settingsViewModel.rememberNumSplit.value,
-                    onRememberNumSplitChanged = settingsViewModel::setRememberNumSplit
+                    onRememberNumSplitChanged = settingsViewModel::setRememberNumSplit,
+                    fontMultiplier = fontMultiplier
                 )
             }
 
             item {
                 PreciseSplitModeItem(
                     isPreciseSplit = settingsViewModel.isPreciseSplit.value,
-                    onPreciseSplitModeChanged = settingsViewModel::setIsPreciseSplit
+                    onPreciseSplitModeChanged = settingsViewModel::setIsPreciseSplit,
+                    fontMultiplier = fontMultiplier
                 )
             }
 
             //Misc Settings
             item {
-                SectionTextItem(textResourceID = miscSettingsTextID)
+                SectionTextItem(
+                    textResourceID = miscSettingsTextID,
+                    fontMultiplier = fontMultiplier
+                )
+            }
+
+            item {
+                LargeFontModeItem(
+                    isLargeFont = isLargeFont,
+                    onLargeFontModeChanged = { settingsViewModel.saveLargeText(!isLargeFont) },
+                    fontMultiplier = fontMultiplier
+                )
             }
 
             item {
@@ -175,6 +211,7 @@ fun SettingsScreen(
                 val currentTipLanguage = getTipLanguage(languageCode)
                 LanguageSelectionItem(
                     tipLanguage = currentTipLanguage,
+                    fontMultiplier = fontMultiplier,
                     onClick = navigateToLanguageSelectionScreen
                 )
             }
@@ -184,15 +221,18 @@ fun SettingsScreen(
                 val theme = Theme.valueOf(themeName)
                 ThemeSelectionItem(
                     theme = theme,
+                    fontMultiplier = fontMultiplier,
                     onThemeChanged = { settingsViewModel.saveTheme(if (theme == Theme.Dark) {
                         Theme.Light
                     } else Theme.Dark) }
                 )
             }
 
+
             item {
                 BackButtonItem(
                     text = stringResource(id = R.string.back),
+                    fontMultiplier = fontMultiplier,
                     onBackButtonPressed = onBackButtonPressed
                 )
             }
@@ -211,7 +251,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.review_request),
-                        style = Typography.body2,
+                        style = scaleFont(Typography.body2, fontMultiplier),
                         color = MaterialTheme.colors.onBackground,
                         textAlign = TextAlign.Center)
                     Box(
@@ -235,11 +275,14 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SectionTextItem(textResourceID: String) {
+private fun SectionTextItem(
+    textResourceID: String,
+    fontMultiplier: Float
+) {
     Text(
         text = textResourceID,
         textAlign = TextAlign.Center,
-        style = Typography.title1,
+        style = scaleFont(Typography.title1, fontMultiplier),
         color = MaterialTheme.colors.onBackground,
         modifier = Modifier
             .fillMaxWidth()
@@ -251,17 +294,21 @@ private fun SectionTextItem(textResourceID: String) {
 fun DefaultTipPercentageItem(
     labelText: String,
     defaultTipPercentage: MutableIntState,
+    fontMultiplier: Float,
     onDefaultTipPercentageChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SettingsChip(
         labelText = labelText,
         defaultValue = defaultTipPercentage,
+        fontMultiplier = fontMultiplier,
         onDefaultValueChanged = onDefaultTipPercentageChanged,
+        labelWeight = .8f,
+        valueWeight = .3f,
         modifier = modifier) {
         Text(
             text = "${defaultTipPercentage.intValue}",
-            style = Typography.display2,
+            style = scaleFont(Typography.display2, fontMultiplier),
             color = MaterialTheme.colors.secondary,
             textAlign = TextAlign.Right,
             maxLines = 1,
@@ -271,7 +318,7 @@ fun DefaultTipPercentageItem(
         )
         Text(
             text = "%",
-            style = Typography.caption1,
+            style = scaleFont(Typography.caption2, fontMultiplier),
             color = MaterialTheme.colors.onPrimary,
             textAlign = TextAlign.Left,
             modifier = Modifier
@@ -284,17 +331,19 @@ fun DefaultTipPercentageItem(
 @Composable
 fun DefaultSplitItem(labelText: String,
                      defaultSplitValue: MutableIntState,
+                     fontMultiplier: Float,
                      onDefaultSplitValueChanged: (Int) -> Unit,
                      modifier: Modifier = Modifier
 ) {
     SettingsChip(
         labelText = labelText,
         defaultValue = defaultSplitValue,
+        fontMultiplier = fontMultiplier,
         onDefaultValueChanged = onDefaultSplitValueChanged,
         modifier = modifier) {
         Text(
             text = "${defaultSplitValue.intValue}",
-            style = Typography.display2,
+            style = scaleFont(Typography.display2, fontMultiplier),
             color = MaterialTheme.colors.secondary,
             modifier = modifier
                 .wrapContentWidth()
@@ -307,15 +356,19 @@ fun RoundIncrementItem(
     labelText: String,
     roundingNumValue: MutableIntState,
     currencySymbol: MutableState<String>,
+    fontMultiplier: Float,
     onRoundingNumChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingsChip(
         labelText = labelText,
         defaultValue = roundingNumValue,
+        fontMultiplier = fontMultiplier,
         onDefaultValueChanged = onRoundingNumChanged,
-        modifier = modifier) {
-        val style = Typography.title2
+        labelWeight = 1f,
+        valueWeight = .5f,
+        modifier = modifier.wrapContentWidth()) {
+        val style = scaleFont(Typography.title2, fontMultiplier)
         Text(
             text = currencySymbol.value,
             style = style,
@@ -338,7 +391,11 @@ fun RoundIncrementItem(
 }
 
 @Composable
-fun LanguageSelectionItem(tipLanguage: TipLanguage, onClick: () -> Unit) {
+fun LanguageSelectionItem(
+    tipLanguage: TipLanguage,
+    fontMultiplier: Float,
+    onClick: () -> Unit
+) {
     Chip(
         onClick = withHaptics { onClick() },
         colors = ChipDefaults.chipColors(
@@ -355,7 +412,7 @@ fun LanguageSelectionItem(tipLanguage: TipLanguage, onClick: () -> Unit) {
                         R.string.language,
                         stringResource(tipLanguage.languageNameID)
                     ),
-                    style = Typography.button,
+                    style = scaleFont(Typography.button, fontMultiplier),
                     textAlign = TextAlign.Center,
                 )
             } },
@@ -372,7 +429,10 @@ fun SettingsChip(
     labelText: String,
     defaultValue: MutableIntState,
     onDefaultValueChanged: (Int) -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier,
+    labelWeight: Float = .9f,
+    valueWeight: Float = .2f,
     content: @Composable RowScope.() -> Unit
 ) {
     Chip(
@@ -381,26 +441,32 @@ fun SettingsChip(
             backgroundColor = MaterialTheme.colors.primary
         ),
         label = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-            ) {
-                Text(
-                    text = labelText,
-                    style = Typography.button,
-                    textAlign = TextAlign.Left,
-                    modifier = Modifier.weight(1f)
-                )
-                Box(
-                    contentAlignment = Alignment.CenterEnd,
-                    modifier = Modifier.fillMaxWidth().weight(.4f)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
                         modifier = Modifier
-                    ) { this@Chip.content() }
-                }
-            } },
+                            .fillMaxWidth()
+                            .weight(labelWeight)
+                            .fillMaxHeight()
+                    ) {
+                        Text(
+                            text = labelText,
+                            style = scaleFont(Typography.button, fontMultiplier),
+                            textAlign = TextAlign.Start,
+                        )
+                    }
+                    Box(
+                        contentAlignment = Alignment.CenterEnd,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(valueWeight)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxSize()
+                        ) { this@Chip.content() }
+                    }
+                },
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(
@@ -414,11 +480,13 @@ fun SettingsChip(
 fun RetainTipPercentageItem(
     isRememberTipPercentage: Boolean,
     onRememberTipPercentageChanged: (Boolean) -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
     SettingsToggleChip(
         labelText = stringResource(id = R.string.retain_tip_percentage),
         checked = isRememberTipPercentage,
+        fontMultiplier = fontMultiplier,
         onCheckedChanged = onRememberTipPercentageChanged,
         modifier = modifier
     )
@@ -428,11 +496,13 @@ fun RetainTipPercentageItem(
 fun RetainNumSplitItem(
     isRememberNumSplit: Boolean,
     onRememberNumSplitChanged: (Boolean) -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
     SettingsToggleChip(
         labelText = stringResource(id = R.string.retain_num_split),
         checked = isRememberNumSplit,
+        fontMultiplier = fontMultiplier,
         onCheckedChanged = onRememberNumSplitChanged,
         modifier = modifier
     )
@@ -442,12 +512,30 @@ fun RetainNumSplitItem(
 fun PreciseSplitModeItem(
     isPreciseSplit: Boolean,
     onPreciseSplitModeChanged: (Boolean) -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
     SettingsToggleChip(
         labelText = stringResource(id = R.string.precise_split_mode),
         checked = isPreciseSplit,
+        fontMultiplier = fontMultiplier,
         onCheckedChanged = onPreciseSplitModeChanged,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun LargeFontModeItem(
+    isLargeFont: Boolean,
+    onLargeFontModeChanged: (Boolean) -> Unit,
+    fontMultiplier: Float,
+    modifier: Modifier = Modifier
+) {
+    SettingsToggleChip(
+        labelText = stringResource(id = R.string.large_text),
+        checked = isLargeFont,
+        fontMultiplier = fontMultiplier,
+        onCheckedChanged = onLargeFontModeChanged,
         modifier = modifier
     )
 }
@@ -456,6 +544,7 @@ fun PreciseSplitModeItem(
 fun SettingsToggleChip(
     labelText: String,
     checked: Boolean,
+    fontMultiplier: Float,
     onCheckedChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -469,7 +558,7 @@ fun SettingsToggleChip(
         label = {
             Text(
                 text = labelText,
-                style = Typography.button,
+                style = scaleFont(Typography.button, fontMultiplier),
                 color = if (checked) {
                     MaterialTheme.colors.onPrimary
                 } else MaterialTheme.colors.onSurfaceVariant,
@@ -496,6 +585,7 @@ fun SettingsToggleChip(
 fun ThemeSelectionItem(
     theme: Theme,
     onThemeChanged: () -> Unit,
+    fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
     Chip(
@@ -515,7 +605,7 @@ fun ThemeSelectionItem(
                 )
                 Text(
                     text = formattedString,
-                    style = Typography.title2,
+                    style = scaleFont(Typography.title2, fontMultiplier),
                     color = MaterialTheme.colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
@@ -530,12 +620,15 @@ fun ThemeSelectionItem(
 }
 
 @Composable
-private fun BackButtonItem(text: String, onBackButtonPressed: () -> Unit) {
+private fun BackButtonItem(
+    text: String, onBackButtonPressed: () -> Unit,
+    fontMultiplier: Float
+) {
     CompactChip(
         label = {
             Text(
                 text = text,
-                style = Typography.button
+                style = scaleFont(Typography.button, fontMultiplier)
             )
         },
         onClick = withHaptics {

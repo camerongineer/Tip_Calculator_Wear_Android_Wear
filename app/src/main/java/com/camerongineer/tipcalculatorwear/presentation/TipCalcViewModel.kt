@@ -48,6 +48,8 @@ class TipCalcViewModel(
     private val _roundingNum = mutableIntStateOf(DataStoreManager.DEFAULT_ROUNDING_NUM)
     val roundingNum = _roundingNum
 
+    fun getLargeTextFlow() = dataStore.largeTextFlow
+
     init {
         viewModelScope.launch {
             dataStore.incrementLaunchCount()
@@ -60,7 +62,6 @@ class TipCalcViewModel(
             _roundingNum.intValue = dataStore.roundingNumFlow.first()
         }
     }
-
 
     private val _grandTotal = derivedStateOf {
         _subTotal.intValue + _tipAmount.intValue

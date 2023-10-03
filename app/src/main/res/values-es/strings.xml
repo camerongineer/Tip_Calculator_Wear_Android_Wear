@@ -6,7 +6,7 @@
     <string name="app_name">Calculadora de propinas (Tip Calculator Wear)</string>
     <string name="tip_percentage">Porcentaje</string>
     <string name="round_up_down">MANTENER PARA REDONDAR EL TOTAL GENERAL</string>
-    <string name="display_subtotal">TOTAL PARCIAL</string>
+    <string name="display_subtotal">SUBTOTAL</string>
     <string name="display_tip">PROPINA</string>
     <string name="display_total">TOTAL</string>
     <string name="split">"Dividir"</string>
@@ -29,4 +29,5 @@
     <string name="fr">Francés</string>
     <string name="es">Español</string>
     <string name="de">Alemán</string>
+    <string name="large_text">Tamaño de texto grande</string>
 </resources>

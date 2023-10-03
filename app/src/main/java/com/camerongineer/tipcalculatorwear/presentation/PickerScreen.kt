@@ -54,7 +54,11 @@ fun <T>PickerScreen(
         timeText = {
             TimeText(
                 timeTextStyle = TimeTextDefaults
-                    .timeTextStyle(color = MaterialTheme.colors.onSurfaceVariant))
+                    .timeTextStyle(
+                        color = MaterialTheme.colors.onSurfaceVariant,
+                        fontSize = Typography.title3.fontSize
+                    )
+            )
         },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         modifier = Modifier
