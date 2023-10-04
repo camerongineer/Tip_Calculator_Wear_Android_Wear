@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.camerongineer.tipcalculatorwear.navigation.Navigation
@@ -13,6 +14,8 @@ import com.camerongineer.tipcalculatorwear.navigation.Navigation
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+        Thread.sleep(500)
         super.onCreate(savedInstanceState)
         setContent {
             TipCalcApp()

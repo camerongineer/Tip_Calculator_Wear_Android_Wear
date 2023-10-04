@@ -590,7 +590,7 @@ fun GrandTotalDisplay(
             .padding(bottom = 2.dp)
         )
     {
-        val lineHeight = 17.dp * fontMultiplier
+        val lineHeight = 16.dp * fontMultiplier
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.SpaceBetween,

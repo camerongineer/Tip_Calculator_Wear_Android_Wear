@@ -92,20 +92,26 @@ fun SplitCalcScreen(
                 state = listState,
                 anchorType = ScalingLazyListAnchorType.ItemCenter,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(horizontal = 0.dp),
+                contentPadding = PaddingValues(horizontal = 2.dp),
                 modifier = Modifier
             ) {
-                item {Spacer(modifier = Modifier.height(screenHeight * .3f))}
+                item { Spacer(modifier = Modifier.height(screenHeight * .3f)) }
                 item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier
+                            .height(screenHeight)
                             .padding(
-                                start = screenWidth / 25,
-                                end = screenWidth / 5.5f)
+                                start = screenWidth / 22,
+                                end = screenWidth / 5.5f
+                            )
 
                     ) {
+                        if (splitViewModel.getSplitSubTotalRemainder() +
+                            splitViewModel.getSplitTipAmountRemainder() > 0) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
                         Row(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.Top,
@@ -129,8 +135,9 @@ fun SplitCalcScreen(
                         )
                     }
                 }
-                item {Spacer(modifier = Modifier.height(screenHeight * .1f))}
+                item { Spacer(modifier = Modifier.height(screenHeight * .1f)) }
             }
+
         }
         Box(
             contentAlignment = Alignment.CenterEnd,
