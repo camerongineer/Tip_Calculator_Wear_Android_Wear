@@ -11,7 +11,7 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
         targetSdk = 33
-        versionCode = 26
+        versionCode = 27
         versionName = "1.5.0"
         resourceConfigurations.addAll(listOf("en", "es", "de", "fr", "pt"))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -88,6 +88,7 @@ dependencies {
     implementation("com.google.android.horologist:horologist-compose-tools:0.5.3")
     implementation("com.google.android.horologist:horologist-tiles:0.5.3")
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
