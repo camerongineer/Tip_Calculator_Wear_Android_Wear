@@ -21,11 +21,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -68,6 +70,8 @@ import com.camerongineer.tipcalculatorwear.utils.getFontMultiplier
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 import com.camerongineer.tipcalculatorwear.utils.getTipLanguage
 import com.camerongineer.tipcalculatorwear.utils.scaleFont
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -81,6 +85,7 @@ fun SettingsScreen(
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val listState = rememberScalingLazyListState()
     val intent = Intent(Intent.ACTION_VIEW)
@@ -92,6 +97,14 @@ fun SettingsScreen(
 
     val isLargeFont by settingsViewModel.getLargeTextFlow().collectAsState(initial = false)
     val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
+
+    DisposableEffect(Unit) {
+        coroutineScope.launch {
+            delay(2000)
+        }
+        onDispose { }
+    }
+
 
     Scaffold(
         timeText = { if (!listState.isScrollInProgress) {
@@ -113,7 +126,8 @@ fun SettingsScreen(
         ScalingLazyColumn(
             state = listState,
             autoCentering = AutoCenteringParams(itemIndex = 0),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
 
             //Tip Settings

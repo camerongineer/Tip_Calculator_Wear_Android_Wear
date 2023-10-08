@@ -67,7 +67,7 @@ dependencies {
 
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
-    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("com.google.android.gms:play-services-wearable:18.1.0")
     implementation("androidx.percentlayout:percentlayout:1.0.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
@@ -81,13 +81,13 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.activity:activity-compose:1.8.0")
     implementation("androidx.wear.tiles:tiles:1.2.0")
     implementation("androidx.wear.tiles:tiles-material:1.2.0")
     implementation("com.google.android.horologist:horologist-compose-tools:0.5.3")
     implementation("com.google.android.horologist:horologist-tiles:0.5.3")
-    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation("androidx.compose.material:material-icons-extended:1.5.3")
     implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
