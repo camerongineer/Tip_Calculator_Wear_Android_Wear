@@ -7,33 +7,27 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
@@ -45,8 +39,6 @@ import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearT
 import com.camerongineer.tipcalculatorwear.presentation.theme.Typography
 import com.camerongineer.tipcalculatorwear.utils.getFontMultiplier
 import com.camerongineer.tipcalculatorwear.utils.scaleFont
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -57,19 +49,9 @@ fun SplitCalcScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
-    val listState = rememberScalingLazyListState()
-    val coroutineScope = rememberCoroutineScope()
 
     val isLargeFont by splitViewModel.getLargeTextFlow().collectAsState(initial = false)
     val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
-
-    val scrollToMiddle: (() -> Unit) -> Unit = {
-        it()
-        coroutineScope.launch {
-            delay(100)
-            listState.animateScrollToItem(1)
-        }
-    }
 
     Scaffold(
         timeText = { TimeText(
@@ -83,78 +65,55 @@ fun SplitCalcScreen(
             .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
                 .fillMaxSize()
-        ) {
-            ScalingLazyColumn(
-                state = listState,
-                anchorType = ScalingLazyListAnchorType.ItemCenter,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(horizontal = 2.dp),
-                modifier = Modifier
-            ) {
-                item { Spacer(modifier = Modifier.height(screenHeight * .3f)) }
-                item {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .height(screenHeight)
-                            .padding(
-                                start = screenWidth / 22,
-                                end = screenWidth / 5.5f
-                            )
+                .padding(
+                    top = screenWidth / 50,
+                    bottom = screenHeight * .16f
+                )
 
-                    ) {
-                        if (splitViewModel.getSplitSubTotalRemainder() +
-                            splitViewModel.getSplitTipAmountRemainder() > 0) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.Top,
-                        ) {
-                            SplitDisplay(
-                                currencySymbol = splitViewModel.getCurrencySymbol(),
-                                splitSubTotalString = splitViewModel.getFormattedSplitSubTotal(),
-                                splitTipString = splitViewModel.getFormattedSplitTipAmount(),
-                                splitGrandTotalString = splitViewModel.getFormattedSplitGrandTotal(),
-                                fontMultiplier = fontMultiplier,
-                                onClick = onBackButtonPressed
-                            )
-                        }
-                        UnevenSplitWarning(
-                            currencySymbol = splitViewModel.getCurrencySymbol(),
-                            subTotalRemainder = splitViewModel.getSplitSubTotalRemainder(),
-                            subTotalRemainderString = splitViewModel.getFormattedSplitSubTotalRemainder(),
-                            tipAmountRemainder = splitViewModel.getSplitTipAmountRemainder(),
-                            tipAmountRemainderString = splitViewModel.getFormattedSplitTipAmountRemainder(),
-                            fontMultiplier = fontMultiplier
-                        )
-                    }
-                }
-                item { Spacer(modifier = Modifier.height(screenHeight * .1f)) }
-            }
+        ) {
+            val shrinkFont = isLargeFont && (splitViewModel.getSplitTipAmountRemainder() +
+                    splitViewModel.getSplitSubTotalRemainder() > 0)
+            Spacer(modifier = Modifier.height(2.dp))
+            SplitDisplay(
+                currencySymbol = splitViewModel.getCurrencySymbol(),
+                splitSubTotalString = splitViewModel.getFormattedSplitSubTotal(),
+                splitTipString = splitViewModel.getFormattedSplitTipAmount(),
+                splitGrandTotalString = splitViewModel.getFormattedSplitGrandTotal(),
+                fontMultiplier = fontMultiplier * (if (shrinkFont) .9f else 1f),
+                onClick = onBackButtonPressed
+            )
+            UnevenSplitWarning(
+                currencySymbol = splitViewModel.getCurrencySymbol(),
+                subTotalRemainder = splitViewModel.getSplitSubTotalRemainder(),
+                subTotalRemainderString = splitViewModel.getFormattedSplitSubTotalRemainder(),
+                tipAmountRemainder = splitViewModel.getSplitTipAmountRemainder(),
+                tipAmountRemainderString = splitViewModel.getFormattedSplitTipAmountRemainder(),
+                fontMultiplier = fontMultiplier * .9f
+            )
+            Spacer(modifier = Modifier.height(6.dp))
 
         }
         Box(
-            contentAlignment = Alignment.CenterEnd,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(end = if (screenWidth > 180.dp) 8.dp else 4.dp)
-        ){
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier.fillMaxSize()
+        ) {
             SplitButtons(
                 numSplit = splitViewModel.getNumSplit(),
-                onSplitUpClicked = { scrollToMiddle(splitViewModel::onSplitUpClicked) },
-                onSplitDownClicked = { scrollToMiddle(splitViewModel::onSplitDownClicked) },
-                onNumSplitLongClicked = { scrollToMiddle(splitViewModel::resetNumSplit) },
+                onSplitUpClicked = splitViewModel::onSplitUpClicked,
+                onSplitDownClicked = splitViewModel::onSplitDownClicked,
+                onNumSplitLongClicked = splitViewModel::resetNumSplit,
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .padding(bottom = screenHeight / 20)
             )
         }
     }
+
 }
 
 @Composable
@@ -167,7 +126,7 @@ fun SplitDisplay(
     fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
-    val lineHeight = 18.dp * fontMultiplier
+    val lineHeight = 18.dp * fontMultiplier * .9f
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -177,17 +136,10 @@ fun SplitDisplay(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = stringResource(id = R.string.split_grand_total),
-                textAlign = TextAlign.Center,
-                style = scaleFont(Typography.title2, fontMultiplier),
-                color = MaterialTheme.colors.onBackground,
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-            )
             AmountDisplay(
                 currencySymbol = currencySymbol,
                 amountString = splitGrandTotalString,
-                style = scaleFont(Typography.display1, fontMultiplier)
+                style = scaleFont(Typography.display1, fontMultiplier * 1.1f)
             )
         }
         Row(
@@ -241,40 +193,41 @@ fun SplitButtons(
     onNumSplitLongClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start,
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
             BillKeyboardButton(
-                icon = Icons.Default.ArrowDropUp,
-                contentDescription = stringResource(id = R.string.increase),
-                onClick = onSplitUpClicked,
+                icon = Icons.Default.ArrowLeft,
+                contentDescription = stringResource(id = R.string.decrease),
+                onClick = onSplitDownClicked,
                 modifier = Modifier
-                    .width(30.dp)
+                    .width(36.dp)
                     .height(32.dp)
             )
+
             Text(
                 text = "$numSplit",
                 style = Typography.display1,
                 color = MaterialTheme.colors.primary,
-                modifier = Modifier.combinedClickable(
+                modifier = Modifier
+                    .padding(start = 4.dp, end=4.dp)
+                    .combinedClickable(
                     onLongClick = withHaptics(
                         block = onNumSplitLongClicked,
                         isLongPress = true
                     ),
-                    onClick = withHaptics { }
-                )
-            )
+                    onClick = withHaptics { }))
             BillKeyboardButton(
-                icon = Icons.Default.ArrowDropDown,
-                contentDescription = stringResource(id = R.string.decrease),
-                onClick = onSplitDownClicked,
+                icon = Icons.Default.ArrowRight,
+                contentDescription = stringResource(id = R.string.increase),
+                onClick = onSplitUpClicked,
                 modifier = Modifier
-                    .width(30.dp)
+                    .width(36.dp)
                     .height(32.dp)
             )
         }
@@ -291,14 +244,17 @@ fun UnevenSplitWarning(
     fontMultiplier: Float,
     modifier: Modifier = Modifier
 ) {
-    val lineHeight = 18.dp * fontMultiplier
+    val lineHeight = 18.dp * fontMultiplier * .9f
     if (subTotalRemainder > 0 || tipAmountRemainder > 0) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
                 .padding(start = 4.dp, end = 2.dp, top = 2.dp)
         ) {
-            Row {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(.92f)
+            ) {
                 SmallText(
                     text = stringResource(id = R.string.split_warning),
                     color = MaterialTheme.colors.secondaryVariant,

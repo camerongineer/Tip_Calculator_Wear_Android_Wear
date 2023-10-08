@@ -66,8 +66,6 @@ import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
-import androidx.wear.compose.material.Vignette
-import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
@@ -117,7 +115,6 @@ fun TipCalcScreen(
                     )
             )
         } },
-        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
