@@ -20,8 +20,11 @@ import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -49,6 +52,8 @@ fun SplitCalcScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
+    val coroutineScope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
 
     val isLargeFont by splitViewModel.getLargeTextFlow().collectAsState(initial = false)
     val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
@@ -74,7 +79,18 @@ fun SplitCalcScreen(
                     top = screenWidth / 50,
                     bottom = screenHeight * .16f
                 )
-
+//                .onRotaryScrollEvent{
+//                    coroutineScope.launch{
+//                        if (it.verticalScrollPixels > 0) {
+//                            splitViewModel.onSplitUpClicked()
+//                        } else if (it.verticalScrollPixels < 0)  {
+//                            splitViewModel.onSplitDownClicked()
+//                        }
+//                    }
+//                    true
+//                }
+//                .focusRequester(focusRequester)
+//                .focusable(),
         ) {
             val shrinkFont = isLargeFont && (splitViewModel.getSplitTipAmountRemainder() +
                     splitViewModel.getSplitSubTotalRemainder() > 0)
@@ -96,11 +112,11 @@ fun SplitCalcScreen(
                 fontMultiplier = fontMultiplier * .9f
             )
             Spacer(modifier = Modifier.height(6.dp))
-
         }
         Box(
             contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             SplitButtons(
                 numSplit = splitViewModel.getNumSplit(),
@@ -113,8 +129,8 @@ fun SplitCalcScreen(
             )
         }
     }
-
 }
+
 
 @Composable
 fun SplitDisplay(

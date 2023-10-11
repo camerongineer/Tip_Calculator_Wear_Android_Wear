@@ -34,6 +34,9 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
     private val _roundingNum = mutableIntStateOf(DataStoreManager.DEFAULT_ROUNDING_NUM)
     val roundingNum = _roundingNum
 
+    private val _isFirstLaunched = mutableStateOf(true);
+    val isFirstLaunched = _isFirstLaunched
+
     fun getThemeFlow() = dataStore.themeFlow
     fun saveTheme(theme: Theme) = viewModelScope.launch { dataStore.saveTheme(theme.name) }
 
@@ -101,4 +104,7 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
             dataStore.saveRoundingNum(roundingNum)
         }
     }
+
+    fun setIsFirstLaunchedFalse() { _isFirstLaunched.value = false }
+    fun setIsFirstLaunchedTrue() { _isFirstLaunched.value = true }
 }
