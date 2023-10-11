@@ -6,6 +6,8 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,14 +24,19 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -97,14 +104,7 @@ fun SettingsScreen(
 
     val isLargeFont by settingsViewModel.getLargeTextFlow().collectAsState(initial = false)
     val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
-
-    DisposableEffect(Unit) {
-        coroutineScope.launch {
-            delay(2000)
-        }
-        onDispose { }
-    }
-
+    val focusRequester = remember { FocusRequester() }
 
     Scaffold(
         timeText = { if (!listState.isScrollInProgress) {
@@ -124,10 +124,18 @@ fun SettingsScreen(
             .background(color = MaterialTheme.colors.background)
     ) {
         ScalingLazyColumn(
-            state = listState,
             autoCentering = AutoCenteringParams(itemIndex = 0),
             modifier = Modifier
                 .fillMaxWidth()
+                .onRotaryScrollEvent {
+                    coroutineScope.launch {
+                        listState.scrollBy(it.verticalScrollPixels)
+                    }
+                    true
+                }
+                .focusRequester(focusRequester)
+                .focusable(),
+            state = listState
         ) {
 
             //Tip Settings
@@ -136,6 +144,7 @@ fun SettingsScreen(
                     textResourceID = tipSettingsTextID,
                     fontMultiplier = fontMultiplier
                 )
+                LaunchedEffect(Unit) { focusRequester.requestFocus() }
             }
 
             item {
@@ -284,6 +293,17 @@ fun SettingsScreen(
                     }
                 }
             }
+        }
+        DisposableEffect(Unit) {
+            if (settingsViewModel.isFirstLaunched.value) {
+                coroutineScope.launch {
+                    listState.scrollToItem(0)
+                    delay(50)
+                    listState.animateScrollToItem(1)
+                }
+                settingsViewModel.setIsFirstLaunchedFalse()
+            }
+            onDispose { }
         }
     }
 }

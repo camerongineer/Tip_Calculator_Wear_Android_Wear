@@ -27,13 +27,14 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.KeyboardBackspace
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -93,17 +94,7 @@ fun TipCalcScreen(
         }
     }
 
-
-    DisposableEffect(Unit) {
-        if (tipCalcViewModel.isFirstLaunch()) {
-            tipCalcViewModel.markAsNotFirstLaunch()
-            coroutineScope.launch {
-                listState.scrollToItem(0)
-            }
-        }
-        onDispose { }
-    }
-
+    val focusRequester = remember { FocusRequester() }
 
     Scaffold(
         timeText = { if (!listState.isScrollInProgress) {
@@ -123,10 +114,23 @@ fun TipCalcScreen(
         ScalingLazyColumn(
             state = listState,
             autoCentering = AutoCenteringParams(itemIndex = 0),
-            modifier = Modifier.fillMaxWidth(),
             anchorType = ScalingLazyListAnchorType.ItemCenter,
             userScrollEnabled = false,
-            contentPadding = PaddingValues(horizontal = 0.dp)
+            contentPadding = PaddingValues(horizontal = 0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+//                .onRotaryScrollEvent{
+//                    coroutineScope.launch{
+//                        if (it.verticalScrollPixels > 0) {
+//                            tipCalcViewModel.tipPercentageDecrement()
+//                        } else if (it.verticalScrollPixels < 0)  {
+//                            tipCalcViewModel.tipPercentageIncrement()
+//                        }
+//                    }
+//                    true
+//                }
+//                .focusRequester(focusRequester)
+//                .focusable(),
         ) {
 
             item {
@@ -134,9 +138,17 @@ fun TipCalcScreen(
                     tipCalcViewModel = tipCalcViewModel,
                     scrollToSection = scrollToSection,
                 )
+
+                LaunchedEffect(Unit) {
+                    if (tipCalcViewModel.isFirstLaunch()) {
+                        tipCalcViewModel.markAsNotFirstLaunch()
+                        listState.scrollToItem(0)
+                    }
+                }
             }
 
             item {
+//                LaunchedEffect(Unit) { focusRequester.requestFocus() }
                 TipSelectionItem(
                     tipCalcViewModel = tipCalcViewModel,
                     scrollToSection = scrollToSection,
@@ -145,7 +157,7 @@ fun TipCalcScreen(
                     },
                     onSettingsClicked = withHaptics {
                         onSettingsButtonClicked()
-                    }
+                    },
                 )
             }
         }
@@ -565,7 +577,6 @@ fun TipSlider(
             text = stringResource(id = R.string.round_up_down),
             style = scaleFont(Typography.caption4, fontMultiplier),
             color = MaterialTheme.colors.secondaryVariant)
-
     }
 }
 

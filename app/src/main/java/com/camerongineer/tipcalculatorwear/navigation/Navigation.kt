@@ -47,11 +47,14 @@ fun Navigation(navController: NavHostController) {
         startDestination = Screen.MainScreen.route
     ) {
         val tipCalcViewModel = TipCalcViewModel(dataStoreManager)
+        val settingsViewModel = SettingsViewModel(dataStoreManager)
         composable(route = Screen.MainScreen.route) {
             TipCalculatorWearTheme(themeName) {
                 TipCalcScreen(
                     tipCalcViewModel = tipCalcViewModel,
-                    onSettingsButtonClicked = { navController.navigate("settings") },
+                    onSettingsButtonClicked = {
+                        settingsViewModel.setIsFirstLaunchedTrue()
+                        navController.navigate("settings") },
                     onSplitButtonClicked = { navController.navigate(Screen.SplitScreen.route) }
                 )
             }
@@ -75,7 +78,6 @@ fun Navigation(navController: NavHostController) {
             startDestination = Screen.SettingsScreen.route,
             route = "settings"
         ) {
-            val settingsViewModel = SettingsViewModel(dataStoreManager)
             composable(route = Screen.SettingsScreen.route) {
                 TipCalculatorWearTheme(themeName) {
                     SettingsScreen(
@@ -88,7 +90,7 @@ fun Navigation(navController: NavHostController) {
                             navController.navigate(Screen.DefaultSplitScreen.route) },
                         navigateToLanguageSelectionScreen = {
                             navController.navigate(Screen.LanguageSelectionScreen.route) },
-                        onBackButtonPressed = { navController.navigateUp() }
+                        onBackButtonPressed = { navController.popBackStack(route = "settings", inclusive = true) }
                     )
                 }
                 Log.d("NAV", "To Settings Screen")
