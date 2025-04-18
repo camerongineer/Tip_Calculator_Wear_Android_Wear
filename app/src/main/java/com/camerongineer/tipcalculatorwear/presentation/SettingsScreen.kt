@@ -2,7 +2,6 @@ package com.camerongineer.tipcalculatorwear.presentation
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -79,6 +78,7 @@ import com.camerongineer.tipcalculatorwear.utils.getTipLanguage
 import com.camerongineer.tipcalculatorwear.utils.scaleFont
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -96,7 +96,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val listState = rememberScalingLazyListState()
     val intent = Intent(Intent.ACTION_VIEW)
-    val playStoreUrl = Uri.parse(stringResource(id = R.string.play_store_url))
+    val playStoreUrl = stringResource(id = R.string.play_store_url).toUri()
 
     val tipSettingsTextID by mutableStateOf(stringResource(R.string.tip_settings))
     val splitSettingsTextID by mutableStateOf(stringResource(R.string.split_settings))
