@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.camerongineer.tipcalculatorwear"
-    compileSdk = 35
+    compileSdk = 34
 
     androidResources {
         localeFilters += listOf("en", "es", "de", "fr", "pt")
@@ -14,9 +14,9 @@ android {
     defaultConfig {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
-        targetSdk = 35
-        versionCode = 29
-        versionName = "1.6.0"
+        targetSdk = 34
+        versionCode = 30
+        versionName = "1.6.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
