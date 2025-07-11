@@ -7,13 +7,16 @@ android {
     namespace = "com.camerongineer.tipcalculatorwear"
     compileSdk = 34
 
+    androidResources {
+        localeFilters += listOf("en", "es", "de", "fr", "pt")
+    }
+
     defaultConfig {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 28
-        targetSdk = 33
-        versionCode = 28
-        versionName = "1.5.0"
-        resourceConfigurations.addAll(listOf("en", "es", "de", "fr", "pt"))
+        targetSdk = 34
+        versionCode = 30
+        versionName = "1.6.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
