@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+  pull_request:
   workflow_dispatch:
 
 concurrency:
@@ -54,4 +55,4 @@ jobs:
             --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
             --device model=PixelWatch,version=33,locale=en_US,orientation=portrait \
             --timeout 10m \
-            --results-dir=gh-actions/run-$GITHUB_RUN_ID
+            --results-dir=gh-actions/pr-$GITHUB_RUN_ID
