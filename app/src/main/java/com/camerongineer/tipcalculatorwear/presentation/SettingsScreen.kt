@@ -45,7 +45,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Devices
+import androidx.wear.tooling.preview.devices.WearDevices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
@@ -673,10 +673,10 @@ private fun BackButtonItem(
 }
 
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true, locale = "DE")
-@Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true, locale = "DE")
+@Preview(device = WearDevices.RECT, showSystemUi = true)
 @Composable
 fun SettingsPreview() {
     TipCalculatorWearTheme {

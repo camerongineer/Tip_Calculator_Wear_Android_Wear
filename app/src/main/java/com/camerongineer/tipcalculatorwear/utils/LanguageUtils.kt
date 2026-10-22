@@ -7,7 +7,10 @@ import java.util.Locale
 fun getLocale(languageCode: String): Locale {
     return try {
         val tipLanguage = getTipLanguage(languageCode)
-        Locale(tipLanguage.name, Locale.getDefault().country)
+        val builder = Locale.Builder().setLanguage(tipLanguage.name)
+        val country = Locale.getDefault().country
+        if (country.isNotEmpty()) builder.setRegion(country)
+        builder.build()
     } catch (e: Exception) {
         Log.d("Language", "Language not set")
         Locale.getDefault()

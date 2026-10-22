@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Devices
+import androidx.wear.tooling.preview.devices.WearDevices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material.Colors
 import androidx.wear.compose.material.MaterialTheme
@@ -43,7 +43,7 @@ fun TipCalculatorWearTheme(
     )
 }
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
 @Composable
 fun ThemeKeyboardPreview(theme: Theme = Theme.Dark) {
     TipCalculatorWearTheme(theme.name) {
@@ -61,7 +61,7 @@ fun ThemeKeyboardPreview(theme: Theme = Theme.Dark) {
     }
 }
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
 @Composable
 fun ThemeTipSelectionPreview(theme: Theme = Theme.Dark) {
     TipCalculatorWearTheme(theme.name) {
@@ -78,7 +78,7 @@ fun ThemeTipSelectionPreview(theme: Theme = Theme.Dark) {
     }
 }
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
 @Composable
 fun ThemeSplitCalcPreview(theme: Theme = Theme.Dark) {
     TipCalculatorWearTheme(theme.name) {
@@ -96,7 +96,7 @@ fun ThemeSplitCalcPreview(theme: Theme = Theme.Dark) {
     }
 }
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
 @Composable
 fun ThemeSettingsPreview(theme: Theme = Theme.Dark) {
     TipCalculatorWearTheme(theme.name) {

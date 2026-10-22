@@ -1,24 +1,19 @@
 plugins {
     id("com.android.test")
-    id("org.jetbrains.kotlin.android")
 }
 
 android {
     namespace = "com.camerongineer.benchmark"
-    compileSdk = 33
+    compileSdk = 37
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     defaultConfig {
         minSdk = 30
-        targetSdk = 33
+        targetSdk = 37
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,11 +31,11 @@ android {
 
     testOptions {
         managedDevices {
-            devices {
-                create ("wearoslargeround31", com.android.build.api.dsl.ManagedVirtualDevice::class) {
+            localDevices {
+                create("wearoslargeround30") {
                     device = "wearos_large_round"
-                    apiLevel = 31
-                    systemImageSource = "aosp"
+                    apiLevel = 30
+                    systemImageSource = "android-wear"
                 }
             }
         }
@@ -51,10 +46,10 @@ android {
 }
 
 dependencies {
-    implementation("androidx.test.ext:junit:1.1.5")
-    implementation("androidx.test.espresso:espresso-core:3.5.1")
-    implementation("androidx.test.uiautomator:uiautomator:2.2.0")
-    implementation("androidx.benchmark:benchmark-macro-junit4:1.1.1")
+    implementation("androidx.test.ext:junit:1.3.0")
+    implementation("androidx.test.espresso:espresso-core:3.7.0")
+    implementation("androidx.test.uiautomator:uiautomator:2.4.0")
+    implementation("androidx.benchmark:benchmark-macro-junit4:1.5.0")
 }
 
 androidComponents {

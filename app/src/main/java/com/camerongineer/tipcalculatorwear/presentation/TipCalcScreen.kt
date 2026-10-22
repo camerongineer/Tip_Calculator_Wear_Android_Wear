@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.KeyboardBackspace
+import androidx.compose.material.icons.automirrored.filled.KeyboardBackspace
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,7 +48,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Devices
+import androidx.wear.tooling.preview.devices.WearDevices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -218,7 +218,7 @@ fun KeyboardItem(
             modifier = Modifier.fillMaxWidth(.9f)
         ) {
             BillKeyboardButton(
-                icon = Icons.Default.KeyboardBackspace,
+                icon = Icons.AutoMirrored.Filled.KeyboardBackspace,
                 contentDescription = stringResource(id = R.string.backspace),
                 onClick = tipCalcViewModel::onDeleteTyped,
                 onLongClick = tipCalcViewModel::setSubTotalBlank,
@@ -313,32 +313,41 @@ fun BillKeyboardButton(
     onLongClick: () -> Unit = {},
     onClick: () -> Unit
 ) {
-    val buttonModifier = modifier.combinedClickable(
-        onLongClick = withHaptics(block = onLongClick, isLongPress = true),
-        onClick = withHaptics(block = onClick)
-    )
     Button(
         onClick = {},
         colors = buttonColors,
         shape = RoundedCornerShape(30),
-        modifier = buttonModifier
+        modifier = modifier
             .height(30.dp)
             .padding(start = 1.dp, end = 1.dp, top = 1.dp, bottom = 1.dp)
     ) {
-        icon?.let {
-            Image(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurfaceVariant),
-            )
-        }
-        if (icon == null) {
-            text?.let {
-                Text(
-                    text = it,
-                    textAlign = TextAlign.Center,
-                    style = scaleFont(Typography.button, fontMultiplier)
+        // The click handlers live on an inner clickable so they win against the
+        // Button's no-op click handling under the new (Compose 1.8+) innermost-wins
+        // hit-testing rules; Button itself can't take an onLongClick parameter.
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .combinedClickable(
+                    onLongClick = withHaptics(block = onLongClick, isLongPress = true),
+                    onClick = withHaptics(block = onClick)
                 )
+        ) {
+            icon?.let {
+                Image(
+                    imageVector = icon,
+                    contentDescription = contentDescription,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurfaceVariant),
+                )
+            }
+            if (icon == null) {
+                text?.let {
+                    Text(
+                        text = it,
+                        textAlign = TextAlign.Center,
+                        style = scaleFont(Typography.button, fontMultiplier)
+                    )
+                }
             }
         }
     }
@@ -551,7 +560,7 @@ fun TipSlider(
             valueProgression = IntProgression.fromClosedRange(0, maxTipPercentage, 1),
             decreaseIcon = {
                 Image(
-                    imageVector = Icons.Default.ArrowLeft,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
                     contentDescription = stringResource(id = R.string.decrease),
                     Modifier.combinedClickable(
                         onLongClick = withHaptics(block = roundDownClicked, isLongPress = true),
@@ -561,7 +570,7 @@ fun TipSlider(
             },
             increaseIcon = {
                 Image(
-                    imageVector = Icons.Default.ArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowRight,
                     contentDescription = stringResource(id = R.string.increase),
                     Modifier.combinedClickable(
                         onLongClick = withHaptics(block = roundUpClicked, isLongPress = true),
@@ -725,10 +734,10 @@ fun SmallText(
 }
 
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.RECT, showSystemUi = true)
 @Composable
 fun TipSelectionPreview() {
     TipCalculatorWearTheme {
@@ -742,10 +751,10 @@ fun TipSelectionPreview() {
     }
 }
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.RECT, showSystemUi = true)
 @Composable
 fun KeyboardPreview() {
     TipCalculatorWearTheme {
