@@ -42,20 +42,19 @@ jobs:
       - name: Ensure Test Lab API is enabled
         run: gcloud services enable testing.googleapis.com
 
-      - name: Discover Pixel Watch device ids
-        id: devices
+      - name: Run instrumentation tests on the wearable device
         run: |
-          echo "Catalog:"
-          gcloud firebase test android models list --format="table(modelId, name, formFactor)" | grep -i -A 3 -B 0 watch || true
-          MODEL=$(gcloud firebase test android models list --format=json | grep -B 4 -i watch | head -50 || true)
-          echo "$MODEL"
-
-      - name: Run instrumentation tests on Pixel Watch
-        run: |
+          set -euo pipefail
+          CATALOG=$(gcloud firebase test android models list --format=json)
+          echo "Wearables in catalog:"
+          echo "$CATALOG" | jq -r '.[] | select(.formFactor=="WEARABLE") | "  \(.modelId) — \(.name) (versions: \(.supportedVersionIds | join(", ")))"'
+          MODEL=$(echo "$CATALOG" | jq -r '[.[] | select(.formFactor=="WEARABLE")][0].modelId')
+          VERSION=$(echo "$CATALOG" | jq -r '[.[] | select(.formFactor=="WEARABLE")][0].supportedVersionIds | map(tostring | tonumber) | max | tostring')
+          echo "Using device: model=$MODEL version=$VERSION"
           gcloud firebase test android run \
             --type instrumentation \
             --app app/build/outputs/apk/debug/app-debug.apk \
             --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
-            --device model=PixelWatch,version=33,locale=en_US,orientation=portrait \
+            --device "model=$MODEL,version=$VERSION,locale=en_US,orientation=portrait" \
             --timeout 10m \
             --results-dir=gh-actions/pr-$GITHUB_RUN_ID
