@@ -1,0 +1,57 @@
+name: Firebase Test Lab (Wear)
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ftl-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  firebase-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6.4.0
+
+      - name: Build app and androidTest APKs
+        run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v3.0.1
+        with:
+          service_account_key: ${{ secrets.FTL_SERVICE_ACCOUNT_KEY }}
+          project_id: tip-calculator-wear
+
+      - name: Ensure Test Lab API is enabled
+        run: gcloud services enable testing.googleapis.com
+
+      - name: Discover Pixel Watch device ids
+        id: devices
+        run: |
+          echo "Catalog:"
+          gcloud firebase test android models list --format="table(modelId, name, formFactor)" | grep -i -A 3 -B 0 watch || true
+          MODEL=$(gcloud firebase test android models list --format=json | grep -B 4 -i watch | head -50 || true)
+          echo "$MODEL"
+
+      - name: Run instrumentation tests on Pixel Watch
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app app/build/outputs/apk/debug/app-debug.apk \
+            --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+            --device model=PixelWatch,version=33,locale=en_US,orientation=portrait \
+            --timeout 10m \
+            --results-dir=gh-actions/run-$GITHUB_RUN_ID
