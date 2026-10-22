@@ -55,15 +55,18 @@ jobs:
           arch: ${{ matrix.arch }}
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
           script: |
+            adb logcat -c
             ./gradlew :app:connectedDebugAndroidTest
+            GRADLE_EXIT=$?
+            adb logcat -d > gradle-logcat.txt
+            if [ $GRADLE_EXIT -ne 0 ]; then
+              exit $GRADLE_EXIT
+            fi
 
             echo "Running Monkey crawl (Robo-style automatic browsing)..."
-            # Clear logcat so the crash check only sees crawl-era output
             adb logcat -c
-            adb shell monkey -p com.camerongineer.tipcalculatorwear \
-              --throttle 200 --pct-syskeys 0 --pct-appswitch 10 \
-              --ignore-timeouts --ignore-security-exceptions --monitor-native-crashes \
-              -v 1000 | tee monkey.log || true
+            adb shell monkey -p com.camerongineer.tipcalculatorwear --throttle 200 --pct-syskeys 0 --pct-appswitch 10 --ignore-timeouts --ignore-security-exceptions --monitor-native-crashes -v 1000 > monkey.log 2>&1 || true
+            tail -5 monkey.log
             adb logcat -d > monkey-logcat.txt
             if grep -q "FATAL EXCEPTION" monkey-logcat.txt; then
               echo "::error::Monkey crawl found a crash — see monkey-logcat.txt"
@@ -78,6 +81,7 @@ jobs:
           name: emulator-test-results-api-${{ matrix.api-level }}
           path: |
             **/connected/**/*.html
+            gradle-logcat.txt
             monkey.log
             monkey-logcat.txt
           if-no-files-found: ignore
