@@ -47,8 +47,9 @@ jobs:
           set -euo pipefail
           CATALOG=$(gcloud firebase test android models list --format=json)
           echo "Wearables in catalog:"
-          echo "$CATALOG" | jq -r '.[] | select(.formFactor=="WEARABLE") | "  \(.modelId) — \(.name) (versions: \(.supportedVersionIds | join(", ")))"'
-          MODEL=$(echo "$CATALOG" | jq -r '[.[] | select(.formFactor=="WEARABLE")][0].modelId')
+          echo "$CATALOG" | jq -r '.[] | select(.formFactor=="WEARABLE") | "  \(.modelId // .id) — \(.manufacturer // "") \(.name) (versions: \(.supportedVersionIds | map(tostring) | join(", ")))"'
+          MODEL=$(echo "$CATALOG" | jq -r '[.[] | select(.formFactor=="WEARABLE")][0].modelId // empty')
+          if [ -z "$MODEL" ]; then MODEL=$(echo "$CATALOG" | jq -r '[.[] | select(.formFactor=="WEARABLE")][0].id'); fi
           VERSION=$(echo "$CATALOG" | jq -r '[.[] | select(.formFactor=="WEARABLE")][0].supportedVersionIds | map(tostring | tonumber) | max | tostring')
           echo "Using device: model=$MODEL version=$VERSION"
           gcloud firebase test android run \
