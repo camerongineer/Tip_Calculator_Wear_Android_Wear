@@ -2,7 +2,7 @@ package com.camerongineer.tipcalculatorwear.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Devices
+import androidx.wear.tooling.preview.devices.WearDevices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material.Colors
 
@@ -81,26 +81,26 @@ internal val lightColorPalette: Colors = Colors(
 )
 
 
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
 @Composable
 fun ColorKeyboardPreview(theme: Theme = Theme.Dark) {
     ThemeKeyboardPreview(theme)
 }
 
 
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
 @Composable
 fun ColorTipSelectionPreview(theme: Theme = Theme.Dark) {
     ThemeTipSelectionPreview(theme)
 }
 
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
 @Composable
 fun ColorSplitCalcPreview(theme: Theme = Theme.Dark) {
     ThemeSplitCalcPreview(theme)
 }
 
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
 @Composable
 fun ColorSettingsPreview(theme: Theme = Theme.Dark) {
     ThemeSettingsPreview(theme)
