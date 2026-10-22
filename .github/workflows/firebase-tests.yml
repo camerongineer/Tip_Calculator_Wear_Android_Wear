@@ -39,8 +39,8 @@ jobs:
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v3.0.1
 
-      - name: Ensure Test Lab API is enabled
-        run: gcloud services enable testing.googleapis.com
+      - name: Ensure Test Lab APIs are enabled
+        run: gcloud services enable testing.googleapis.com toolresults.googleapis.com firebase.googleapis.com
 
       - name: Run instrumentation tests on the wearable device
         run: |
