@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,7 +28,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
+import androidx.wear.tooling.preview.devices.WearDevices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.MaterialTheme
@@ -218,7 +218,7 @@ fun SplitButtons(
             verticalAlignment = Alignment.CenterVertically
         ) {
             BillKeyboardButton(
-                icon = Icons.Default.ArrowLeft,
+                icon = Icons.AutoMirrored.Filled.ArrowLeft,
                 contentDescription = stringResource(id = R.string.decrease),
                 onClick = onSplitDownClicked,
                 modifier = Modifier
@@ -239,7 +239,7 @@ fun SplitButtons(
                     ),
                     onClick = withHaptics { }))
             BillKeyboardButton(
-                icon = Icons.Default.ArrowRight,
+                icon = Icons.AutoMirrored.Filled.ArrowRight,
                 contentDescription = stringResource(id = R.string.increase),
                 onClick = onSplitUpClicked,
                 modifier = Modifier
@@ -331,10 +331,10 @@ fun UnevenSplitWarning(
 }
 
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true, locale = "FR")
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true, locale = "DE")
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true, locale = "ES")
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true, locale = "FR")
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true, locale = "DE")
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.RECT, showSystemUi = true, locale = "ES")
 @Composable
 fun SplitPreview() {
     TipCalculatorWearTheme {

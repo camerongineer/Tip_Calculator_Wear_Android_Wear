@@ -23,7 +23,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
+import androidx.wear.tooling.preview.devices.WearDevices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
@@ -141,10 +141,10 @@ fun <T>PickerScreen(
     }
 }
 
-@Preview(device = Devices.WEAR_OS_LARGE_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_SQUARE, showSystemUi = true)
-@Preview(device = Devices.WEAR_OS_RECT, showSystemUi = true)
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SQUARE, showSystemUi = true)
+@Preview(device = WearDevices.RECT, showSystemUi = true)
 @Composable
 fun PickerPreview() {
     TipCalculatorWearTheme {
