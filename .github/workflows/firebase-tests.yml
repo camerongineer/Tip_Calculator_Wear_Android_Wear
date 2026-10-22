@@ -1,10 +1,13 @@
 name: Firebase Test Lab (Wear)
 
+# NOTE: parked — Firebase Test Lab requires either a billing account (Blaze) on the
+# Firebase project or an upgrade path we don't use today. The github-actions SA
+# can't upload APKs to the Google-managed shared results bucket without billing.
+# Manual trigger only — run FTL tests yourself instead with:
+#   1) Local:  gcloud auth login && gcloud firebase test android run --type robo|instrumentation ...  (your creds work)
+#   2) Console: Firebase → Test Lab → Robo test
+# When billing exists someday: re-add push/pull_request triggers + --results-bucket of an in-project bucket.
 on:
-  push:
-    branches:
-      - master
-  pull_request:
   workflow_dispatch:
 
 concurrency:
