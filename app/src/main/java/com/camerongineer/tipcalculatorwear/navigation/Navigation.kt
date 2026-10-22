@@ -1,10 +1,14 @@
 package com.camerongineer.tipcalculatorwear.navigation
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
@@ -31,17 +35,38 @@ fun Navigation(navController: NavHostController) {
     val themeName by dataStoreManager.themeFlow.collectAsState(Theme.Dark.name)
     val languageCode = dataStoreManager.languageFlow.collectAsState("")
 
-    if (languageCode.value.isNotEmpty()) {
-        val config = LocalContext.current.resources.configuration
-        val locale = getLocale(languageCode.value)
-        Locale.setDefault(locale)
-        config.setLocale(locale)
-        LocalContext.current.resources.updateConfiguration(
-            config,
-            LocalContext.current.resources.displayMetrics
-        )
+    val localizedContext = remember(languageCode.value, context) {
+        if (languageCode.value.isEmpty()) {
+            context
+        } else {
+            val locale = getLocale(languageCode.value)
+            Locale.setDefault(locale)
+            val config = Configuration(context.resources.configuration)
+            config.setLocale(locale)
+            context.createConfigurationContext(config)
+        }
     }
 
+    CompositionLocalProvider(
+        LocalContext provides localizedContext,
+        LocalResources provides localizedContext.resources,
+    ) {
+        AppNavHost(
+            dataStoreManager = dataStoreManager,
+            navController = navController,
+            themeName = themeName,
+            languageCode = languageCode.value,
+        )
+    }
+}
+
+@Composable
+private fun AppNavHost(
+    dataStoreManager: DataStoreManager,
+    navController: NavHostController,
+    themeName: String,
+    languageCode: String
+) {
     SwipeDismissableNavHost(
         navController = navController,
         startDestination = Screen.MainScreen.route
@@ -136,7 +161,7 @@ fun Navigation(navController: NavHostController) {
                 Log.d("NAV", "To Rounding Num Picker Screen")
             }
             composable(route = Screen.LanguageSelectionScreen.route) {
-                val tipLanguage = getTipLanguage(languageCode.value)
+                val tipLanguage = getTipLanguage(languageCode)
                 TipCalculatorWearTheme(themeName) {
                     PickerScreen(
                         initialValue = tipLanguage,
