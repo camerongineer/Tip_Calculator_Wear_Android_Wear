@@ -35,22 +35,6 @@ class CurrencyTest {
     }
 
     @Test
-    fun `real uses the real symbol`() {
-        assertEquals("R$", TipCurrency.BRL.symbol)
-    }
-
-    @Test
-    fun `franc uses the franc symbol`() {
-        assertEquals("CHF", TipCurrency.CHF.symbol)
-    }
-
-    @Test
-    fun `scandinavian krones use the krone symbol`() {
-        listOf(TipCurrency.SEK, TipCurrency.NOK, TipCurrency.DKK)
-            .forEach { assertEquals("kr", it.symbol) }
-    }
-
-    @Test
     fun `rupee uses the rupee symbol`() {
         assertEquals("₹", TipCurrency.INR.symbol)
     }
@@ -61,8 +45,17 @@ class CurrencyTest {
     }
 
     @Test
+    fun `every symbol is a single character`() {
+        // Reviewer constraint: one-glyph symbols only, until the two-character
+        // variants (R$ / CHF / kr) get their own layout handling.
+        TipCurrency.entries.forEach { currency ->
+            assertEquals("'$currency' symbol ${currency.symbol}", 1, currency.symbol.length)
+        }
+    }
+
+    @Test
     fun `all currencies have a symbol in the reviewed symbol pool`() {
-        val symbolPool = setOf("$", "€", "£", "₺", "¥", "R$", "CHF", "kr", "₹", "₽")
+        val symbolPool = setOf("$", "€", "£", "₺", "¥", "₹", "₽")
         TipCurrency.entries.forEach { currency ->
             assert(currency.symbol.isNotBlank())
             assert(currency.symbol in symbolPool)
@@ -70,12 +63,11 @@ class CurrencyTest {
     }
 
     @Test
-    fun `currency set matches the reviewed ISO list`() {
+    fun `currency set matches the reviewed Iso list`() {
         assertEquals(
             listOf(
                 "CAD", "CNY", "EUR", "GBP", "HKD", "TRY", "USD",
-                "AUD", "BRL", "CHF", "DKK", "INR", "MXN", "NOK",
-                "NZD", "RUB", "SEK", "SGD"
+                "AUD", "INR", "MXN", "NZD", "RUB", "SGD"
             ),
             TipCurrency.entries.map { it.name }
         )

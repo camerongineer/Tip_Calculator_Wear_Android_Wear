@@ -25,15 +25,12 @@ class CurrencyResolutionTest {
     private val reviewedRegions: Map<String, TipCurrency> = mapOf(
         // North America
         "US" to TipCurrency.USD, "CA" to TipCurrency.CAD, "MX" to TipCurrency.MXN,
-        // South America
-        "BR" to TipCurrency.BRL,
         // Europe (euro zone sample + national currencies)
         "DE" to TipCurrency.EUR, "FR" to TipCurrency.EUR, "NL" to TipCurrency.EUR,
         "ES" to TipCurrency.EUR, "IT" to TipCurrency.EUR, "IE" to TipCurrency.EUR,
         "AT" to TipCurrency.EUR, "BE" to TipCurrency.EUR, "PT" to TipCurrency.EUR,
         "FI" to TipCurrency.EUR, "GR" to TipCurrency.EUR,
-        "GB" to TipCurrency.GBP, "CH" to TipCurrency.CHF,
-        "SE" to TipCurrency.SEK, "NO" to TipCurrency.NOK, "DK" to TipCurrency.DKK,
+        "GB" to TipCurrency.GBP,
         // Asia & Pacific
         "CN" to TipCurrency.CNY, "HK" to TipCurrency.HKD, "IN" to TipCurrency.INR,
         "SG" to TipCurrency.SGD, "AU" to TipCurrency.AUD, "NZ" to TipCurrency.NZD,
@@ -80,14 +77,15 @@ class CurrencyResolutionTest {
 
     @Test
     fun `unmapped markets fall back to USD`() {
-        // Zero-decimal or otherwise unsupported markets stay on the USD default.
-        listOf("JP", "KR", "PL", "ZA", "AE", "IL").forEach { country ->
-            assertEquals(
-                "region $country",
-                TipCurrency.USD,
-                resolveTipCurrency(Locale("", country))
-            )
-        }
+        // Zero-decimal or multi-character-symbol markets stay on the dollar default.
+        listOf("JP", "KR", "PL", "ZA", "AE", "IL", "BR", "CH", "SE", "NO", "DK")
+            .forEach { country ->
+                assertEquals(
+                    "region $country",
+                    TipCurrency.USD,
+                    resolveTipCurrency(Locale("", country))
+                )
+            }
     }
 
     @Test
