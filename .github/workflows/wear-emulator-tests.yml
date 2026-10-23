@@ -63,8 +63,7 @@ jobs:
             adb shell monkey -p com.camerongineer.tipcalculatorwear --throttle 200 --pct-syskeys 0 --pct-appswitch 10 --ignore-timeouts --ignore-security-exceptions --monitor-native-crashes -v 1000 > monkey.log 2>&1 || true
             tail -3 monkey.log
             adb logcat -d > monkey-logcat.txt
-            grep -A 2 "FATAL EXCEPTION" monkey-logcat.txt | grep -q "tipcalculatorwear" && { echo "::error::Monkey crawl found a crash in the app - see monkey-logcat.txt" ; exit 1 ; }
-            echo "Monkey crawl complete: no crashes found."
+            grep -A 2 "FATAL EXCEPTION" monkey-logcat.txt | grep "tipcalculatorwear" && { echo "::error::Monkey crawl found a crash in the app - see monkey-logcat.txt" ; exit 1 ; } ; echo "Monkey crawl complete: no crashes found."
 
       - name: Upload test artifacts
         if: always()

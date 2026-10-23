@@ -1,5 +1,7 @@
 package com.camerongineer.tipcalculatorwear
 
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
@@ -169,7 +171,7 @@ class TipCalcScreenTest {
     @Test
     fun tipSliderGreaterOrEqualZero() {
         navigateToTipSelection()
-        repeat(101) { composeTestRule.onNode(buttonTipSliderDecrease).performClick() }
+        repeat(101) { composeTestRule.onNode(buttonTipSliderDecrease).performClickResilient() }
         composeTestRule.onNode(textDisplayTip and hasText("0.00")).assertExists()
         composeTestRule.onNode(textTipPercentage and hasText("0")).assertExists()
     }
@@ -177,7 +179,7 @@ class TipCalcScreenTest {
     @Test
     fun tipSliderLessThanEqualOneHundred() {
         composeTestRule.onNode(buttonSubmit).performClick()
-        repeat(101) { composeTestRule.onNode(buttonTipSliderIncrease).performClick() }
+        repeat(101) { composeTestRule.onNode(buttonTipSliderIncrease).performClickResilient() }
         composeTestRule.onNode(textTipPercentage and hasText("100")).assertExists()
     }
 
@@ -193,6 +195,21 @@ class TipCalcScreenTest {
 
     private fun navigateToTipSelection() {
         composeTestRule.onNode(buttonSubmit).performClick()
+    }
+
+    /**
+     * performClick with retry: on CI's software rendering (swiftshader) the
+     * composition can transiently disappear mid-run ("No compose hierarchies
+     * found"), especially during rapid click loops. Wait for it to return and
+     * retry; surface the error if it never comes back.
+     */
+    private fun SemanticsNodeInteraction.performClickResilient(): SemanticsNodeInteraction {
+        repeat(20) {
+            runCatching { performClick() }
+                .onSuccess { return it }
+            Thread.sleep(500)
+        }
+        return performClick()
     }
 
 }
