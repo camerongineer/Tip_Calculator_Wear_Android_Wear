@@ -10,13 +10,13 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.camerongineer.tipcalculatorwear.utils.resolveTipCurrency
 import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-import java.util.Currency
 import java.util.Locale
 
 private val Context.dataStore : DataStore<Preferences> by preferencesDataStore("SETTINGS_KEY")
@@ -47,14 +47,10 @@ class DataStoreManager(context: Context) {
         val largeTextKey = booleanPreferencesKey("LARGE_TEXT_KEY")
     }
 
-    private val tipCurrency = try {
-        val currency: Currency = Currency.getInstance(Locale.getDefault())
-        val currencyCode: String = currency.currencyCode
-        Log.d("Currency", currencyCode)
-        TipCurrency.valueOf(currencyCode)
-    } catch (e: Exception) {
-        TipCurrency.USD
-    }
+    /** Region-driven currency; "Currency" tag logging matches the old inline logic. */
+    private val tipCurrency: TipCurrency =
+        resolveTipCurrency(Locale.getDefault())
+            .also { Log.d("Currency", it.name) }
 
     val currencySymbolFlow: Flow<String> = dataFlow(
         key = currencySymbolKey,
