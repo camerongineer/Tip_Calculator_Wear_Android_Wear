@@ -111,7 +111,7 @@ class LanguageUiTest {
             .assertExists()
 
         // No other currency symbol leaks onto the keyboard row.
-        listOf("€", "£", "₺", "¥").forEach { symbol ->
+        listOf("€", "£", "₺", "¥", "₹", "₽").forEach { symbol ->
             composeTestRule.onNode(
                 keyboardSubtotal and hasText(symbol, substring = true)
             ).assertDoesNotExist()
@@ -159,7 +159,7 @@ class LanguageUiTest {
         }
         composeTestRule.onNode(keyboardSubtotal and hasText("$", substring = true))
             .assertExists()
-        listOf("€", "£", "₺", "¥").forEach { symbol ->
+        listOf("€", "£", "₺", "¥", "₹", "₽").forEach { symbol ->
             composeTestRule.onNode(
                 keyboardSubtotal and hasText(symbol, substring = true)
             ).assertDoesNotExist()

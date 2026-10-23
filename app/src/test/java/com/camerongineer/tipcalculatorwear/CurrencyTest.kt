@@ -8,9 +8,10 @@ class CurrencyTest {
 
     @Test
     fun `dollar currencies use the dollar symbol`() {
-        assertEquals("$", TipCurrency.CAD.symbol)
-        assertEquals("$", TipCurrency.HKD.symbol)
-        assertEquals("$", TipCurrency.USD.symbol)
+        listOf(
+            TipCurrency.CAD, TipCurrency.HKD, TipCurrency.USD,
+            TipCurrency.AUD, TipCurrency.MXN, TipCurrency.NZD, TipCurrency.SGD
+        ).forEach { assertEquals("$", it.symbol) }
     }
 
     @Test
@@ -34,8 +35,27 @@ class CurrencyTest {
     }
 
     @Test
-    fun `all currencies have a non blank unique-ish symbol`() {
-        val symbolPool = setOf("$", "€", "£", "₺", "¥")
+    fun `rupee uses the rupee symbol`() {
+        assertEquals("₹", TipCurrency.INR.symbol)
+    }
+
+    @Test
+    fun `ruble uses the ruble symbol`() {
+        assertEquals("₽", TipCurrency.RUB.symbol)
+    }
+
+    @Test
+    fun `every symbol is a single character`() {
+        // Reviewer constraint: one-glyph symbols only, until the two-character
+        // variants (R$ / CHF / kr) get their own layout handling.
+        TipCurrency.entries.forEach { currency ->
+            assertEquals("'$currency' symbol ${currency.symbol}", 1, currency.symbol.length)
+        }
+    }
+
+    @Test
+    fun `all currencies have a symbol in the reviewed symbol pool`() {
+        val symbolPool = setOf("$", "€", "£", "₺", "¥", "₹", "₽")
         TipCurrency.entries.forEach { currency ->
             assert(currency.symbol.isNotBlank())
             assert(currency.symbol in symbolPool)
@@ -43,10 +63,22 @@ class CurrencyTest {
     }
 
     @Test
-    fun `currency set is CAD CNY EUR GBP HKD TRY USD`() {
+    fun `currency set matches the reviewed Iso list`() {
         assertEquals(
-            listOf("CAD", "CNY", "EUR", "GBP", "HKD", "TRY", "USD"),
+            listOf(
+                "CAD", "CNY", "EUR", "GBP", "HKD", "TRY", "USD",
+                "AUD", "INR", "MXN", "NZD", "RUB", "SGD"
+            ),
             TipCurrency.entries.map { it.name }
         )
+    }
+
+    @Test
+    fun `forCodeOrNull resolves and rejects codes`() {
+        assertEquals(TipCurrency.EUR, TipCurrency.forCodeOrNull("EUR"))
+        assertEquals(TipCurrency.USD, TipCurrency.forCodeOrNull("USD"))
+        assertEquals(null, TipCurrency.forCodeOrNull("JPY"))
+        assertEquals(null, TipCurrency.forCodeOrNull(null))
+        assertEquals(null, TipCurrency.forCodeOrNull(""))
     }
 }
