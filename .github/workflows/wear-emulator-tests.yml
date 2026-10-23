@@ -22,6 +22,8 @@ jobs:
           - { api-level: 30, arch: x86, wear-version: "Wear OS 3" }
           - { api-level: 33, arch: x86_64, wear-version: "Wear OS 4" }
           - { api-level: 34, arch: x86_64, wear-version: "Wear OS 5" }
+          # Wear OS 6 only ships as the production-signed image.
+          - { api-level: 36, arch: x86_64, wear-version: "Wear OS 6", target: android-wear-signed }
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -51,7 +53,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
-          target: android-wear
+          target: ${{ matrix.target || 'android-wear' }}
           arch: ${{ matrix.arch }}
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
           # Line-by-line execution gotcha: keep every shell statement on one line
