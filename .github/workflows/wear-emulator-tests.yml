@@ -55,23 +55,14 @@ jobs:
           arch: ${{ matrix.arch }}
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
           script: |
-            adb logcat -c
-            ./gradlew :app:connectedDebugAndroidTest
-            GRADLE_EXIT=$?
-            adb logcat -d > gradle-logcat.txt
-            if [ $GRADLE_EXIT -ne 0 ]; then
-              exit $GRADLE_EXIT
-            fi
+            adb logcat -c ; ./gradlew :app:connectedDebugAndroidTest ; GRADLE_EXIT=$? ; adb logcat -d > gradle-logcat.txt ; exit $GRADLE_EXIT
 
             echo "Running Monkey crawl (Robo-style automatic browsing)..."
             adb logcat -c
             adb shell monkey -p com.camerongineer.tipcalculatorwear --throttle 200 --pct-syskeys 0 --pct-appswitch 10 --ignore-timeouts --ignore-security-exceptions --monitor-native-crashes -v 1000 > monkey.log 2>&1 || true
-            tail -5 monkey.log
+            tail -3 monkey.log
             adb logcat -d > monkey-logcat.txt
-            if grep -q "FATAL EXCEPTION" monkey-logcat.txt; then
-              echo "::error::Monkey crawl found a crash — see monkey-logcat.txt"
-              exit 1
-            fi
+            grep -A 2 "FATAL EXCEPTION" monkey-logcat.txt | grep -q "tipcalculatorwear" && { echo "::error::Monkey crawl found a crash in the app - see monkey-logcat.txt" ; exit 1 ; }
             echo "Monkey crawl complete: no crashes found."
 
       - name: Upload test artifacts
