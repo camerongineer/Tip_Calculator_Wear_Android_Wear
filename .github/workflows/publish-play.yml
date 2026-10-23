@@ -29,6 +29,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
+        with:
+          # Need HEAD~1 (previous master commit) for versionCode comparison.
+          fetch-depth: 2
 
       - name: Detect version bump on this push
         id: version
@@ -39,7 +42,12 @@ jobs:
           echo "versionCode ${OLD_CODE:-unset} -> $NEW_CODE (name $NEW_NAME)"
           echo "version_code=$NEW_CODE" >> "$GITHUB_OUTPUT"
           echo "version_name=$NEW_NAME" >> "$GITHUB_OUTPUT"
-          if [ -n "$NEW_CODE" ] && [ "$NEW_CODE" -gt "${OLD_CODE:-0}" ]; then
+          # Manual dispatch always attempts the release (used to retry a
+          # push-release that failed on an external step, e.g. Play perms).
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "manual dispatch - releasing regardless of bump state"
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          elif [ -n "$NEW_CODE" ] && [ "$NEW_CODE" -gt "${OLD_CODE:-0}" ]; then
             echo "should_release=true" >> "$GITHUB_OUTPUT"
           else
             echo "should_release=false" >> "$GITHUB_OUTPUT"
@@ -127,4 +135,4 @@ jobs:
           track: internal
           releaseName: ${{ steps.version.outputs.version_name }}
           status: completed
-          mappingFiles: app/build/outputs/mapping/release/mapping.txt
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
