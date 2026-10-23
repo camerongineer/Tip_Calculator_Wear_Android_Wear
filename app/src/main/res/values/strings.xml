@@ -52,6 +52,7 @@
     <string name="fr">French</string>
     <string name="es">Spanish</string>
     <string name="de">German</string>
+    <string name="hi">Hindi</string>
 
     <string name="title_activity_presentation._main" translatable="false">presentation.MainActivity</string>
     <string name="title_activity_main" translatable="false">MainActivity</string>

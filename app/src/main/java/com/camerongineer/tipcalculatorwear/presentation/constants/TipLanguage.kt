@@ -7,6 +7,7 @@ enum class TipLanguage(val languageNameID: Int) {
     EN(R.string.en),
     ES(R.string.es),
     FR(R.string.fr),
+    HI(R.string.hi),
     PT(R.string.pt);
 
     override fun toString(): String {

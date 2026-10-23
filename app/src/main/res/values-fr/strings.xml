@@ -29,5 +29,6 @@
     <string name="fr">Français</string>
     <string name="es">Espagnol</string>
     <string name="de">Allemand</string>
+    <string name="hi">Hindi</string>
     <string name="large_text">Grande taille de texte</string>
 </resources>
