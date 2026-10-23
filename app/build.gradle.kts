@@ -26,6 +26,21 @@ android {
         }
     }
 
+    signingConfigs {
+        // Filled only by the publish-to-Play CI workflow (env vars). Without
+        // them the release build stays unsigned exactly as before: local
+        // ./gradlew assembleRelease/bundleRelease and the CI build keep working.
+        register("ciPlay") {
+            val storeFilePath = System.getenv("CI_KEYSTORE_FILE")
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+                storePassword = System.getenv("CI_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("CI_KEYSTORE_ALIAS")
+                keyPassword = System.getenv("CI_KEYSTORE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
 
         release {
@@ -35,6 +50,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (System.getenv("CI_KEYSTORE_FILE") != null) {
+                signingConfig = signingConfigs.getByName("ciPlay")
+            }
         }
 
         create("benchmark") {
