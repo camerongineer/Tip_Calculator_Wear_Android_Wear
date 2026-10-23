@@ -5,7 +5,7 @@ Guidance for AI agents (and humans) working on **Tip Calculator for Wear OS** (`
 ## Project overview
 
 - Kotlin + Jetpack Compose Wear OS app (Wear Compose Material 1.7.1, Compose BOM 2026.09.00).
-- `compileSdk`/`targetSdk` 37, `minSdk` 30, `versionCode` 31 (`versionName` 1.7.0). Keep behavior (touch, haptics) identical when modernizing.
+- `compileSdk`/`targetSdk` 37, `minSdk` 30, `versionCode` 32 (`versionName` 1.7.1 — first CI-published release). Keep behavior (touch, haptics) identical when modernizing.
 - Single Compose UI entry: `MainActivity` → `TipCalcApp`. UI semantics (content descriptions) double as the automation surface — do not change them without updating `app/src/androidTest/.../TipCalcScreenTest.kt`.
 
 ## Environment setup (Windows)
@@ -31,7 +31,7 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
   - Triggers on any master push (and `workflow_dispatch`). It reads `versionCode` from `app/build.gradle.kts` and compares against the previous master commit: **publishes only when `versionCode` increased**; otherwise the job exits early (a merge without a version bump is a no-op release).
   - Publishing refuses to run until the `CI` and `Wear OS Emulator Tests` runs for the *same commit SHA* conclude `success` (polls via `gh api`, ~55 min deadline). A red check blocks the release.
   - Builds `:app:bundleRelease` signed through the `ciPlay` signing config, which only activates when `CI_KEYSTORE_FILE` etc. are set — locally (and in the plain `CI` workflow) release stays unsigned exactly as before.
-  - Uploads the AAB + the R8 `mapping.txt` (release is minified; without mapping, Play Console stack traces are unreadable). Track: `internal`, status `completed`, `releaseName` = versionName.
+  - Uploads the AAB + the R8 `mapping.txt` (release is minified; without mapping, Play Console stack traces are unreadable). Track: `wear:internal` (the Play API scopes tracks per form factor — plain `internal` is the phone track and rejects watch-feature artifacts), status `completed`, `releaseName` = versionName.
   - Required GitHub secrets: `PLAY_SERVICE_ACCOUNT_JSON` (Play API service-account key JSON), `PLAY_KEYSTORE_BASE64` (base64 of the upload keystore), `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEYSTORE_ALIAS`, `PLAY_KEYSTORE_KEY_PASSWORD`. The keystore must be the upload key registered with Play App Signing. **Never commit keystores** (`*.jks`/`*.keystore` are gitignored).
   - Release flow: bump `versionCode` + `versionName` in a PR → merge → publish runs automatically after CI + emulator gates pass. Promote internal → closed/production manually in Play Console.
 
