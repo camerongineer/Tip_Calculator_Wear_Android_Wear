@@ -55,7 +55,7 @@ jobs:
           arch: ${{ matrix.arch }}
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
           script: |
-            adb logcat -c ; ./gradlew :app:connectedDebugAndroidTest ; GRADLE_EXIT=$? ; adb logcat -d > gradle-logcat.txt ; exit $GRADLE_EXIT
+            adb shell dumpsys battery unplug 2>/dev/null ; adb shell dumpsys battery set status 3 2>/dev/null ; adb logcat -c ; ./gradlew :app:connectedDebugAndroidTest ; GRADLE_EXIT=$? ; adb logcat -d > gradle-logcat.txt ; exit $GRADLE_EXIT
 
             echo "Running Monkey crawl (Robo-style automatic browsing)..."
             adb install -r app/build/outputs/apk/debug/app-debug.apk
