@@ -16,3 +16,8 @@ local.properties
 /.idea/deploymentTargetDropDown.xml
 /app/release/app-release.aab
 .idea/deviceManager.xml
+
+# Never commit signing material
+*.jks
+*.keystore
+keystore.properties

@@ -27,6 +27,13 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
   - Every run uploads XML/HTML results, per-test logcats, and emulator screenshots + focused-window dumps as artifacts (7-day retention).
   - The aggregate job `wear-emulator-tests` (`needs:` all matrix legs) is the single status context required by branch protection — add new gates into the matrix, don't invent new required check names.
   - Firebase Test Lab was permanently removed: Robo requires billing/Blaze (no card); the emulator matrix + monkey crawl is the replacement. Run Robo crawls manually from the user's own Google credentials when needed, never from CI.
+- `.github/workflows/publish-play.yml` — automated publishing to Google Play's **internal testing** track:
+  - Triggers on any master push (and `workflow_dispatch`). It reads `versionCode` from `app/build.gradle.kts` and compares against the previous master commit: **publishes only when `versionCode` increased**; otherwise the job exits early (a merge without a version bump is a no-op release).
+  - Publishing refuses to run until the `CI` and `Wear OS Emulator Tests` runs for the *same commit SHA* conclude `success` (polls via `gh api`, ~55 min deadline). A red check blocks the release.
+  - Builds `:app:bundleRelease` signed through the `ciPlay` signing config, which only activates when `CI_KEYSTORE_FILE` etc. are set — locally (and in the plain `CI` workflow) release stays unsigned exactly as before.
+  - Uploads the AAB + the R8 `mapping.txt` (release is minified; without mapping, Play Console stack traces are unreadable). Track: `internal`, status `completed`, `releaseName` = versionName.
+  - Required GitHub secrets: `PLAY_SERVICE_ACCOUNT_JSON` (Play API service-account key JSON), `PLAY_KEYSTORE_BASE64` (base64 of the upload keystore), `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEYSTORE_ALIAS`, `PLAY_KEYSTORE_KEY_PASSWORD`. The keystore must be the upload key registered with Play App Signing. **Never commit keystores** (`*.jks`/`*.keystore` are gitignored).
+  - Release flow: bump `versionCode` + `versionName` in a PR → merge → publish runs automatically after CI + emulator gates pass. Promote internal → closed/production manually in Play Console.
 
 ## Testing rules (mandatory)
 
