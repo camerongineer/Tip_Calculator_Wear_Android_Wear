@@ -35,10 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -649,6 +651,14 @@ fun ThemeSelectionItem(
             .fillMaxWidth()
             .defaultMinSize(
                 minHeight = ToggleChipDefaults.Height * .75f
+            )
+            // Encodes the palette applied by the surrounding (nav-host) theme
+            // wrapper so tests can assert in-place re-theme without navigation.
+            // The tag value changes only when the actual MaterialTheme colors
+            // change — screen-local state alone does not affect it.
+            .testTag(
+                "theme-chip-primary-" +
+                    Integer.toHexString(MaterialTheme.colors.primary.toArgb())
             )
     )
 }

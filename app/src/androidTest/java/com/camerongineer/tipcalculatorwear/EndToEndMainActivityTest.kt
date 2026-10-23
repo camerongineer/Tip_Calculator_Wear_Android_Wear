@@ -1,15 +1,22 @@
 package com.camerongineer.tipcalculatorwear
 
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.espresso.Espresso
 import com.camerongineer.tipcalculatorwear.MainActivity
+import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -186,5 +193,73 @@ class EndToEndMainActivityTest {
         composeTestRule.onNode(
             hasContentDescription("Percentage") and hasText("20")
         ).assertExists()
+    }
+
+    /** Scroll the current (settings) lazy column far enough that the row composes. */
+    private fun scrollToRow(matcher: SemanticsMatcher) {
+        composeTestRule.onNode(hasScrollAction()).performScrollToNode(matcher)
+    }
+
+    private fun appContext() =
+        androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+
+    private fun themeChipText(theme: Theme): String =
+        appContext().resources.getString(R.string.enabled, appContext().resources.getString(theme.descriptionID))
+
+    private fun themeChip(theme: Theme): SemanticsMatcher =
+        hasText(themeChipText(theme)) and hasClickAction()
+
+    /**
+     * Regression: theme toggling must recolor the CURRENT screen in place.
+     * Before the nav-host theme hoist, the real SwipeDismissableNavHost kept
+     * the destination's MaterialTheme stale until the screen was re-entered.
+     */
+    @Test
+    fun themeChangeAppliesInPlaceWithoutNavigation() {
+        returnToCleanKeyboard()
+        composeTestRule.navigateToTipSelection()
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
+            composeTestRule.onAllNodes(buttonSettings).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNode(buttonSettings).performClickResilient()
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
+            composeTestRule.onAllNodes(
+                hasText(resStringForDisplay(R.string.tip_settings))
+            ).fetchSemanticsNodes().isNotEmpty()
+        }
+
+        val darkChipTag = "theme-chip-primary-" +
+            Integer.toHexString(Theme.Dark.colors.primary.toArgb())
+        val lightChipTag = "theme-chip-primary-" +
+            Integer.toHexString(Theme.Light.colors.primary.toArgb())
+        val darkChip = themeChip(Theme.Dark)
+        val lightChip = themeChip(Theme.Light)
+
+        try {
+            scrollToRow(darkChip)
+            composeTestRule.onNode(darkChip).assertExists()
+            composeTestRule.onNode(hasTestTag(darkChipTag)).assertExists()
+
+            // Toggle Dark -> Light; the palette must flip on this same screen.
+            composeTestRule.onNode(darkChip).performClickResilient()
+            composeTestRule.waitForIdle()
+            scrollToRow(lightChip)
+            composeTestRule.onNode(hasTestTag(lightChipTag)).assertExists()
+
+            // Toggle back so later tests and real usage start on the default.
+            composeTestRule.onNode(lightChip).performClickResilient()
+            composeTestRule.waitForIdle()
+            composeTestRule.onNode(hasTestTag(darkChipTag)).assertExists()
+        } finally {
+            runBlocking {
+                com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager(
+                    appContext()
+                ).saveTheme(Theme.Dark.name)
+            }
+        }
+
+        Espresso.pressBack()
+        composeTestRule.waitForIdle()
     }
 }

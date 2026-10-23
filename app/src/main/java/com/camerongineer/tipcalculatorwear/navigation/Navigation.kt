@@ -67,14 +67,18 @@ private fun AppNavHost(
     themeName: String,
     languageCode: String
 ) {
-    SwipeDismissableNavHost(
-        navController = navController,
-        startDestination = Screen.MainScreen.route
-    ) {
-        val tipCalcViewModel = TipCalcViewModel(dataStoreManager)
-        val settingsViewModel = SettingsViewModel(dataStoreManager)
-        composable(route = Screen.MainScreen.route) {
-            TipCalculatorWearTheme(themeName) {
+    // ONE theme above the SwipeDismissableNavHost: a theme-flow write
+    // invalidates the MaterialTheme colors ambient for every destination,
+    // so the current screen re-colors in place. (Per-destination wrappers
+    // kept the palette stale until the destination was re-entered.)
+    TipCalculatorWearTheme(themeName) {
+        SwipeDismissableNavHost(
+            navController = navController,
+            startDestination = Screen.MainScreen.route
+        ) {
+            val tipCalcViewModel = TipCalcViewModel(dataStoreManager)
+            val settingsViewModel = SettingsViewModel(dataStoreManager)
+            composable(route = Screen.MainScreen.route) {
                 TipCalcScreen(
                     tipCalcViewModel = tipCalcViewModel,
                     onSettingsButtonClicked = {
@@ -82,29 +86,25 @@ private fun AppNavHost(
                         navController.navigate("settings") },
                     onSplitButtonClicked = { navController.navigate(Screen.SplitScreen.route) }
                 )
+                Log.d("NAV", "To Main Screen")
             }
-            Log.d("NAV", "To Main Screen")
-        }
-        composable(route = Screen.SplitScreen.route) {
-            val splitViewModel = SplitViewModel(
-                dataStore = dataStoreManager,
-                subTotal = tipCalcViewModel.subTotal.intValue,
-                tipAmount = tipCalcViewModel.tipAmount.intValue
-            )
-            TipCalculatorWearTheme(themeName) {
+            composable(route = Screen.SplitScreen.route) {
+                val splitViewModel = SplitViewModel(
+                    dataStore = dataStoreManager,
+                    subTotal = tipCalcViewModel.subTotal.intValue,
+                    tipAmount = tipCalcViewModel.tipAmount.intValue
+                )
                 SplitCalcScreen(
                     splitViewModel = splitViewModel,
                     onBackButtonPressed = navController::navigateUp
                 )
+                Log.d("NAV", "To Split Screen")
             }
-            Log.d("NAV", "To Split Screen")
-        }
-        navigation(
-            startDestination = Screen.SettingsScreen.route,
-            route = "settings"
-        ) {
-            composable(route = Screen.SettingsScreen.route) {
-                TipCalculatorWearTheme(themeName) {
+            navigation(
+                startDestination = Screen.SettingsScreen.route,
+                route = "settings"
+            ) {
+                composable(route = Screen.SettingsScreen.route) {
                     SettingsScreen(
                         settingsViewModel = settingsViewModel,
                         navigateToDefaultTipScreen = {
@@ -117,11 +117,9 @@ private fun AppNavHost(
                             navController.navigate(Screen.LanguageSelectionScreen.route) },
                         onBackButtonPressed = { navController.popBackStack(route = "settings", inclusive = true) }
                     )
+                    Log.d("NAV", "To Settings Screen")
                 }
-                Log.d("NAV", "To Settings Screen")
-            }
-            composable(route = Screen.DefaultTipScreen.route) {
-                TipCalculatorWearTheme(themeName) {
+                composable(route = Screen.DefaultTipScreen.route) {
                     PickerScreen(
                         initialValue = settingsViewModel.defaultTipPercentage.intValue,
                         optionsList = OptionsLists.TIP_PERCENT_OPTIONS,
@@ -130,11 +128,9 @@ private fun AppNavHost(
                             navController.navigateUp()
                         }
                     )
+                    Log.d("NAV", "To Default Tip Picker Screen")
                 }
-                Log.d("NAV", "To Default Tip Picker Screen")
-            }
-            composable(route = Screen.DefaultSplitScreen.route) {
-                TipCalculatorWearTheme(themeName) {
+                composable(route = Screen.DefaultSplitScreen.route) {
                     PickerScreen(
                         initialValue = settingsViewModel.defaultNumSplit.intValue,
                         optionsList = OptionsLists.NUM_SPLIT_OPTIONS,
@@ -143,11 +139,9 @@ private fun AppNavHost(
                             navController.navigateUp()
                         }
                     )
+                    Log.d("NAV", "To Default Split Picker Screen")
                 }
-                Log.d("NAV", "To Default Split Picker Screen")
-            }
-            composable(route = Screen.RoundingNumScreen.route) {
-                TipCalculatorWearTheme(themeName) {
+                composable(route = Screen.RoundingNumScreen.route) {
                     PickerScreen(
                         initialValue = settingsViewModel.roundingNum.intValue,
                         optionsList = OptionsLists.ROUNDING_INCREMENTS,
@@ -157,12 +151,10 @@ private fun AppNavHost(
                             navController.navigateUp()
                         }
                     )
+                    Log.d("NAV", "To Rounding Num Picker Screen")
                 }
-                Log.d("NAV", "To Rounding Num Picker Screen")
-            }
-            composable(route = Screen.LanguageSelectionScreen.route) {
-                val tipLanguage = getTipLanguage(languageCode)
-                TipCalculatorWearTheme(themeName) {
+                composable(route = Screen.LanguageSelectionScreen.route) {
+                    val tipLanguage = getTipLanguage(languageCode)
                     PickerScreen(
                         initialValue = tipLanguage,
                         optionsList = OptionsLists.LANGUAGE_OPTIONS,
@@ -172,8 +164,8 @@ private fun AppNavHost(
                             navController.navigateUp()
                         }
                     )
+                    Log.d("NAV", "To Language Selection Screen")
                 }
-                Log.d("NAV", "To Language Selection Screen")
             }
         }
     }
