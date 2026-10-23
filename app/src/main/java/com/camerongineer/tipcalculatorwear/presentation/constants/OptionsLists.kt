@@ -17,6 +17,7 @@ class OptionsLists {
             TipLanguage.EN,
             TipLanguage.ES,
             TipLanguage.FR,
+            TipLanguage.HI,
             TipLanguage.PT).map {
                 OptionsItem(it, false)
         }
