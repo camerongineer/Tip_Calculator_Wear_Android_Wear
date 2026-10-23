@@ -5,7 +5,7 @@ Guidance for AI agents (and humans) working on **Tip Calculator for Wear OS** (`
 ## Project overview
 
 - Kotlin + Jetpack Compose Wear OS app (Wear Compose Material 1.7.1, Compose BOM 2026.09.00).
-- `compileSdk`/`targetSdk` 37, `minSdk` 30, `versionCode` 31 (`versionName` 1.7.0). Keep behavior (touch, haptics) identical when modernizing.
+- `compileSdk`/`targetSdk` 37, `minSdk` 30, `versionCode` 32 (`versionName` 1.7.1 — first CI-published release). Keep behavior (touch, haptics) identical when modernizing.
 - Single Compose UI entry: `MainActivity` → `TipCalcApp`. UI semantics (content descriptions) double as the automation surface — do not change them without updating `app/src/androidTest/.../TipCalcScreenTest.kt`.
 
 ## Environment setup (Windows)
