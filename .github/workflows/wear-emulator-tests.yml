@@ -54,8 +54,11 @@ jobs:
           target: android-wear
           arch: ${{ matrix.arch }}
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
+          # Line-by-line execution gotcha: keep every shell statement on one line
+          # (screenshots/window state are captured BEFORE the exit code is
+          # propagated so they survive a failing instrumentation run).
           script: |
-            adb shell dumpsys battery unplug 2>/dev/null ; adb shell dumpsys battery set status 3 2>/dev/null ; adb logcat -c ; ./gradlew :app:connectedDebugAndroidTest ; GRADLE_EXIT=$? ; adb logcat -d > gradle-logcat.txt ; exit $GRADLE_EXIT
+            adb shell dumpsys battery unplug 2>/dev/null ; adb shell dumpsys battery set status 3 2>/dev/null ; adb logcat -c ; ./gradlew :app:connectedDebugAndroidTest ; GRADLE_EXIT=$? ; adb logcat -d > gradle-logcat.txt ; mkdir -p screenshots ; adb shell dumpsys window | grep mCurrentFocus > screenshots/current-window.txt 2>/dev/null ; adb exec-out screencap -p > screenshots/after-instrumentation.png 2>/dev/null ; exit $GRADLE_EXIT
 
             echo "Running Monkey crawl (Robo-style automatic browsing)..."
             adb install -r app/build/outputs/apk/debug/app-debug.apk
@@ -63,15 +66,20 @@ jobs:
             adb shell monkey -p com.camerongineer.tipcalculatorwear --throttle 200 --pct-syskeys 0 --pct-appswitch 10 --ignore-timeouts --ignore-security-exceptions --monitor-native-crashes -v 1000 > monkey.log 2>&1 || true
             tail -3 monkey.log
             adb logcat -d > monkey-logcat.txt
-            grep -A 2 "FATAL EXCEPTION" monkey-logcat.txt | grep "tipcalculatorwear" && { echo "::error::Monkey crawl found a crash in the app - see monkey-logcat.txt" ; exit 1 ; } ; echo "Monkey crawl complete: no crashes found."
+            grep -A 2 "FATAL EXCEPTION" monkey-logcat.txt | grep "tipcalculatorwear" && { echo "::error::Monkey crawl found a crash in the app - see monkey-logcat.txt" ; exit 1 ; } ; echo "Monkey crawl complete: no crashes found." ; adb shell dumpsys window | grep mCurrentFocus > screenshots/monkey-current-window.txt 2>/dev/null ; adb exec-out screencap -p > screenshots/after-monkey.png 2>/dev/null
 
+      # XML results (per-test failure messages + stack traces), HTML reports,
+      # captured emulator screenshots and all logcat captures.
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v5
         with:
           name: emulator-test-results-api-${{ matrix.api-level }}
+          retention-days: 7
           path: |
-            **/connected/**/*.html
+            app/build/outputs/androidTest-results/**
+            app/build/reports/androidTests/**
+            screenshots/**
             gradle-logcat.txt
             monkey.log
             monkey-logcat.txt
