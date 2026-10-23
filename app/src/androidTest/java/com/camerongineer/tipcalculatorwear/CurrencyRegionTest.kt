@@ -57,6 +57,21 @@ class CurrencyRegionTest {
     fun turkeyRegionResolvesLiraSymbol() = assertEquals("₺", currencySymbolFor(Locale("tr", "TR")))
 
     @Test
+    fun indiaRegionResolvesRupeeSymbol() = assertEquals("₹", currencySymbolFor(Locale("", "IN")))
+
+    @Test
+    fun brazilRegionResolvesRealSymbol() = assertEquals("R$", currencySymbolFor(Locale("", "BR")))
+
+    @Test
+    fun switzerlandRegionResolvesFrancSymbol() = assertEquals("CHF", currencySymbolFor(Locale("", "CH")))
+
+    @Test
+    fun swedenRegionResolvesKronaSymbol() = assertEquals("kr", currencySymbolFor(Locale("", "SE")))
+
+    @Test
+    fun russiaRegionResolvesRubleSymbol() = assertEquals("₽", currencySymbolFor(Locale("", "RU")))
+
+    @Test
     fun unsupportedRegionFallsBackToDollarSymbol() =
         assertEquals("$", currencySymbolFor(Locale.JAPAN))
 }
