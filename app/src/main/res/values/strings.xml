@@ -5,7 +5,7 @@
     <string name="tag_keyboard_subtotal" translatable="false">Keyboard Subtotal</string>
     <string name="backspace" translatable="false">Backspace</string>
     <string name="tip_percentage">Tip Percentage</string>
-    <string name="round_up_down">HOLD ARROW TO ROUND GRANDTOTAL</string>
+    <string name="round_up_down">HOLD ARROW TO ROUND GRAND TOTAL</string>
     <string name="decrease" translatable="false">Decrease</string>
     <string name="increase" translatable="false">Increase</string>
     <string name="display_subtotal">SUBTOTAL</string>
@@ -19,7 +19,7 @@
 
 
     <!--Split Screen-->
-    <string name="split_grand_total">Each payee owes</string>
+    <string name="split_grand_total">Each person pays</string>
     <string name="split_warning">Uneven Split, additional amount(s) are required to satisfy grand total.</string>
 
     <!--Settings Screen-->
