@@ -51,8 +51,15 @@ class TipCalcScreenTest {
 
     @After
     fun tearDown() {
-        composeTestRule.onNode(textTipPercentage)
-            .performTouchInput { longClick(center, 1000) }
+        // Best-effort state reset: under heavy CI flake the composition can be
+        // transiently recreated, so don't fail if it's briefly unavailable.
+        runCatching {
+            composeTestRule.waitUntil(timeoutMillis = 10_000) {
+                composeTestRule.onAllNodes(textTipPercentage).fetchSemanticsNodes().isNotEmpty()
+            }
+            composeTestRule.onNode(textTipPercentage)
+                .performTouchInput { longClick(center, 1000) }
+        }
     }
 
     @Test

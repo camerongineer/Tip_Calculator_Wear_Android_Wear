@@ -58,6 +58,7 @@ jobs:
             adb logcat -c ; ./gradlew :app:connectedDebugAndroidTest ; GRADLE_EXIT=$? ; adb logcat -d > gradle-logcat.txt ; exit $GRADLE_EXIT
 
             echo "Running Monkey crawl (Robo-style automatic browsing)..."
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
             adb logcat -c
             adb shell monkey -p com.camerongineer.tipcalculatorwear --throttle 200 --pct-syskeys 0 --pct-appswitch 10 --ignore-timeouts --ignore-security-exceptions --monitor-native-crashes -v 1000 > monkey.log 2>&1 || true
             tail -3 monkey.log
