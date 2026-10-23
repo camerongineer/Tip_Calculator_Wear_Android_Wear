@@ -5,12 +5,12 @@
     <string name="precise_split_mode">Modo de precisão</string>
     <string name="app_name">Calculadora de gorjeta (Tip Calculator Wear)</string>
     <string name="tip_percentage">Porcentagem</string>
-    <string name="round_up_down">SEGURE A SETA PARA ARREDONDAR TOTAL</string>
+    <string name="round_up_down">SEGURE A SETA PARA ARREDONDAR O TOTAL GERAL</string>
     <string name="display_subtotal">SUBTOTAL</string>
     <string name="display_tip">GORJETA</string>
     <string name="display_total">TOTAL</string>
     <string name="split">Divisão</string>
-    <string name="split_grand_total">Cada beneficiário deverá</string>
+    <string name="split_grand_total">Cada pessoa paga</string>
     <string name="split_warning">Divisão desigual, é necessário um valor adicional.</string>
     <string name="tip_settings">Configurações de gorjeta</string>
     <string name="round_increment">Incremento de arredondamento</string>
@@ -23,11 +23,11 @@
     <string name="review_request">Se você gosta deste aplicativo, considere deixar um comentário na Play Store!</string>
     <string name="dark_theme">Tema escuro</string>
     <string name="enabled">%s ativado</string>
-    <string name="language">Linguagem: %s</string>
+    <string name="language">Idioma: %s</string>
     <string name="en">Inglês</string>
     <string name="pt">Português</string>
-    <string name="fr">Francesa</string>
-    <string name="es">Espanhola</string>
-    <string name="de">Alemã</string>
+    <string name="fr">Francês</string>
+    <string name="es">Espanhol</string>
+    <string name="de">Alemão</string>
     <string name="large_text">Tamanho de Texto Grande</string>
 </resources>
