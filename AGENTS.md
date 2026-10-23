@@ -21,11 +21,12 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
 
 - PRs target `master`. Branch protection blocks merges until the required checks `build` and `wear-emulator-tests` complete.
 - `.github/workflows/master.yml` — builds on `master`.
-- `.github/workflows/wear-emulator-tests.yml` — the primary test gate. Matrix of 3 emulator legs:
-  - Wear OS 3 (API 30, x86), Wear OS 4 (API 33, x86_64), Wear OS 5 (API 34, x86_64)
-  - Each leg runs `connectedDebugAndroidTest` (7 instrumentation tests, including a 101-click slider stress test), then a monkey crawl (the CI equivalent of Robo testing), then fails if the app package logged a `FATAL EXCEPTION`.
+- `.github/workflows/wear-emulator-tests.yml` — the primary test gate. Matrix of 4 emulator legs:
+  - Wear OS 3 (API 30, x86), Wear OS 4 (API 33, x86_64), Wear OS 5 (API 34, x86_64), Wear OS 6 (API 36, android-wear-signed, x86_64)
+  - Each leg runs `connectedDebugAndroidTest` (38 instrumentation tests, including the split-count clamp walk and a settings/picker/device-region/language set), then a monkey crawl (the CI equivalent of Robo testing), then fails if the app package logged a `FATAL EXCEPTION`.
+  - Every run uploads XML/HTML results, per-test logcats, and emulator screenshots + focused-window dumps as artifacts (7-day retention).
   - The aggregate job `wear-emulator-tests` (`needs:` all matrix legs) is the single status context required by branch protection — add new gates into the matrix, don't invent new required check names.
-- `.github/workflows/firebase-tests.yml` — **parked, manual dispatch only.** Firebase Test Lab (Robo) requires billing/Blaze, which this project cannot enable (no card). Run Robo manually from the user's own Google credentials (Firebase console) or via local `gcloud`/monkey instead. Do not re-enable FTL from CI.
+  - Firebase Test Lab was permanently removed: Robo requires billing/Blaze (no card); the emulator matrix + monkey crawl is the replacement. Run Robo crawls manually from the user's own Google credentials when needed, never from CI.
 
 ## Testing rules (mandatory)
 
