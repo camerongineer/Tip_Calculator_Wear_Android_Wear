@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">टिप कैलकुलेटर (Tip Calculator Wear)</string>
+
+    <string name="tip_percentage">टिप प्रतिशत</string>
+    <string name="round_up_down">कुल योग राउंड करने के लिए तीर को दबाकर रखें</string>
+    <string name="display_subtotal">सब-टोटल</string>
+    <string name="display_tip">टिप</string>
+    <string name="display_total">कुल योग</string>
+    <string name="split">बांटें</string>
+
+    <!--Split Screen-->
+    <string name="split_grand_total">हर व्यक्ति देगा</string>
+    <string name="split_warning">असमान बंटवारा, कुल योग पूरा करने के लिए अतिरिक्त राशि ज़रूरी है।</string>
+
+    <!--Settings Screen-->
+    <string name="tip_settings">टिप सेटिंग्स</string>
+    <string name="default_tip">डिफ़ॉल्ट टिप</string>
+    <string name="retain_tip_percentage">पिछली टिप % सहेजें</string>
+    <string name="round_increment">राउंडिंग अंतराल</string>
+    <string name="split_settings">बंटवारा सेटिंग्स</string>
+    <string name="default_split">डिफ़ॉल्ट बंटवारा</string>
+    <string name="retain_num_split">पिछला बंटवारा सहेजें</string>
+    <string name="precise_split_mode">सटीक मोड</string>
+    <string name="misc_settings">अन्य सेटिंग्स</string>
+    <string name="back">वापस</string>
+    <string name="review_request">अगर यह ऐप बहुत पसंद है, तो Play Store में समीक्षा दें!</string>
+    <string name="dark_theme">डार्क थीम</string>
+    <string name="light_theme">लाइट थीम</string>
+    <string name="enabled">%s सक्रिय</string>
+
+    <!--Language Options-->
+    <string name="language">भाषा: %s</string>
+    <string name="en">अंग्रेज़ी</string>
+    <string name="pt">पुर्तगाली</string>
+    <string name="fr">फ़्रेंच</string>
+    <string name="es">स्पेनिश</string>
+    <string name="de">जर्मन</string>
+    <string name="hi">हिन्दी</string>
+
+    <string name="large_text">बड़ा टेक्स्ट</string>
+</resources>

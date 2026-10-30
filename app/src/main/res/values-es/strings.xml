@@ -5,21 +5,21 @@
     <string name="precise_split_mode">Modo de precisión</string>
     <string name="app_name">Calculadora de propinas (Tip Calculator Wear)</string>
     <string name="tip_percentage">Porcentaje</string>
-    <string name="round_up_down">MANTENER PARA REDONDAR EL TOTAL GENERAL</string>
+    <string name="round_up_down">MANTENER PULSADA LA FLECHA PARA REDONDEAR EL TOTAL</string>
     <string name="display_subtotal">SUBTOTAL</string>
     <string name="display_tip">PROPINA</string>
     <string name="display_total">TOTAL</string>
-    <string name="split">"Dividir"</string>
-    <string name="split_grand_total">Cada beneficiario debe</string>
+    <string name="split">Dividir</string>
+    <string name="split_grand_total">Cada persona paga</string>
     <string name="split_warning">División desigual, se requiere una cantidad adicional.</string>
     <string name="tip_settings">Configuración de propinas</string>
     <string name="round_increment">Paso de redondeo</string>
-    <string name="split_settings">Configuración dividida</string>
+    <string name="split_settings">Ajustes de división</string>
     <string name="default_split">División predeterminada</string>
     <string name="retain_num_split">Guardar última división</string>
     <string name="misc_settings">Otras configuraciones</string>
-    <string name="light_theme">Tema ligero</string>
-    <string name="back">De vuelta</string>
+    <string name="light_theme">Tema claro</string>
+    <string name="back">Atrás</string>
     <string name="review_request">Si disfrutas de esta aplicación, ¡considera dejar una reseña en Play Store!</string>
     <string name="dark_theme">Tema oscuro</string>
     <string name="enabled">%s habilitado</string>
@@ -29,5 +29,6 @@
     <string name="fr">Francés</string>
     <string name="es">Español</string>
     <string name="de">Alemán</string>
+    <string name="hi">Hindi</string>
     <string name="large_text">Tamaño de texto grande</string>
 </resources>
