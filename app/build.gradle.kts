@@ -15,8 +15,8 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 30
         targetSdk = 37
-        versionCode = 33
-        versionName = "1.7.2"
+        versionCode = 34
+        versionName = "1.7.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

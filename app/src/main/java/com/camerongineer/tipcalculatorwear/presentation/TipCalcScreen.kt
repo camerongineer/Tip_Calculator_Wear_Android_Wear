@@ -76,6 +76,7 @@ import com.camerongineer.tipcalculatorwear.utils.getFontMultiplier
 import com.camerongineer.tipcalculatorwear.utils.scaleFont
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 @Composable
 fun TipCalcScreen(
@@ -172,29 +173,54 @@ fun KeyboardItem(
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val buttonHeight = screenHeight * (if (configuration.isScreenRound) .15f else .17f)
+    val isScreenRound = configuration.isScreenRound
+    val rowHeightFraction = if (isScreenRound) .12f else .17f
+    val buttonHeight = screenHeight * rowHeightFraction
     val scrollToTipSection = remember { { scrollToSection(1) } }
 
     val isLargeFont by tipCalcViewModel.getLargeTextFlow().collectAsState(initial = false)
     val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
 
+    // Uniform bezel-safe width for every keypad row and the subtotal pill
+    // (Play review, watch-shape rule): on a round face the drawable width at a
+    // height is the chord of the circle inscribed in the display, so a single
+    // shared width for all rows is bounded by whichever rows sit furthest from
+    // center — the top keypad row and the subtotal pill at the bottom. Sizing
+    // every row to that chord (with a small safety margin) keeps every corner
+    // of every control inside the bezel while keeping the keypad uniform.
+    // Square faces keep the flat .9f.
+    val screenHeightDp = screenHeight.value
+    val blockDp = 4 * buttonHeight.value + 2f + (min(buttonHeight, 24.dp)).value
+    val maxHalfWidth = if (isScreenRound) {
+        .97f * sqrt(
+            (screenHeightDp / 2) * (screenHeightDp / 2) -
+                (blockDp / 2) * (blockDp / 2)
+        )
+    } else Float.POSITIVE_INFINITY
+    val rowWidthFraction = if (isScreenRound) {
+        (2 * maxHalfWidth / (screenHeightDp - 16f)).coerceAtMost(.9f)
+    } else .9f
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
+        // ScalingLazyColumn measures items content-sized, so an exact viewport
+        // height keeps the next item (tip page) from peeking into the bezel
+        // curve when the keypad block is shorter than the display.
         modifier = modifier
             .padding(
                 start = 8.dp,
                 end = 8.dp,
                 top = 6.dp
             )
-            .fillMaxSize()
-
+            .fillMaxWidth()
+            .height(screenHeight)
     ) {
-        Spacer(modifier = Modifier.height(if (configuration.isScreenRound) 8.dp else 0.dp))
         BillDigitsRow(
             digits = listOf('1', '2', '3'),
             onDigitClick = tipCalcViewModel::onDigitTyped,
             fontMultiplier = fontMultiplier,
+            rowWidthFraction = rowWidthFraction,
             modifier = Modifier.height(buttonHeight)
         )
 
@@ -202,6 +228,7 @@ fun KeyboardItem(
             digits = listOf('4', '5', '6'),
             onDigitClick = tipCalcViewModel::onDigitTyped,
             fontMultiplier = fontMultiplier,
+            rowWidthFraction = rowWidthFraction,
             modifier = Modifier.height(buttonHeight)
         )
 
@@ -209,13 +236,14 @@ fun KeyboardItem(
             digits = listOf('7', '8', '9'),
             onDigitClick = tipCalcViewModel::onDigitTyped,
             fontMultiplier = fontMultiplier,
+            rowWidthFraction = rowWidthFraction,
             modifier = Modifier.height(buttonHeight)
         )
 
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(.9f)
+            modifier = Modifier.fillMaxWidth(rowWidthFraction)
         ) {
             BillKeyboardButton(
                 icon = Icons.AutoMirrored.Filled.KeyboardBackspace,
@@ -255,7 +283,7 @@ fun KeyboardItem(
                     shape = CircleShape
                 )
                 .height(min(buttonHeight, 24.dp))
-                .fillMaxWidth(.8f)
+                .fillMaxWidth(rowWidthFraction)
         )
     }
 }
@@ -269,11 +297,12 @@ fun BillDigitsRow(
     onDigitClick: (Char) -> Unit,
     fontMultiplier: Float,
     modifier: Modifier = Modifier,
+    rowWidthFraction: Float = .9f,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(.9f)
+        modifier = modifier.fillMaxWidth(rowWidthFraction)
     ) {
         digits.forEach { digit ->
             BillKeyboardDigit(
