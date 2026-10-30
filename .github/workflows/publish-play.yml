@@ -135,4 +135,9 @@ jobs:
           track: wear:internal
           releaseName: ${{ steps.version.outputs.version_name }}
           status: completed
+          # Play refuses API-driven "send for review" while an app is in a
+          # review-required state (e.g. right after a policy rejection). The
+          # release is committed as a draft and review is sent manually from
+          # Play Console (Testing > Internal testing > Submit for review).
+          changesNotSentForReview: true
           mappingFile: app/build/outputs/mapping/release/mapping.txt
