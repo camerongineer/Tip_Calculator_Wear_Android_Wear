@@ -188,7 +188,8 @@ fun KeyboardItem(
     // center — the top keypad row and the subtotal pill at the bottom. Sizing
     // every row to that chord (with a small safety margin) keeps every corner
     // of every control inside the bezel while keeping the keypad uniform.
-    // Square faces keep the flat .9f.
+    // Square faces have no bezel curve, so they can use nearly the whole
+    // width of the safe rectangle.
     val screenHeightDp = screenHeight.value
     val blockDp = 4 * buttonHeight.value + 2f + (min(buttonHeight, 24.dp)).value
     val maxHalfWidth = if (isScreenRound) {
@@ -199,7 +200,7 @@ fun KeyboardItem(
     } else Float.POSITIVE_INFINITY
     val rowWidthFraction = if (isScreenRound) {
         (2 * maxHalfWidth / (screenHeightDp - 16f)).coerceAtMost(.9f)
-    } else .9f
+    } else .97f
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -211,7 +212,11 @@ fun KeyboardItem(
             .padding(
                 start = 8.dp,
                 end = 8.dp,
-                top = 6.dp
+                // Symmetric vertical padding: an asymmetric top-only inset
+                // shifts the centered block 3dp below true center, which made
+                // the keypad visibly sit low (more margin above than below).
+                top = 6.dp,
+                bottom = 6.dp
             )
             .fillMaxWidth()
             .height(screenHeight)
@@ -347,7 +352,6 @@ fun BillKeyboardButton(
         colors = buttonColors,
         shape = RoundedCornerShape(30),
         modifier = modifier
-            .height(30.dp)
             .padding(start = 1.dp, end = 1.dp, top = 1.dp, bottom = 1.dp)
     ) {
         // The click handlers live on an inner clickable so they win against the
