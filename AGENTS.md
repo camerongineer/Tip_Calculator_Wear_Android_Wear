@@ -35,6 +35,12 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
   - Required GitHub secrets: `PLAY_SERVICE_ACCOUNT_JSON` (Play API service-account key JSON), `PLAY_KEYSTORE_BASE64` (base64 of the upload keystore), `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEYSTORE_ALIAS`, `PLAY_KEYSTORE_KEY_PASSWORD`. The keystore must be the upload key registered with Play App Signing. **Never commit keystores** (`*.jks`/`*.keystore` are gitignored).
   - Release flow: bump `versionCode` + `versionName` in a PR → merge → publish runs automatically after CI + emulator gates pass. Promote internal → closed/production manually in Play Console.
 
+## User collaboration rules (mandatory)
+
+1. **Never create PRs or issues unless the user explicitly asks.** This includes `gh pr create`, `gh issue create`, and any equivalent. Pushing a branch as a prerequisite is fine; opening the PR/issue itself needs an explicit request. Show the planned actions and wait for approval.
+2. **Always show a draft of what you are about to do first** for any outward-facing or irreversible action: PR/issue bodies, commit messages, Play Console submissions/review notes, version bumps/releases, and befores merging or deleting anything. Post the exact draft text and let the user approve or edit it before running the action.
+3. When writing PR/issue text from PowerShell/shell, avoid inline backtick-style code spans that need escaping — mangled escapes have produced unreadable bodies before. Prefer a plain-text body, or write the body to a file and pass it via `gh pr create --body-file`.
+
 ## Testing rules (mandatory)
 
 1. **Run tests after every change that may be breaking** (manifest, Gradle config, Compose code, tests, workflows). Minimum local gate:
