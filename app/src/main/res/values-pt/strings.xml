@@ -20,7 +20,7 @@
     <string name="misc_settings">Configurações diversas</string>
     <string name="light_theme">Tema claro</string>
     <string name="back">Voltar</string>
-    <string name="review_request">Se você gosta deste aplicativo, considere deixar um comentário na Play Store!</string>
+    <string name="review_request">Se você gosta deste aplicativo, considere deixar uma avaliação na Play Store!</string>
     <string name="dark_theme">Tema escuro</string>
     <string name="enabled">%s ativado</string>
     <string name="language">Idioma: %s</string>
@@ -30,5 +30,5 @@
     <string name="es">Espanhol</string>
     <string name="de">Alemão</string>
     <string name="hi">Hindi</string>
-    <string name="large_text">Tamanho de Texto Grande</string>
+    <string name="large_text">Tamanho de texto grande</string>
 </resources>
