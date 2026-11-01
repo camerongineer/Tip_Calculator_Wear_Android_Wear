@@ -8,7 +8,10 @@ android {
     compileSdk = 37
 
     androidResources {
-        localeFilters += listOf("en", "es", "de", "fr", "pt")
+        // Whitelist compiled locales. Any locale NOT listed here is stripped
+        // from every build (debug AND release/AAB) at resource-compile time -
+        // selecting it in-app then silently falls back to English values/.
+        localeFilters += listOf("en", "es", "de", "fr", "pt", "hi")
     }
 
     defaultConfig {

@@ -18,6 +18,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Locale
+import org.junit.Assert.assertNotEquals
 
 /**
  * End-to-end region & language flows through the real MainActivity:
@@ -129,6 +130,19 @@ class LanguageUiTest {
         // UI must relocate without any recreation or relaunch.
         setLanguage("DE")
         composeTestRule.onNode(hasText(germanTitle)).assertExists()
+        composeTestRule.onNode(hasText(englishTitle)).assertDoesNotExist()
+    }
+
+    @Test
+    fun changingLanguageToHindiLocalizesTheUiInPlace() {
+        navigateToSettings()
+        val englishTitle = localizedString("en", R.string.tip_settings)
+        val hindiTitle = localizedString("hi", R.string.tip_settings)
+        assertNotEquals("values-hi missing from the build (localeFilters?)", englishTitle, hindiTitle)
+        composeTestRule.onNode(hasText(englishTitle)).assertExists()
+
+        setLanguage("HI")
+        composeTestRule.onNode(hasText(hindiTitle)).assertExists()
         composeTestRule.onNode(hasText(englishTitle)).assertDoesNotExist()
     }
 
