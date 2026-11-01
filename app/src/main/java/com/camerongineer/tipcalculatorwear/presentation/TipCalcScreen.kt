@@ -181,36 +181,38 @@ fun KeyboardItem(
     val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
 
     // Responsive keypad geometry: every dimension below is derived from the
-    // screen size (no hardcoded per-shape fractions), so any watch fills its
-    // safe area. The block is 4 uniform rows + a subtotal pill; on round faces
-    // all rows share one width bounded by the bezel chord at the outermost row,
-    // so we maximize total keypad area over block height B:
-    //   halfWidth(B) = SAFETY * sqrt(R^2 - (B/2)^2),  R = screenHeightDp / 2
+    // screen size (no hardcoded per-shape fractions). The block is 4 uniform
+    // rows + a subtotal pill; on round faces all rows share one width bounded
+    // by the bezel chord at the outermost row, so we maximize total keypad
+    // area over block height B:
+    //   halfWidth(B) = sqrt(R^2 - (B/2)^2),  R = screenHeightDp / 2
     //   area(B) ~ halfWidth(B) * (B - C),  C = pill cap + spacer
     //   d(area)/dB = 0  =>  B = (C + sqrt(C^2 + 32R^2)) / 4
     // Square faces have no bezel curve, so the block fills the padded viewport.
     val screenHeightDp = screenHeight.value
+    val screenWidthDp = configuration.screenWidthDp
     val radius = screenHeightDp / 2f
     val pillGapTotal = 26f // subtotal pill cap (24dp) + spacer (2dp)
     // The Scaffold's TimeText overlay is anchored about 5-13dp below the top
     // edge on every display (fixed 12sp text, shape-independent), so square
     // faces reserve a top clock zone and run the block under it; round faces
     // already clear the clock with the centered max-area block below.
-    val bottomInsetDp = 6f
-    val topInsetDp = if (isScreenRound) bottomInsetDp else 20f
+    val bottomInsetDp = if (isScreenRound) 0f else 6f
+    val topInsetDp = if (isScreenRound) 0f else 20f
     val blockHeight = if (isScreenRound) {
         (pillGapTotal + sqrt(pillGapTotal * pillGapTotal + 32f * radius * radius)) / 4f
     } else screenHeightDp - topInsetDp - bottomInsetDp
     val buttonHeight = ((blockHeight - pillGapTotal) / 4f).dp
     val maxHalfWidth = if (isScreenRound) {
-        .97f * sqrt(
+        sqrt(
             radius * radius -
                 (blockHeight / 2f) * (blockHeight / 2f)
         )
     } else Float.POSITIVE_INFINITY
     val rowWidthFraction = if (isScreenRound) {
-        (2 * maxHalfWidth / (screenHeightDp - 16f)).coerceAtMost(.9f)
+        (2 * maxHalfWidth / screenWidthDp).coerceAtMost(1f)
     } else .97f
+    val controlRowWeight = if (isScreenRound) 1f else .33f
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -220,12 +222,8 @@ fun KeyboardItem(
         // curve when the keypad block is shorter than the display.
         modifier = modifier
             .padding(
-                start = 8.dp,
-                end = 8.dp,
-                // Round faces keep the symmetric inset (an asymmetric top-only
-                // inset shifts the centered block below true center and it
-                // reads low); square faces swap the top inset for the clock
-                // zone instead, anchoring the block just under the TimeText.
+                start = if (isScreenRound) 0.dp else 8.dp,
+                end = if (isScreenRound) 0.dp else 8.dp,
                 top = topInsetDp.dp,
                 bottom = bottomInsetDp.dp
             )
@@ -267,7 +265,7 @@ fun KeyboardItem(
                 onClick = tipCalcViewModel::onDeleteTyped,
                 onLongClick = tipCalcViewModel::setSubTotalBlank,
                 modifier = Modifier
-                    .weight(.33f)
+                    .weight(controlRowWeight)
                     .height(buttonHeight)
             )
             BillKeyboardDigit(
@@ -275,7 +273,7 @@ fun KeyboardItem(
                 onClick = { tipCalcViewModel.onDigitTyped('0') },
                 fontMultiplier = fontMultiplier,
                 modifier = Modifier
-                    .weight(.33f)
+                    .weight(controlRowWeight)
                     .height(buttonHeight)
             )
             BillKeyboardButton(
@@ -283,7 +281,7 @@ fun KeyboardItem(
                 contentDescription = stringResource(id = R.string.submit),
                 onClick = scrollToTipSection,
                 modifier = Modifier
-                    .weight(.33f)
+                    .weight(controlRowWeight)
                     .height(buttonHeight)
             )
         }
