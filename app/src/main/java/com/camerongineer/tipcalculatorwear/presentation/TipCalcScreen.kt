@@ -174,28 +174,38 @@ fun KeyboardItem(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val isScreenRound = configuration.isScreenRound
-    val rowHeightFraction = if (isScreenRound) .12f else .17f
-    val buttonHeight = screenHeight * rowHeightFraction
+
     val scrollToTipSection = remember { { scrollToSection(1) } }
 
     val isLargeFont by tipCalcViewModel.getLargeTextFlow().collectAsState(initial = false)
     val fontMultiplier = getFontMultiplier(screenHeight, isLargeFont)
 
-    // Uniform bezel-safe width for every keypad row and the subtotal pill
-    // (Play review, watch-shape rule): on a round face the drawable width at a
-    // height is the chord of the circle inscribed in the display, so a single
-    // shared width for all rows is bounded by whichever rows sit furthest from
-    // center — the top keypad row and the subtotal pill at the bottom. Sizing
-    // every row to that chord (with a small safety margin) keeps every corner
-    // of every control inside the bezel while keeping the keypad uniform.
-    // Square faces have no bezel curve, so they can use nearly the whole
-    // width of the safe rectangle.
+    // Responsive keypad geometry: every dimension below is derived from the
+    // screen size (no hardcoded per-shape fractions), so any watch fills its
+    // safe area. The block is 4 uniform rows + a subtotal pill; on round faces
+    // all rows share one width bounded by the bezel chord at the outermost row,
+    // so we maximize total keypad area over block height B:
+    //   halfWidth(B) = SAFETY * sqrt(R^2 - (B/2)^2),  R = screenHeightDp / 2
+    //   area(B) ~ halfWidth(B) * (B - C),  C = pill cap + spacer
+    //   d(area)/dB = 0  =>  B = (C + sqrt(C^2 + 32R^2)) / 4
+    // Square faces have no bezel curve, so the block fills the padded viewport.
     val screenHeightDp = screenHeight.value
-    val blockDp = 4 * buttonHeight.value + 2f + (min(buttonHeight, 24.dp)).value
+    val radius = screenHeightDp / 2f
+    val pillGapTotal = 26f // subtotal pill cap (24dp) + spacer (2dp)
+    // The Scaffold's TimeText overlay is anchored about 5-13dp below the top
+    // edge on every display (fixed 12sp text, shape-independent), so square
+    // faces reserve a top clock zone and run the block under it; round faces
+    // already clear the clock with the centered max-area block below.
+    val bottomInsetDp = 6f
+    val topInsetDp = if (isScreenRound) bottomInsetDp else 20f
+    val blockHeight = if (isScreenRound) {
+        (pillGapTotal + sqrt(pillGapTotal * pillGapTotal + 32f * radius * radius)) / 4f
+    } else screenHeightDp - topInsetDp - bottomInsetDp
+    val buttonHeight = ((blockHeight - pillGapTotal) / 4f).dp
     val maxHalfWidth = if (isScreenRound) {
         .97f * sqrt(
-            (screenHeightDp / 2) * (screenHeightDp / 2) -
-                (blockDp / 2) * (blockDp / 2)
+            radius * radius -
+                (blockHeight / 2f) * (blockHeight / 2f)
         )
     } else Float.POSITIVE_INFINITY
     val rowWidthFraction = if (isScreenRound) {
@@ -212,11 +222,12 @@ fun KeyboardItem(
             .padding(
                 start = 8.dp,
                 end = 8.dp,
-                // Symmetric vertical padding: an asymmetric top-only inset
-                // shifts the centered block 3dp below true center, which made
-                // the keypad visibly sit low (more margin above than below).
-                top = 6.dp,
-                bottom = 6.dp
+                // Round faces keep the symmetric inset (an asymmetric top-only
+                // inset shifts the centered block below true center and it
+                // reads low); square faces swap the top inset for the clock
+                // zone instead, anchoring the block just under the TimeText.
+                top = topInsetDp.dp,
+                bottom = bottomInsetDp.dp
             )
             .fillMaxWidth()
             .height(screenHeight)
