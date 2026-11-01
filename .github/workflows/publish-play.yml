@@ -30,16 +30,30 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v7
         with:
-          # Need HEAD~1 (previous master commit) for versionCode comparison.
-          fetch-depth: 2
+          # Full history so the pre-push master commit (github.event.before)
+          # is available locally for the versionCode comparison below.
+          fetch-depth: 0
 
       - name: Detect version bump on this push
         id: version
         run: |
-          OLD_CODE=$(git show HEAD~1:app/build.gradle.kts 2>/dev/null | sed -n 's/^\s*versionCode = \([0-9]*\).*/\1/p')
+          # Baseline = the exact master state BEFORE this push (the push event's
+          # before SHA). HEAD~1 alone misses bumps inside multi-commit pushes:
+          # the bump commit can sit deeper than HEAD~1, whose versionCode is
+          # already the new one. If the before commit is unresolvable (branch
+          # creation, or erased by a force-push), fall back to HEAD~1.
+          BASE="HEAD~1"
+          BEFORE="${{ github.event.before }}"
+          if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            git cat-file -e "${BEFORE}^{commit}" 2>/dev/null || git fetch --quiet origin "$BEFORE" 2>/dev/null || true
+            if git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+              BASE="$BEFORE"
+            fi
+          fi
+          OLD_CODE=$(git show "${BASE}:app/build.gradle.kts" 2>/dev/null | sed -n 's/^\s*versionCode = \([0-9]*\).*/\1/p')
           NEW_CODE=$(sed -n 's/^\s*versionCode = \([0-9]*\).*/\1/p' app/build.gradle.kts)
           NEW_NAME=$(sed -n 's/^\s*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts)
-          echo "versionCode ${OLD_CODE:-unset} -> $NEW_CODE (name $NEW_NAME)"
+          echo "baseline $BASE: versionCode ${OLD_CODE:-unset} -> $NEW_CODE (name $NEW_NAME)"
           echo "version_code=$NEW_CODE" >> "$GITHUB_OUTPUT"
           echo "version_name=$NEW_NAME" >> "$GITHUB_OUTPUT"
           # Manual dispatch always attempts the release (used to retry a
