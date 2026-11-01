@@ -35,6 +35,19 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
   - Required GitHub secrets: `PLAY_SERVICE_ACCOUNT_JSON` (Play API service-account key JSON), `PLAY_KEYSTORE_BASE64` (base64 of the upload keystore), `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEYSTORE_ALIAS`, `PLAY_KEYSTORE_KEY_PASSWORD`. The keystore must be the upload key registered with Play App Signing. **Never commit keystores** (`*.jks`/`*.keystore` are gitignored).
   - Release flow: bump `versionCode` + `versionName` in a PR → merge → publish runs automatically after CI + emulator gates pass. Promote internal → closed/production manually in Play Console.
 
+## Play release notes (mandatory process + delivery format)
+
+When the user asks for release notes, follow these steps in order:
+
+1. **Establish the baseline from git, never from assumption.** Find the last release users actually received: `git tag`, then `git log -S "versionName" -- app/build.gradle.kts` to map versionName↔versionCode history, and `git show <rev>:app/build.gradle.kts` at key commits to pin the version/minSdk values at each step. Beware commits whose versionName matches an already-released name (e.g. rotary input shipped inside 1.5.0-era versionCodes) — verify before calling anything "new", and flag ambiguous ones to the user.
+2. **Enumerate and classify the delta.** `git log --oneline --no-merges <baseline>..origin/master` plus the uncommitted work heading into this release. Read commit bodies for specifics (which currencies, old→new minSdk). Classify each: user-facing big change → list it; everything else → exclude.
+3. **Content policy.** One line per big change a user notices. Include: new language support (a feature), currency/region support, platform requirement changes stated plainly (e.g. "support has been dropped for older versions of Wear OS" when minSdk rises), and translation corrections as ONE summary line (e.g. "Corrected mistranslations and improved wording in all supported languages") when they landed after the baseline — reuse the established line from prior notes when it exists, and never itemize per-locale wording tweaks. Exclude: theme-only changes, internal/CI work, Play-compliance fixes. Layout changes stay vague and outcome-only (e.g. "adjustments to number pad sizing") — never promise bigger buttons; sizes can also shrink on some devices.
+4. **Draft English first, then translate** to every store language. Translations must read naturally (not calqued) and must match the app's own in-app glossary in `values-*/strings.xml` — e.g. Trinkgeld/Aufteilen (de), propina/división (es), pourboire/partage (fr), gorjeta/divisão (pt), टिप/बंटवारा (hi). Keep the brand name "Tip Calculator" untranslated in body text.
+5. **Verify programmatically before presenting:** count each block's characters (normalize CRLF out first) — every language ≤ 500 (Play's limit); shrink by rewording, not by dropping items.
+6. **Deliver as ONE copyable code block** in chat, using Play's tag format: `<en-US>…</en-US>`, `<de-DE>…</de-DE>`, `<es-US>…</es-US>`, `<fr-FR>…</fr-FR>`, `<pt-BR>…</pt-BR>`, `<hi-IN>…</hi-IN>`. Inside each tag block: plain text, one change per line — no bullets/dashes, no intro sentence, no blank lines, no counts or markers inside the tags (counts go in the surrounding chat text only).
+7. **Never commit release notes to the repository** — they are pasted manually into Play Console (Release › Release notes per language). Keep the working copy outside the worktree, e.g. `%TEMP%\opencode\release_notes_v<version>_play.txt`.
+8. **Apply the user's wording corrections** (tone, specificity, what counts as relevant) to the notes AND to this section's policy when they reveal a new preference.
+
 ## User collaboration rules (mandatory)
 
 1. **Never create PRs or issues unless the user explicitly asks.** This includes `gh pr create`, `gh issue create`, and any equivalent. Pushing a branch as a prerequisite is fine; opening the PR/issue itself needs an explicit request. Show the planned actions and wait for approval.
@@ -56,6 +69,16 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
    & "$env:ANDROID_HOME\cmdline-tools\latest\bin\avdmanager.bat" create avd -n <name> -k "system-images;android-33;android-wear-cn;x86_64"
    ```
    Boot: `$env:ANDROID_HOME\emulator\emulator.exe -avd WearOS33` (~25 s to `adb wait-for-device` + boot complete). If multiple emulators are running, Gradle tests on all of them — kill extras with `adb emu kill` or pin with `$env:ANDROID_SERIAL`.
+
+Watch shapes/skins for verification (skins are folders in the system image):
+
+```powershell
+Get-ChildItem "$env:ANDROID_HOME\system-images\android-33\android-wear\x86_64\skins"   # android-30/34 similar
+```
+
+android-33 skins (folder names): WearLargeRound, WearSmallRound, WearSquare, WearRect (android-30 x86 also has AndroidWearRound/360x360…480x480 and AndroidWearSquare240x240/320x320). Observed dp: 454x454@320 → 227dp round, 384x384@320 → 192dp round, 360x360@320 → 180dp square, 240x240@240 → 160dp square; round skins set `ro.emulator.circular=1`. Build one AVD per skin with `avdmanager create avd -n <name> -k "system-images;android-33;android-wear;x86_64"`, then launch that AVD with `-skin <SkinName>` to switch shape/size without rebuilding the image.
+
+Screenshot workflow per config: `adb -s <serial> install -r app\build\outputs\apk\debug\app-debug.apk`, launch via `adb shell "monkey -p com.camerongineer.tipcalculatorwear -c android.intent.category.LAUNCHER 1"`, then `adb exec-out screencap -p` piped binary-safe (PowerShell: `Start-Process adb -RedirectStandardOutput file.png -NoNewWindow`; `Out-File -Encoding Byte` is PS5.1-only and `| Out-File` mangles bytes). Wear boots show a "Starting…" splash — wait ~45 s after `pidof system_server` before screenshotting, else the shot is the splash.
 3. HTML results land in `app/build/reports/androidTests/connected/debug/`.
 
 ## CI workflow gotchas (the easy traps)
