@@ -94,3 +94,4 @@ Screenshot workflow per config: `adb -s <serial> install -r app\build\outputs\ap
 
 - Commits/PR titles: `type(scope): summary` (e.g. `ci(test): ...`, `fix(wear): ...`).
 - Dependency upgrades go through the BOMs first: update `androidx.compose:compose-bom` / Wear Compose versions in `app/build.gradle.kts`, then verify with the local test gate before pushing.
+- Code comments: code should mostly speak for itself - prefer readable naming and structure over comments, and avoid verbose comment blocks. Keep comments sparse and factual, and reserve them for the invisible *why*: math derivations and non-obvious build/framework behavior (e.g. what `androidResources.localeFilters` does to any locale left out). Never narrate what was *not* changed or alternatives that were rejected, and never write one-off item-specific nag notes ("hi must stay in the list") when the general behavior comment already covers every case.
