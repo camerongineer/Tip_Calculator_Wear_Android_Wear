@@ -30,7 +30,8 @@ import org.junit.Assert.assertNotEquals
  *
  * One activity instance is shared by the class; route screens are left with
  * Espresso.pressBack() (a back KEY — safe against SwipeDismissableNavHost,
- * unlike a swipe). Language is reset to the app default ("") in fixtures.
+ * unlike a swipe). Language and the currency override are reset to the app
+ * default ("") in fixtures, so the region-symbol assertions see region behavior.
  */
 @RunWith(AndroidJUnit4::class)
 class LanguageUiTest {
@@ -90,6 +91,7 @@ class LanguageUiTest {
     @Before
     fun setUp() {
         setLanguage("")
+        runBlocking { dataStoreManager.saveCurrencySymbol("") }
     }
 
     @After
@@ -97,7 +99,10 @@ class LanguageUiTest {
         runCatching {
             leaveRouteScreensIfAny()
         }
-        runBlocking { dataStoreManager.saveLanguage("") }
+        runBlocking {
+            dataStoreManager.saveLanguage("")
+            dataStoreManager.saveCurrencySymbol("")
+        }
     }
 
     @Test

@@ -81,4 +81,40 @@ class CurrencyTest {
         assertEquals(null, TipCurrency.forCodeOrNull(null))
         assertEquals(null, TipCurrency.forCodeOrNull(""))
     }
+
+    @Test
+    fun `stored codes resolve to their symbol`() {
+        listOf(
+            "CAD" to "$", "USD" to "$", "EUR" to "€", "GBP" to "£",
+            "TRY" to "₺", "CNY" to "¥", "INR" to "₹", "RUB" to "₽"
+        ).forEach { (code, symbol) ->
+            assertEquals(code, symbol, TipCurrency.symbolForStoredCode(code, TipCurrency.EUR))
+        }
+    }
+
+    @Test
+    fun `unset or stale stored codes fall back to the region currency`() {
+        assertEquals("$", TipCurrency.symbolForStoredCode("", TipCurrency.CAD))
+        assertEquals("£", TipCurrency.symbolForStoredCode("", TipCurrency.GBP))
+        assertEquals("₹", TipCurrency.symbolForStoredCode("JPY", TipCurrency.INR))
+        assertEquals("₽", TipCurrency.symbolForStoredCode("BRL", TipCurrency.RUB))
+    }
+
+    @Test
+    fun `picker codes cover exactly the reviewed symbol pool once each`() {
+        val symbols = TipCurrency.defaultCurrencyCodes.map {
+            TipCurrency.valueOf(it).symbol
+        }
+        assertEquals(listOf("$", "€", "£", "₺", "¥", "₹", "₽"), symbols)
+        assertEquals(
+            "picker representatives must cover every pool symbol once",
+            TipCurrency.entries.map { it.symbol }.distinct().sorted(),
+            symbols.distinct().sorted()
+        )
+        TipCurrency.defaultCurrencyCodes.forEach { code ->
+            assert(TipCurrency.valueOf(code).nameResId != null) { "picker code $code needs a name" }
+        }
+        TipCurrency.entries.filter { it.name !in TipCurrency.defaultCurrencyCodes }
+            .forEach { assertEquals(null, it.nameResId) }
+    }
 }

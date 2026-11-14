@@ -1,5 +1,6 @@
 package com.camerongineer.tipcalculatorwear.presentation.constants
 
+import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 
@@ -21,10 +22,22 @@ class OptionsLists {
             TipLanguage.PT).map {
                 OptionsItem(it, false)
         }
+        // Stored TipCurrency codes; "" (first row) = region default. Glyphs
+        // are script characters, locale-invariant, so they are not resource strings.
+        val CURRENCY_OPTIONS =
+            listOf(OptionsItem("", nameResId = R.string.currency_default)) +
+                TipCurrency.pickerCurrencies.map {
+                    OptionsItem(it.name, nameResId = it.nameResId, symbol = it.symbol)
+                }
     }
 }
 
-class OptionsItem<T>(val value: T, private val isCurrency: Boolean) {
+class OptionsItem<T>(
+    val value: T,
+    private val isCurrency: Boolean = false,
+    val nameResId: Int? = null,
+    val symbol: String = "",
+) {
     override fun toString(): String {
         return if (isCurrency) getFormattedAmountString(value.toString().toInt()) else value.toString()
     }

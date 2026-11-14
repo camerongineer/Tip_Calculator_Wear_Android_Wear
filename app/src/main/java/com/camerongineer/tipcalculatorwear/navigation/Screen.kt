@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
     object DefaultSplitScreen : Screen("default_split_screen")
     object RoundingNumScreen : Screen("rounding_num_screen")
     object LanguageSelectionScreen : Screen("language_selection_screen")
+    object CurrencySelectionScreen : Screen("currency_selection_screen")
 
 
     fun withArgs(vararg args: String): String {

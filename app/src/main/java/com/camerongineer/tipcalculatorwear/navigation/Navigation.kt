@@ -22,6 +22,7 @@ import com.camerongineer.tipcalculatorwear.presentation.SplitViewModel
 import com.camerongineer.tipcalculatorwear.presentation.TipCalcScreen
 import com.camerongineer.tipcalculatorwear.presentation.TipCalcViewModel
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
 import com.camerongineer.tipcalculatorwear.utils.getLocale
@@ -34,6 +35,10 @@ fun Navigation(navController: NavHostController) {
     val dataStoreManager = DataStoreManager(context)
     val themeName by dataStoreManager.themeFlow.collectAsState(Theme.Dark.name)
     val languageCode = dataStoreManager.languageFlow.collectAsState("")
+    val currencyCode = dataStoreManager.currencyCodeFlow.collectAsState("")
+    val currencySymbol by dataStoreManager.currencySymbolFlow.collectAsState(
+        TipCurrency.regionSymbol()
+    )
 
     val localizedContext = remember(languageCode.value, context) {
         if (languageCode.value.isEmpty()) {
@@ -56,6 +61,8 @@ fun Navigation(navController: NavHostController) {
             navController = navController,
             themeName = themeName,
             languageCode = languageCode.value,
+            currencyCode = currencyCode.value,
+            currencySymbol = currencySymbol,
         )
     }
 }
@@ -65,7 +72,9 @@ private fun AppNavHost(
     dataStoreManager: DataStoreManager,
     navController: NavHostController,
     themeName: String,
-    languageCode: String
+    languageCode: String,
+    currencyCode: String,
+    currencySymbol: String
 ) {
     // ONE theme above the SwipeDismissableNavHost: a theme-flow write
     // invalidates the MaterialTheme colors ambient for every destination,
@@ -115,6 +124,9 @@ private fun AppNavHost(
                             navController.navigate(Screen.DefaultSplitScreen.route) },
                         navigateToLanguageSelectionScreen = {
                             navController.navigate(Screen.LanguageSelectionScreen.route) },
+                        navigateToCurrencySelectionScreen = {
+                            navController.navigate(Screen.CurrencySelectionScreen.route) },
+                        currencySymbol = currencySymbol,
                         onBackButtonPressed = { navController.popBackStack(route = "settings", inclusive = true) }
                     )
                     Log.d("NAV", "To Settings Screen")
@@ -165,6 +177,17 @@ private fun AppNavHost(
                         }
                     )
                     Log.d("NAV", "To Language Selection Screen")
+                }
+                composable(route = Screen.CurrencySelectionScreen.route) {
+                    PickerScreen(
+                        initialValue = currencyCode,
+                        optionsList = OptionsLists.CURRENCY_OPTIONS,
+                        onSubmitPressed = {
+                            settingsViewModel.setCurrencySymbol(it)
+                            navController.navigateUp()
+                        }
+                    )
+                    Log.d("NAV", "To Currency Selection Screen")
                 }
             }
         }

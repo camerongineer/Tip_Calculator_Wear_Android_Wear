@@ -1,8 +1,10 @@
 package com.camerongineer.tipcalculatorwear
 
+import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
 import com.camerongineer.tipcalculatorwear.utils.getFormattedAmountString
 import com.camerongineer.tipcalculatorwear.presentation.constants.OptionsLists
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import com.camerongineer.tipcalculatorwear.presentation.constants.TipLanguage
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -46,5 +48,18 @@ class OptionsListsTest {
     fun `non currency items render as plain values`() {
         val percentItem = OptionsLists.TIP_PERCENT_OPTIONS.first { it.value == 15 }
         assertEquals("15", percentItem.toString())
+    }
+
+    @Test
+    fun `currency options start with the region default then the pool codes`() {
+        assertEquals(
+            listOf("", "USD", "EUR", "GBP", "TRY", "CNY", "INR", "RUB"),
+            OptionsLists.CURRENCY_OPTIONS.map { it.value }
+        )
+        assertEquals(R.string.currency_default, OptionsLists.CURRENCY_OPTIONS.first().nameResId)
+        assertEquals(
+            TipCurrency.defaultCurrencyCodes.map { TipCurrency.valueOf(it).nameResId },
+            OptionsLists.CURRENCY_OPTIONS.drop(1).map { it.nameResId }
+        )
     }
 }

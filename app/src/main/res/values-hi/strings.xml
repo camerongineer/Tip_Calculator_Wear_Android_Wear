@@ -37,5 +37,16 @@
     <string name="de">जर्मन</string>
     <string name="hi">हिन्दी</string>
 
+    <!--Currency Options-->
+    <string name="currency">मुद्रा: %s</string>
+    <string name="currency_default">डिफ़ॉल्ट (आपका क्षेत्र)</string>
+    <string name="currency_dollar">डॉलर</string>
+    <string name="currency_euro">यूरो</string>
+    <string name="currency_pound">पाउंड</string>
+    <string name="currency_lira">लिरा</string>
+    <string name="currency_yuan">युआन</string>
+    <string name="currency_rupee">रुपया</string>
+    <string name="currency_ruble">रूबल</string>
+
     <string name="large_text">बड़ा टेक्स्ट</string>
 </resources>
