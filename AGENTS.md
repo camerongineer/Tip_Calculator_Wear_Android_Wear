@@ -4,8 +4,8 @@ Guidance for AI agents (and humans) working on **Tip Calculator for Wear OS** (`
 
 ## Project overview
 
-- Kotlin + Jetpack Compose Wear OS app (Wear Compose Material 1.7.1, Compose BOM 2026.09.00).
-- `compileSdk`/`targetSdk` 37, `minSdk` 30, `versionCode` 33 (`versionName` 1.7.2 — shipped via the CI publish pipeline). Keep behavior (touch, haptics) identical when modernizing.
+- Kotlin + Jetpack Compose Wear OS app (Wear Compose Material on the Compose BOM).
+- `compileSdk`/`targetSdk`, `minSdk`, the Compose/BOM pins and the app version all live in `app/build.gradle.kts`. Read them there; this file deliberately records no current version numbers so it cannot go stale. Keep behavior (touch, haptics) identical when modernizing.
 - Single Compose UI entry: `MainActivity` → `TipCalcApp`. UI semantics (content descriptions) double as the automation surface — do not change them without updating `app/src/androidTest/.../TipCalcScreenTest.kt`.
 
 ## Environment setup (Windows)
@@ -23,7 +23,7 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
 - `.github/workflows/master.yml` — builds on `master`.
 - `.github/workflows/wear-emulator-tests.yml` — the primary test gate. Matrix of 4 emulator legs:
   - Wear OS 3 (API 30, x86), Wear OS 4 (API 33, x86_64), Wear OS 5 (API 34, x86_64), Wear OS 6 (API 36, android-wear-signed, x86_64)
-  - Each leg runs `connectedDebugAndroidTest` (38 instrumentation tests, including the split-count clamp walk and a settings/picker/device-region/language set), then a monkey crawl (the CI equivalent of Robo testing), then fails if the app package logged a `FATAL EXCEPTION`.
+  - Each leg runs `connectedDebugAndroidTest` (the whole instrumentation suite, including the split-count clamp walk and a settings/picker/device-region/language set), then a monkey crawl (the CI equivalent of Robo testing), then fails if the app package logged a `FATAL EXCEPTION`.
   - Every run uploads XML/HTML results, per-test logcats, and emulator screenshots + focused-window dumps as artifacts (7-day retention).
   - The aggregate job `wear-emulator-tests` (`needs:` all matrix legs) is the single status context required by branch protection — add new gates into the matrix, don't invent new required check names.
   - Firebase Test Lab was permanently removed: Robo requires billing/Blaze (no card); the emulator matrix + monkey crawl is the replacement. Run Robo crawls manually from the user's own Google credentials when needed, never from CI.
@@ -35,11 +35,18 @@ $env:ANDROID_HOME = "C:\Users\c-em\AppData\Local\Android\Sdk"
   - Required GitHub secrets: `PLAY_SERVICE_ACCOUNT_JSON` (Play API service-account key JSON), `PLAY_KEYSTORE_BASE64` (base64 of the upload keystore), `PLAY_KEYSTORE_PASSWORD`, `PLAY_KEYSTORE_ALIAS`, `PLAY_KEYSTORE_KEY_PASSWORD`. The keystore must be the upload key registered with Play App Signing. **Never commit keystores** (`*.jks`/`*.keystore` are gitignored).
   - Release flow: bump `versionCode` + `versionName` in a PR → merge → publish runs automatically after CI + emulator gates pass. Promote internal → closed/production manually in Play Console.
 
+## Release versioning
+
+- `versionName` is semantic: MAJOR for a deliberate break, MINOR for new user-facing capability, PATCH for fixes and tweaks. `versionCode` is a monotonic integer that rises by exactly 1 per release, bumped in the same commit as the `versionName`, in the PR that ships the change.
+- That bump commit is the release record. Git tags are not maintained for current releases and Play's `releaseName` is the `versionName`, so the `app/build.gradle.kts` version ladder in git history is where a release baseline is read from.
+- Publishing keys off `versionCode` rising on `master` (see `publish-play.yml` above): a merge without a bump is an intentional no-op release, and a feature PR that users should receive must carry the bump.
+- Do not record the current version numbers in docs, tests or comments. Anything that needs them reads `app/build.gradle.kts` or git history.
+
 ## Play release notes (mandatory process + delivery format)
 
 When the user asks for release notes, follow these steps in order:
 
-1. **Establish the baseline from git, never from assumption.** Find the last release users actually received: `git tag`, then `git log -S "versionName" -- app/build.gradle.kts` to map versionName↔versionCode history, and `git show <rev>:app/build.gradle.kts` at key commits to pin the version/minSdk values at each step. Beware commits whose versionName matches an already-released name (e.g. rotary input shipped inside 1.5.0-era versionCodes) — verify before calling anything "new", and flag ambiguous ones to the user.
+1. **Establish the baseline from git, never from assumption.** Find the last release users actually received: `git tag`, then `git log -S "versionName" -- app/build.gradle.kts` to map versionName↔versionCode history, and `git show <rev>:app/build.gradle.kts` at key commits to pin the version/minSdk values at each step. Cross-check the publish workflow runs on `master` to confirm the top of that ladder really shipped. Beware a versionName that was already shipped under an earlier versionCode, or a feature that landed inside an older versionCode range than the versionName now carrying it — verify before calling anything "new", and flag ambiguous ones to the user.
 2. **Enumerate and classify the delta.** `git log --oneline --no-merges <baseline>..origin/master` plus the uncommitted work heading into this release. Read commit bodies for specifics (which currencies, old→new minSdk). Classify each: user-facing big change → list it; everything else → exclude.
 3. **Content policy.** One line per big change a user notices. Include: new language support (a feature), currency/region support, platform requirement changes stated plainly (e.g. "support has been dropped for older versions of Wear OS" when minSdk rises), and translation corrections as ONE summary line (e.g. "Corrected mistranslations and improved wording in all supported languages") when they landed after the baseline — reuse the established line from prior notes when it exists, and never itemize per-locale wording tweaks. Exclude: theme-only changes, internal/CI work, Play-compliance fixes. Layout changes stay vague and outcome-only (e.g. "adjustments to number pad sizing") — never promise bigger buttons; sizes can also shrink on some devices.
 4. **Draft English first, then translate** to every store language. Translations must read naturally (not calqued) and must match the app's own in-app glossary in `values-*/strings.xml` — e.g. Trinkgeld/Aufteilen (de), propina/división (es), pourboire/partage (fr), gorjeta/divisão (pt), टिप/बंटवारा (hi). Keep the brand name "Tip Calculator" untranslated in body text.
