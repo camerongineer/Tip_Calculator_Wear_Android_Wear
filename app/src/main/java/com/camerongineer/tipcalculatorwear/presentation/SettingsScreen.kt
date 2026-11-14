@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,6 +69,7 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import com.camerongineer.tipcalculatorwear.presentation.constants.TipLanguage
 import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import com.camerongineer.tipcalculatorwear.presentation.theme.TipCalculatorWearTheme
@@ -86,10 +86,12 @@ import androidx.core.net.toUri
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
+    currencySymbol: String,
     navigateToDefaultTipScreen: () -> Unit,
     navigateToRoundingNumScreen: () -> Unit,
     navigateToDefaultSplitScreen: () -> Unit,
     navigateToLanguageSelectionScreen: () -> Unit,
+    navigateToCurrencySelectionScreen: () -> Unit,
     onBackButtonPressed: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
@@ -173,7 +175,7 @@ fun SettingsScreen(
                     labelText = stringResource(id = R.string.round_increment),
                     fontMultiplier = fontMultiplier,
                     roundingNumValue = settingsViewModel.roundingNum,
-                    currencySymbol = settingsViewModel.currencySymbol,
+                    currencySymbol = currencySymbol,
                     onRoundingNumChanged = {
                         navigateToRoundingNumScreen()
                     }
@@ -238,6 +240,14 @@ fun SettingsScreen(
                     tipLanguage = currentTipLanguage,
                     fontMultiplier = fontMultiplier,
                     onClick = navigateToLanguageSelectionScreen
+                )
+            }
+
+            item {
+                CurrencySelectionItem(
+                    currencySymbol = currencySymbol,
+                    fontMultiplier = fontMultiplier,
+                    onClick = navigateToCurrencySelectionScreen
                 )
             }
 
@@ -391,7 +401,7 @@ fun DefaultSplitItem(labelText: String,
 fun RoundIncrementItem(
     labelText: String,
     roundingNumValue: MutableIntState,
-    currencySymbol: MutableState<String>,
+    currencySymbol: String,
     fontMultiplier: Float,
     onRoundingNumChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -406,7 +416,7 @@ fun RoundIncrementItem(
         modifier = modifier.wrapContentWidth()) {
         val style = scaleFont(Typography.title2, fontMultiplier)
         Text(
-            text = currencySymbol.value,
+            text = currencySymbol,
             style = style,
             color = MaterialTheme.colors.onPrimary,
             fontSize = style.fontSize * .66,
@@ -448,6 +458,37 @@ fun LanguageSelectionItem(
                         R.string.language,
                         stringResource(tipLanguage.languageNameID)
                     ),
+                    style = scaleFont(Typography.button, fontMultiplier),
+                    textAlign = TextAlign.Center,
+                )
+            } },
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(
+                minHeight = ToggleChipDefaults.Height * .75f
+            )
+    )
+}
+
+@Composable
+fun CurrencySelectionItem(
+    currencySymbol: String,
+    fontMultiplier: Float,
+    onClick: () -> Unit
+) {
+    Chip(
+        onClick = withHaptics { onClick() },
+        colors = ChipDefaults.chipColors(
+            backgroundColor = MaterialTheme.colors.primary
+        ),
+        label = {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.currency, currencySymbol),
                     style = scaleFont(Typography.button, fontMultiplier),
                     textAlign = TextAlign.Center,
                 )
@@ -692,6 +733,8 @@ fun SettingsPreview() {
     TipCalculatorWearTheme {
         SettingsScreen(
             SettingsViewModel(DataStoreManager(LocalContext.current)),
+            TipCurrency.regionSymbol(),
+            {},
             {},
             {},
             {},

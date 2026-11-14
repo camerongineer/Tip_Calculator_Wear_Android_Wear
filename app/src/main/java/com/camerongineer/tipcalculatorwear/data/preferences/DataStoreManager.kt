@@ -52,10 +52,18 @@ class DataStoreManager(context: Context) {
         resolveTipCurrency(Locale.getDefault())
             .also { Log.d("Currency", it.name) }
 
-    val currencySymbolFlow: Flow<String> = dataFlow(
+    /** Stored picker code; "" = region default (mirrors the language key). */
+    val currencyCodeFlow: Flow<String> = dataFlow(
         key = currencySymbolKey,
-        defaultValue = tipCurrency.symbol
+        defaultValue = ""
     )
+
+    val currencySymbolFlow: Flow<String> =
+        currencyCodeFlow.map { TipCurrency.symbolForStoredCode(it, tipCurrency) }
+
+    suspend fun saveCurrencySymbol(code: String) {
+        dataSave(code, currencySymbolKey)
+    }
 
     val themeFlow: Flow<String> = dataFlow(
         key = themeKey,

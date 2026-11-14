@@ -116,6 +116,8 @@ fun <T>PickerScreen(
                 OptionRow(
                     rawText = pickerViewModel.optionsList[index].toString(),
                     isResourceString = isResourceString,
+                    nameResId = pickerViewModel.optionsList[index].nameResId,
+                    symbol = pickerViewModel.optionsList[index].symbol,
                     selected = index == selectedOption,
                     onClick = withHaptics { selectedOption = index }
                 )
@@ -150,6 +152,8 @@ fun <T>PickerScreen(
 private fun OptionRow(
     rawText: String,
     isResourceString: Boolean,
+    nameResId: Int?,
+    symbol: String,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -169,8 +173,17 @@ private fun OptionRow(
         label = {
             // Same text resolution the Picker used: language options carry a
             // string resource id; currency options resolve via toString().
+            // Options with a nameResId render "glyph localized-name"
+            // (currency picker); an empty glyph renders the bare name.
             Text(
-                text = if (isResourceString) stringResource(rawText.toInt()) else rawText,
+                text = when {
+                    nameResId == null ->
+                        if (isResourceString) stringResource(rawText.toInt()) else rawText
+                    symbol.isEmpty() -> stringResource(nameResId)
+                    else -> stringResource(
+                        R.string.currency_option, symbol, stringResource(nameResId)
+                    )
+                },
                 style = Typography.button,
                 modifier = Modifier.fillMaxWidth()
             )

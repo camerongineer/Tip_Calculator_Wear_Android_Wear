@@ -16,6 +16,7 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import com.camerongineer.tipcalculatorwear.R
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
+import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import com.camerongineer.tipcalculatorwear.presentation.KeyboardItem
 import com.camerongineer.tipcalculatorwear.presentation.SettingsScreen
 import com.camerongineer.tipcalculatorwear.presentation.SettingsViewModel
@@ -109,7 +110,7 @@ fun ThemeSettingsPreview(theme: Theme = Theme.Dark) {
             vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
             modifier = Modifier.background(MaterialTheme.colors.background)
         ) {
-            SettingsScreen(SettingsViewModel(DataStoreManager(LocalContext.current)), {}, {}, {}, {}, {})
+            SettingsScreen(SettingsViewModel(DataStoreManager(LocalContext.current)), TipCurrency.regionSymbol(), {}, {}, {}, {}, {}, {})
         }
     }
 }

@@ -30,5 +30,17 @@
     <string name="es">Espanhol</string>
     <string name="de">Alemão</string>
     <string name="hi">Hindi</string>
+
+    <!--Currency Options-->
+    <string name="currency">Moeda: %s</string>
+    <string name="currency_default">Padrão (sua região)</string>
+    <string name="currency_dollar">Dólar</string>
+    <string name="currency_euro">Euro</string>
+    <string name="currency_pound">Libra</string>
+    <string name="currency_lira">Lira</string>
+    <string name="currency_yuan">Yuan</string>
+    <string name="currency_rupee">Rúpia</string>
+    <string name="currency_ruble">Rublo</string>
+
     <string name="large_text">Tamanho de texto grande</string>
 </resources>

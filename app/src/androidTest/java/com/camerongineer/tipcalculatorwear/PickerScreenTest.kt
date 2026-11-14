@@ -27,7 +27,7 @@ class PickerScreenTest {
 
     private val res = ApplicationProvider.getApplicationContext<android.content.Context>().resources
 
-    private fun resStringFor(id: Int) = res.getString(id)
+    private fun resStringFor(id: Int, vararg args: Any) = res.getString(id, *args)
 
     @Test
     fun tipPercentPickerShowsInitialSelection() {
@@ -84,5 +84,29 @@ class PickerScreenTest {
         composeTestRule.onNode(hasText(resStringFor(R.string.en)), useUnmergedTree = true).assertExists()
         composeTestRule.onNode(buttonSubmit).performClickResilient()
         org.junit.Assert.assertEquals(listOf(TipLanguage.EN), selected)
+    }
+
+    @Test
+    fun currencyPickerShowsDefaultAndGlyphNameOptionsAndHandsBackTheCode() {
+        val selected = mutableListOf<Any>()
+        composeTestRule.setContent {
+            TipCalculatorWearTheme {
+                PickerScreen(
+                    initialValue = "EUR",
+                    optionsList = OptionsLists.CURRENCY_OPTIONS,
+                    onSubmitPressed = { selected += it },
+                )
+            }
+        }
+
+        composeTestRule.onNode(
+            hasText(resStringFor(R.string.currency_default)), useUnmergedTree = true
+        ).assertExists()
+        composeTestRule.onNode(
+            hasText(resStringFor(R.string.currency_option, "€", resStringFor(R.string.currency_euro))),
+            useUnmergedTree = true
+        ).assertExists()
+        composeTestRule.onNode(buttonSubmit).performClickResilient()
+        org.junit.Assert.assertEquals(listOf("EUR"), selected)
     }
 }

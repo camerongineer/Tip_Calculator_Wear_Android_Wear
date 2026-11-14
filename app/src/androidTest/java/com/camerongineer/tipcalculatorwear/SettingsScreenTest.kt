@@ -36,6 +36,7 @@ class SettingsScreenTest {
     private var roundingNavigations = AtomicInteger(0)
     private var defaultSplitNavigations = AtomicInteger(0)
     private var languageNavigations = AtomicInteger(0)
+    private var currencyNavigations = AtomicInteger(0)
     private var backNavigations = AtomicInteger(0)
 
     private val dataStore = DataStoreManager(ApplicationProvider.getApplicationContext())
@@ -44,7 +45,7 @@ class SettingsScreenTest {
     // asserted string from the app's own resources instead of hardcoding.
     private val res = ApplicationProvider.getApplicationContext<android.content.Context>().resources
 
-    private fun resString(id: Int) = res.getString(id)
+    private fun resString(id: Int, vararg args: Any) = res.getString(id, *args)
 
     private fun toggleRow(labelText: String, on: Boolean): SemanticsMatcher =
         // ToggleChip merges its label Text and the inner Switch ("On"/"Off")
@@ -63,14 +64,19 @@ class SettingsScreenTest {
     }
 
     private fun hostSettings() {
+        // The rounding row renders the flow-resolved symbol; read it so the
+        // host matches whatever the live app would show for this device.
+        val symbol = runBlocking { dataStore.currencySymbolFlow.first() }
         composeTestRule.setContent {
             TipCalculatorWearTheme {
                 SettingsScreen(
                     settingsViewModel = SettingsViewModel(dataStore),
+                    currencySymbol = symbol,
                     navigateToDefaultTipScreen = { defaultTipNavigations.incrementAndGet() },
                     navigateToRoundingNumScreen = { roundingNavigations.incrementAndGet() },
                     navigateToDefaultSplitScreen = { defaultSplitNavigations.incrementAndGet() },
                     navigateToLanguageSelectionScreen = { languageNavigations.incrementAndGet() },
+                    navigateToCurrencySelectionScreen = { currencyNavigations.incrementAndGet() },
                     onBackButtonPressed = { backNavigations.incrementAndGet() },
                 )
             }
@@ -168,6 +174,14 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun currencyChipOpensCurrencyPicker() {
+        hostSettings()
+        val symbol = runBlocking { dataStore.currencySymbolFlow.first() }
+        clickRow(resString(R.string.currency, symbol))
+        org.junit.Assert.assertEquals(1, currencyNavigations.get())
+    }
+
+    @Test
     fun pickerAndBackCallbacksFire() {
         hostSettings()
 
@@ -175,12 +189,14 @@ class SettingsScreenTest {
         clickRow(resString(R.string.round_increment))
         clickRow(resString(R.string.default_split))
         clickRow(res.getString(R.string.language, resString(R.string.en)))
+        clickRow(resString(R.string.currency, runBlocking { dataStore.currencySymbolFlow.first() }))
         clickRow(resString(R.string.back))
 
         org.junit.Assert.assertEquals(1, defaultTipNavigations.get())
         org.junit.Assert.assertEquals(1, roundingNavigations.get())
         org.junit.Assert.assertEquals(1, defaultSplitNavigations.get())
         org.junit.Assert.assertEquals(1, languageNavigations.get())
+        org.junit.Assert.assertEquals(1, currencyNavigations.get())
         org.junit.Assert.assertEquals(1, backNavigations.get())
     }
 }

@@ -54,6 +54,18 @@
     <string name="de">German</string>
     <string name="hi">Hindi</string>
 
+    <!--Currency Options-->
+    <string name="currency">Currency: %s</string>
+    <string name="currency_default">Default (your region)</string>
+    <string name="currency_option" translatable="false">%1$s %2$s</string>
+    <string name="currency_dollar">Dollar</string>
+    <string name="currency_euro">Euro</string>
+    <string name="currency_pound">Pound</string>
+    <string name="currency_lira">Lira</string>
+    <string name="currency_yuan">Yuan</string>
+    <string name="currency_rupee">Rupee</string>
+    <string name="currency_ruble">Ruble</string>
+
     <string name="title_activity_presentation._main" translatable="false">presentation.MainActivity</string>
     <string name="title_activity_main" translatable="false">MainActivity</string>
     <string name="large_text">Large Text Size</string>

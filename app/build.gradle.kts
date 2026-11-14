@@ -18,8 +18,8 @@ android {
         applicationId = "com.camerongineer.tipcalculatorwear"
         minSdk = 30
         targetSdk = 37
-        versionCode = 37
-        versionName = "1.7.6"
+        versionCode = 38
+        versionName = "1.7.7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -53,6 +53,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
             if (System.getenv("CI_KEYSTORE_FILE") != null) {
                 signingConfig = signingConfigs.getByName("ciPlay")
             }

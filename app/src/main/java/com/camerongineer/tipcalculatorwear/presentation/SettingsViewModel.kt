@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.camerongineer.tipcalculatorwear.data.preferences.DataStoreManager
-import com.camerongineer.tipcalculatorwear.presentation.constants.TipCurrency
 import com.camerongineer.tipcalculatorwear.presentation.constants.TipLanguage
 import com.camerongineer.tipcalculatorwear.presentation.theme.Theme
 import kotlinx.coroutines.flow.first
@@ -28,9 +27,6 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
     private val _isPreciseSplit = mutableStateOf(true)
     val isPreciseSplit = _isPreciseSplit
 
-    private val _currencySymbol = mutableStateOf(TipCurrency.USD.symbol)
-    val currencySymbol = _currencySymbol
-
     private val _roundingNum = mutableIntStateOf(DataStoreManager.DEFAULT_ROUNDING_NUM)
     val roundingNum = _roundingNum
 
@@ -39,6 +35,10 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
 
     fun getThemeFlow() = dataStore.themeFlow
     fun saveTheme(theme: Theme) = viewModelScope.launch { dataStore.saveTheme(theme.name) }
+
+    fun setCurrencySymbol(code: String) = viewModelScope.launch {
+        dataStore.saveCurrencySymbol(code)
+    }
 
     fun getLanguageFlow() = dataStore.languageFlow
     fun saveLanguage(tipLanguage: TipLanguage) = viewModelScope.launch {
@@ -59,7 +59,6 @@ class SettingsViewModel(private val dataStore: DataStoreManager): ViewModel() {
             _rememberNumSplit.value = dataStore.rememberNumSplitFlow.first()
             _isPreciseSplit.value = dataStore.preciseSplitFlow.first()
             _roundingNum.intValue = dataStore.roundingNumFlow.first()
-            _currencySymbol.value = dataStore.currencySymbolFlow.first()
         }
     }
 

@@ -21,3 +21,6 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+
+# CI helper scripts run with python3
+__pycache__/
