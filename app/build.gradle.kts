@@ -53,6 +53,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
             if (System.getenv("CI_KEYSTORE_FILE") != null) {
                 signingConfig = signingConfigs.getByName("ciPlay")
             }
