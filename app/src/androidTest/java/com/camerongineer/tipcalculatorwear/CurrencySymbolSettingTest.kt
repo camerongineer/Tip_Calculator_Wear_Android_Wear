@@ -53,17 +53,46 @@ class CurrencySymbolSettingTest {
     private fun currencyChip(symbol: String) =
         hasText(resString(R.string.currency, symbol)) and hasClickAction()
 
-    /** After a recreate the nav host restores the last route; pop back to main. */
+    /** True when the app window, not a SystemUI overlay, owns input focus. */
+    private fun windowHasFocus(): Boolean =
+        composeTestRule.runOnUiThread {
+            composeTestRule.activity.window.decorView.hasWindowFocus()
+        }
+
+    /**
+     * Espresso waits 10s for a focused root. The API 33/34 legs hand input
+     * focus to a SystemUI launch-transition or boot overlay window for longer
+     * than that, so wait it out here and name the stall instead of failing
+     * inside pressBack().
+     */
+    private fun waitForWindowFocus(timeoutMillis: Long = 30_000): Boolean {
+        val deadline = System.currentTimeMillis() + timeoutMillis
+        while (System.currentTimeMillis() < deadline) {
+            if (windowHasFocus()) return true
+            Thread.sleep(250)
+        }
+        return windowHasFocus()
+    }
+
+    /** Back out of the settings routes until the main route is on screen. */
     private fun returnToMainRoute() {
-        fun mainVisible() =
+        fun mainVisible() = runCatching {
             composeTestRule.onAllNodes(hasContentDescription("Keyboard Subtotal"))
                 .fetchSemanticsNodes().isNotEmpty() ||
                 composeTestRule.onAllNodes(hasContentDescription("Display Subtotal"))
                     .fetchSemanticsNodes().isNotEmpty()
+        }.getOrDefault(false)
+
         repeat(4) {
             if (mainVisible()) return
-            Espresso.pressBack()
+            if (!waitForWindowFocus()) {
+                throw AssertionError("no input focus after 30s; ${uiSnapshot()}")
+            }
+            runCatching { Espresso.pressBack() }
             composeTestRule.waitForIdle()
+        }
+        if (!mainVisible()) {
+            throw AssertionError("main route not reached after back presses; ${uiSnapshot()}")
         }
     }
 
@@ -139,6 +168,7 @@ class CurrencySymbolSettingTest {
 
         composeTestRule.onNode(hasText(displayText)).performClickResilient()
         composeTestRule.onNode(submitNode).performClickResilient()
+        waitForWindowFocus()
         composeTestRule.waitForIdle()
     }
 
