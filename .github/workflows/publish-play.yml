@@ -4,12 +4,23 @@ name: Publish to Google Play
 # versionCode in app/build.gradle.kts. Regular merges (no version bump) skip
 # immediately. The upload only happens after the required CI and Wear OS
 # Emulator Tests runs for the SAME commit are green — never publish unverified.
+# Release notes ship with the upload: they are the tagged <en-US>… block in the
+# release PR body, or the release_notes dispatch input.
 
 on:
   push:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      release_notes:
+        description: Tagged release-notes block (<en-US> ... </en-US> ...). Blank = read it from the merged PR body.
+        required: false
+        type: string
+      skip_release_notes:
+        description: Publish without release notes even when none can be found.
+        required: false
+        type: boolean
 
 concurrency:
   group: publish-play
@@ -65,6 +76,46 @@ jobs:
             echo "should_release=true" >> "$GITHUB_OUTPUT"
           else
             echo "should_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve release notes for this release
+        if: steps.version.outputs.should_release == 'true'
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          NOTES_INPUT: ${{ github.event.inputs.release_notes }}
+          SKIP_NOTES: ${{ github.event.inputs.skip_release_notes }}
+        run: |
+          # Notes source priority: the dispatch input, then the body of the PR
+          # that produced this commit. The uploaded whatsnew-<locale> files ARE
+          # the store's per-language release notes, so the tagged block written
+          # into the release PR body is what ships. Fail here rather than after
+          # an hour of gate waiting.
+          SRC="$RUNNER_TEMP/release-notes-src.txt"
+          OUT="$RUNNER_TEMP/whatsnew"
+          if [ -n "$NOTES_INPUT" ]; then
+            echo "release notes source: workflow_dispatch input"
+            printf '%s\n' "$NOTES_INPUT" > "$SRC"
+            SOURCE_ARGS="--text $SRC"
+          else
+            gh api "repos/$GITHUB_REPOSITORY/commits/$SHA/pulls" > "$RUNNER_TEMP/pulls.json"
+            echo "release notes source: PR bodies attached to $SHA"
+            SOURCE_ARGS="--pulls $RUNNER_TEMP/pulls.json"
+          fi
+          set +e
+          result=$(python3 .github/scripts/extract_whatsnew.py $SOURCE_ARGS --out "$OUT")
+          code=$?
+          set -e
+          echo "$result"
+          if [ "$code" -eq 0 ]; then
+            echo "whatsnew_dir=$OUT" >> "$GITHUB_OUTPUT"
+          elif [ "$SKIP_NOTES" = "true" ]; then
+            echo "::warning::No usable release notes; publishing without notes (skip_release_notes=true)."
+            echo "whatsnew_dir=" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Release notes missing or malformed for ${{ steps.version.outputs.version_name }}. Add the full tagged block (<en-US> <de-DE> <es-US> <fr-FR> <pt-BR> <hi-IN>, each under 500 chars) to the release PR body, or re-run this workflow with skip_release_notes=true to publish without notes."
+            exit 1
           fi
 
       - name: Wait for CI and Wear OS Emulator Tests to finish green
@@ -146,8 +197,10 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: ${{ env.PACKAGE }}
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: wear:internal
+          tracks: wear:internal
           releaseName: ${{ steps.version.outputs.version_name }}
+          # Empty when the notes step fell back to no-notes mode.
+          whatsNewDirectory: ${{ steps.notes.outputs.whatsnew_dir }}
           status: completed
           # Play refuses API-driven "send for review" while an app is in a
           # review-required state (e.g. right after a policy rejection). The
